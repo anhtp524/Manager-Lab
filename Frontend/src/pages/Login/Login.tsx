@@ -1,5 +1,16 @@
-const Login = () => {
-  return <div>Login</div>
-}
+import './login.scss';
 
-export default Login
+const Login = () => {
+  return (
+    <div className="login">
+      <div className="loginstudent">
+        <button>Login with student</button>
+      </div>
+      <div className="loginlecture">
+        <button>Login with lecture</button>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
