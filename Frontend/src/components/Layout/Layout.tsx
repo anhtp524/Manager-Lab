@@ -46,7 +46,7 @@ function Layout() {
       <Headertop />
       <div style={{ display: 'flex' }}>
         <Menu
-          style={{ backgroundColor: '#ccc' }}
+          style={{ backgroundColor: '#7ac1df', height: '800px' }}
           onClick={({ key }) => {
             if (key === 'signout') {
               //test
