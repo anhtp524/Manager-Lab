@@ -1,14 +1,26 @@
 .login {
-  .loginstudent {
-    margin-top: 50px;
-    button {
-      border: 1px solid #ccc;
-    }
-  }
-  .loginlecture {
-    margin-top: 50px;
-    button {
-      border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  flex-direction: column;
+  height: 500px;
+  background-color: #ccc;
+
+  .logincontent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px 30px;
+    background-color: bisque;
+    width: 30%;
+    height: 100%;
+    border: 1px solid #ccc;
+    .header {
+      margin-bottom: 20px;
+      font-size: 16px;
+      font-weight: 500;
     }
   }
 }
