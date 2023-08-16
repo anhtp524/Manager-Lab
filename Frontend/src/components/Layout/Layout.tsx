@@ -57,7 +57,7 @@ function Layout() {
         <Menu
           style={{
             backgroundColor: '#0E2554',
-            height: '94vh',
+            height: '95vh',
             color: 'white'
           }}
           onClick={({ key }) => {
