@@ -1,11 +1,20 @@
-import { FolderOutlined, HomeOutlined, ReadOutlined, UnorderedListOutlined } from '@ant-design/icons'
+import {
+  FolderOutlined,
+  GiftOutlined,
+  HeatMapOutlined,
+  HomeOutlined,
+  ReadOutlined,
+  WechatOutlined
+} from '@ant-design/icons'
 import { Menu } from 'antd'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import Homepage from '~/pages/Homepage/Homepage'
+import Labs from '~/pages/Labs/Labs'
 import ManagementProduct from '~/pages/ManagementProduct/ManagementProduct'
 import ManagementStudent from '~/pages/ManagementStudent/ManagementStudent'
 import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
 import Headertop from '../Headertop/Headertop'
+import './layout.scss'
 
 function Layout() {
   const navigate = useNavigate()
@@ -16,32 +25,41 @@ function Layout() {
       icon: <HomeOutlined />
     },
     {
-      label: 'Sinh viên',
-      key: '/student',
-      icon: <UnorderedListOutlined />
+      label: 'Labs',
+      key: '/labs',
+      icon: <HeatMapOutlined />
     },
     {
-      label: 'Quản lí sinh viên',
-      key: '/studentmanagement',
-      icon: <FolderOutlined />
+      label: 'Cuộc thi và giải thưởng',
+      key: '/contestsprizes',
+      icon: <GiftOutlined />
     },
     {
-      label: 'Quản lí sản phẩm',
-      key: '/productmanagement',
+      label: 'Project',
+      key: '/project',
       icon: <FolderOutlined />
     },
     {
       label: 'Bảng tin',
       key: '/newfeed',
       icon: <ReadOutlined />
+    },
+    {
+      label: 'Chat',
+      key: '/chat',
+      icon: <WechatOutlined />
     }
   ]
   return (
-    <div>
+    <div className='layout'>
       <Headertop />
-      <div style={{ display: 'flex' }}>
+      <div className='layoutcontent' style={{ display: 'flex' }}>
         <Menu
-          style={{ backgroundColor: '#7ac1df', height: '800px' }}
+          style={{
+            backgroundColor: '#0E2554',
+            height: '94vh',
+            color: 'white'
+          }}
           onClick={({ key }) => {
             if (key === 'signout') {
               //test
@@ -51,7 +69,9 @@ function Layout() {
           }}
           items={items}
         ></Menu>
-        <Content />
+        <div className='content'>
+          <Content />
+        </div>
       </div>
     </div>
   )
@@ -61,6 +81,7 @@ function Content() {
     <div>
       <Routes>
         <Route path='/' element={<Homepage />}></Route>
+        <Route path='/labs' element={<Labs />}></Route>
         <Route path='/studentmanagement' element={<ManagementStudent />}></Route>
         <Route path='/productmanagement' element={<ManagementProduct />}></Route>
         <Route path='/personalinfo' element={<Personalinfo />}></Route>

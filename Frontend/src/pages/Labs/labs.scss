@@ -1,0 +1,12 @@
+.labsParent {
+  .labscontent {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+
+    .labscontentChild {
+      margin-top: 10px;
+      padding-right: 10px;
+    }
+  }
+}

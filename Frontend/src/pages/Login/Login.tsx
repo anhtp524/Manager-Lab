@@ -1,15 +1,14 @@
+import { Button, Checkbox, Form, Input } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import './login.scss';
-import { Button, Checkbox, Form, Input } from 'antd';
 
 const Login = () => {
   const navigate = useNavigate();
-  const handleLoginStudent = () => {
+  // const handleLoginStudent = () => {};
+  const onFinish = (values: any) => {
+    console.log(values);
     localStorage.setItem('accessToken', true);
     navigate('/');
-  };
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -33,7 +32,7 @@ const Login = () => {
       </div>
     </div> */}
       <div className="logincontent">
-        <div className="header">Đăng nhập để tiếp tục phiên làm việc</div>
+        <div className="header">Đăng nhập để truy cập hệ thống</div>
         <Form
           name="basic"
           labelCol={{ span: 8 }}
