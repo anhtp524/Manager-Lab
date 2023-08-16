@@ -18,6 +18,38 @@
       margin-left: 210px;
       width: 100%;
       padding: 10px 20px;
+
+      .labdetail {
+        .header {
+          font-size: 24px;
+          font-weight: 600;
+          color: #3475e3;
+        }
+        .profile {
+          margin-top: 10px;
+          display: flex;
+          background-color: rgb(238, 244, 255);
+          justify-content: space-between;
+          padding: 20px 30px;
+          .profileuser {
+            height: 100px;
+            width: 100px;
+            object-fit: cover;
+
+            img {
+              height: 100%;
+              width: 100%;
+            }
+          }
+          .profilefuntion {
+            .contact {
+              margin-top: 30px;
+              display: flex;
+              justify-content: space-between;
+            }
+          }
+        }
+      }
     }
   }
 }
