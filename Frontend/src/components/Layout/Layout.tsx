@@ -13,9 +13,11 @@ import Labs from '~/pages/Labs/Labs'
 import ManagementProduct from '~/pages/ManagementProduct/ManagementProduct'
 import ManagementStudent from '~/pages/ManagementStudent/ManagementStudent'
 import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
+import ProfileLecture from '~/pages/ProfileLecture/ProfileLecture'
+import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
 import Headertop from '../Headertop/Headertop'
-import './layout.scss'
 import LabDetail from './../../pages/Labs/LabDetail'
+import './layout.scss'
 
 function Layout() {
   const navigate = useNavigate()
@@ -87,6 +89,8 @@ function Content() {
     <div>
       <Routes>
         <Route path='/' element={<Homepage />}></Route>
+        <Route path='/profile/lecture' element={<ProfileLecture />}></Route>
+        <Route path='/profile/student' element={<ProfileStudent />}></Route>
         <Route path='/labs' element={<Labs />}></Route>
         <Route path='/labsdetail/:id' element={<LabDetail />}></Route>
         <Route path='/studentmanagement' element={<ManagementStudent />}></Route>
