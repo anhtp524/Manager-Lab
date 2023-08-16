@@ -15,6 +15,7 @@ import ManagementStudent from '~/pages/ManagementStudent/ManagementStudent'
 import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
 import Headertop from '../Headertop/Headertop'
 import './layout.scss'
+import LabDetail from './../../pages/Labs/LabDetail'
 
 function Layout() {
   const navigate = useNavigate()
@@ -52,23 +53,28 @@ function Layout() {
   ]
   return (
     <div className='layout'>
-      <Headertop />
-      <div className='layoutcontent' style={{ display: 'flex' }}>
-        <Menu
-          style={{
-            backgroundColor: '#0E2554',
-            height: '95vh',
-            color: 'white'
-          }}
-          onClick={({ key }) => {
-            if (key === 'signout') {
-              //test
-            } else {
-              navigate(key)
-            }
-          }}
-          items={items}
-        ></Menu>
+      <div className='layoutheadertop'>
+        <Headertop />
+      </div>
+      <div className='layoutcontent'>
+        <div className='ctleft'>
+          <Menu
+            style={{
+              backgroundColor: '#0E2554',
+              height: '100vh',
+              color: 'white',
+              marginTop: '51px'
+            }}
+            onClick={({ key }) => {
+              if (key === 'signout') {
+                //test
+              } else {
+                navigate(key)
+              }
+            }}
+            items={items}
+          ></Menu>
+        </div>
         <div className='content'>
           <Content />
         </div>
@@ -82,6 +88,7 @@ function Content() {
       <Routes>
         <Route path='/' element={<Homepage />}></Route>
         <Route path='/labs' element={<Labs />}></Route>
+        <Route path='/labsdetail/:id' element={<LabDetail />}></Route>
         <Route path='/studentmanagement' element={<ManagementStudent />}></Route>
         <Route path='/productmanagement' element={<ManagementProduct />}></Route>
         <Route path='/personalinfo' element={<Personalinfo />}></Route>

@@ -1,34 +1,58 @@
 const dataLab = [
   {
-    title: ' Lab1',
+    title: 'Lab Cô Thoa',
     img: 'lab1'
   },
   {
-    title: ' Lab2',
+    title: 'Lab Cô Thoa',
+
     img: 'lab2'
   },
   {
-    title: ' Lab3',
+    title: 'Lab Cô Thoa',
+
     img: 'lab3'
   },
   {
-    title: ' Lab4',
+    title: 'Lab Cô Thoa',
+
     img: 'lab4'
   },
   {
-    title: ' Lab4',
+    title: 'Lab Cô Thoa',
+
     img: 'lab4'
   },
   {
-    title: ' Lab4',
+    title: 'Lab Cô Thoa',
+
     img: 'lab4'
   },
   {
-    title: ' Lab4',
+    title: 'Lab Cô Thoa',
+
     img: 'lab4'
   },
   {
-    title: ' Lab4',
+    title: 'Lab Cô Thoa',
+
+    img: 'lab4'
+  },
+  {
+    title: 'Lab Cô Thoa',
+
+    img: 'lab4'
+  },
+
+  {
+    title: 'Lab Cô Thoa',
+
+    img: 'lab4'
+  },
+
+  {
+    title: 'Lab Cô Thoa',
+
     img: 'lab4'
   }
 ]

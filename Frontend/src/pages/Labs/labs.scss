@@ -1,8 +1,13 @@
 .labsParent {
+  span {
+    font-weight: 600;
+    font-size: 18px;
+  }
   .labscontent {
     margin-top: 20px;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 
     .labscontentChild {
       margin-top: 10px;

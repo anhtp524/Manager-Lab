@@ -1,7 +1,21 @@
 .layout {
+  scroll-behavior: unset;
+
+  .layoutheadertop {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: white;
+  }
   .layoutcontent {
     display: flex;
+    .ctleft {
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
     .content {
+      margin-left: 200px;
       width: 100%;
       padding: 10px 20px;
     }
