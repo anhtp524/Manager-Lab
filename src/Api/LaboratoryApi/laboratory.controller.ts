@@ -1,20 +1,26 @@
-import { Controller } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { LabboratoryService } from "./laboratory.service";
+import { CreateLaboratoryDto } from "./Dto/laboratory.dto";
 
 @ApiTags("Lab")
 @Controller("lab")
 export class LaboratoryController {
-  constructor(private readonly userService: LabboratoryService) {}
+  constructor(private readonly labService: LabboratoryService) {}
 
-//   @ApiBody({type: CreateUser})
-//   @Post("adduser")
-//   CreateUsers(@Body() newUser: CreateUser) {
-//     return this.userService.add(newUser);
-//   }
+  @ApiBody({type: CreateLaboratoryDto})
+  @Post("createLab")
+  CreateLab(@Body() newUser: CreateLaboratoryDto) {
+    return this.labService.add(newUser);
+  }
 
-//   @Get("getall")
-//   GetAllUser(){
-//     return this.userService.findAll();
-//   }
+  @Get("getall")
+  GetAllLab(){
+    return this.labService.findAll();
+  }
+
+  @Get("/:id")
+  GetLabById(@Param('id') id: string){
+    return this.labService.findOne(id);
+  }
 }

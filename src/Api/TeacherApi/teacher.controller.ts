@@ -1,20 +1,26 @@
-import { Controller } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { TeacherService } from "./teacher.service";
+import { CreateTeacherDto } from "./Dto/teacher.dto";
 
 @ApiTags("Teacher")
 @Controller("teacher")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
-//   @ApiBody({type: CreateUser})
-//   @Post("adduser")
-//   CreateUsers(@Body() newUser: CreateUser) {
-//     return this.userService.add(newUser);
-//   }
+  @Get("getall")
+  GetAllTeacher(){
+    return this.teacherService.findAll();
+  }
 
-//   @Get("getall")
-//   GetAllUser(){
-//     return this.userService.findAll();
-//   }
+  @Get("/:id")
+  GetTeacherById(@Param('id') id: string){
+    return this.teacherService.findOne(id)
+  }
+
+  @ApiBody({type: CreateTeacherDto})
+  @Post("createteacher")
+  CreateStudent(@Body() newStudent: CreateTeacherDto){
+    return this.teacherService.add(newStudent);
+  }
 }

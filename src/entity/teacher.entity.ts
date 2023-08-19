@@ -1,8 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Project } from "./project.entity";
+import { ProjectEntity } from "./project.entity";
+import { LaboratoryEntity } from "./laboratory.entity";
 
-@Entity()
-export class Teacher {
+@Entity({name: "Teacher"})
+export class TeacherEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -13,7 +14,7 @@ export class Teacher {
     dateOfBirth: string;
 
     @Column()
-    departmaent: string;
+    department: string;
 
     @Column()
     major: string;
@@ -24,7 +25,11 @@ export class Teacher {
     @Column()
     email: string;
 
-    @ManyToOne(() => Project)
+    @ManyToOne(() => ProjectEntity)
     @JoinColumn()
-    projectId: Project
+    projectId: ProjectEntity
+
+    @ManyToOne(() => LaboratoryEntity)
+    @JoinColumn()
+    labId: LaboratoryEntity;
 }

@@ -3,6 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './Api/UserApi/users.module';
+import { ProjectModule } from './Api/ProjectApi/project.module';
+import { LaboratoryModule } from './Api/LaboratoryApi/laboratory.module';
+import { StudentModule } from './Api/StudentApi/student.module';
+import { TeacherModule } from './Api/TeacherApi/teacher.module';
 
 @Module({
   imports: [
@@ -14,11 +18,16 @@ import { UsersModule } from './Api/UserApi/users.module';
       password: '17112001',
       database: 'hello_postgre',
       entities: [__dirname + '/**/entity/*.entity{.ts,.js}'], 
-      synchronize: true
+      synchronize: true,
+      autoLoadEntities: true,
     }),
-    UsersModule
+    UsersModule,
+    ProjectModule,
+    LaboratoryModule,
+    StudentModule,
+    TeacherModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

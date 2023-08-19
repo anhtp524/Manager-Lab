@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Project } from "./project.entity";
+import { ProjectEntity } from "./project.entity";
 
-@Entity()
-export class Student {
+@Entity({name: "Student"})
+export class StudentEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -24,7 +24,10 @@ export class Student {
     @Column()
     email: string;
 
-    @ManyToOne(() => Project)
+    @ManyToOne(() => ProjectEntity)
     @JoinColumn()
-    projectId: Project;
+    projectId: ProjectEntity;
+
+    @Column()
+    isApproveToLab: boolean;
 }

@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Laboratory } from "src/entity/laboratory.entity";
+import { LaboratoryEntity } from "src/entity/laboratory.entity";
 import { Repository } from "typeorm";
+import { CreateLaboratoryDto } from "./Dto/laboratory.dto";
 
 @Injectable()
 export class LabboratoryService {
   constructor(
-    @InjectRepository(Laboratory)
-    private labRepository: Repository<Laboratory>,
+    @InjectRepository(LaboratoryEntity)
+    private labRepository: Repository<LaboratoryEntity>,
   ) {}
 
   findAll() {
@@ -23,9 +24,9 @@ export class LabboratoryService {
     return 1;
   }
 
-//   async add(newuser: CreateUser){
-//     const data = await this.projectRepository.create(newuser);
-//     await this.projectRepository.save(data);
-//     return 1;
-//   }
+  async add(newLab: CreateLaboratoryDto){
+    var newLabModel = await this.labRepository.create();
+    await this.labRepository.save(newLabModel);
+    return newLabModel;
+  }
 }

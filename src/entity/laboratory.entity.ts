@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Teacher } from "./teacher.entity";
+import { TeacherEntity } from "./teacher.entity";
 
-@Entity()
-export class Laboratory {
+@Entity({name: "Laboratory"})
+export class LaboratoryEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -12,7 +12,7 @@ export class Laboratory {
     @Column()
     description: string;
 
-    @OneToOne(() => Teacher)
+    @OneToOne(() => TeacherEntity)
     @JoinColumn()
-    idTeacher: Teacher;
+    idTeacher: TeacherEntity;
 }

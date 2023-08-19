@@ -1,13 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Student } from "src/entity/student.entity";
-import { Repository } from "typeorm";
+import { StudentEntity } from "src/entity/student.entity";
+import { IsNull, Repository } from "typeorm";
+import { CreateStudentDto, UpdateStudentDto } from "./Dto/student.dto";
 
 @Injectable()
 export class StudentService {
   constructor(
-    @InjectRepository(Student)
-    private studentRepository: Repository<Student>,
+    @InjectRepository(StudentEntity)
+    private studentRepository: Repository<StudentEntity>,
   ) {}
 
   findAll() {
@@ -23,9 +24,19 @@ export class StudentService {
     return 1;
   }
 
-//   async add(newuser: CreateUser){
-//     const data = await this.projectRepository.create(newuser);
-//     await this.projectRepository.save(data);
-//     return 1;
-//   }
+  async add(newStudent: CreateStudentDto){
+    const data = await this.studentRepository.create(newStudent);
+    await this.studentRepository.save(data);
+    return 1;
+  }
+
+  async updateStudent(id: string, updateModel: UpdateStudentDto){
+    const studentModel = await this.findOne(id);
+    if (!studentModel) throw new HttpException("Error when update student", HttpStatus.BAD_REQUEST);
+    studentModel.dateOfBirth = updateModel.dateOfBirth;
+    studentModel.email = updateModel.email;
+    studentModel.phoneNumber = updateModel.phoneNumber;
+    const res = await this.studentRepository.update(id, studentModel);
+    return res;
+  }
 }
