@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('v1')
   const config = new DocumentBuilder()
     .setTitle('Managerment Lab')
     .setDescription('The Managerment Lab API description')
