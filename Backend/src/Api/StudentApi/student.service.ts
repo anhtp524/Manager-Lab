@@ -39,4 +39,30 @@ export class StudentService {
     const res = await this.studentRepository.update(id, studentModel);
     return res;
   }
+
+  async registerForLab(studentId: string, labId: string){
+    const studentModel = await this.findOne(studentId);
+    if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    studentModel.labId = labId;
+    studentModel.isApproveToLab = false;
+    const res = await this.studentRepository.update(studentId, studentModel);
+    return res;
+  }
+
+  async approveStudentToLab(studentId: string){
+    const studentModel = await this.findOne(studentId);
+    if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    studentModel.isApproveToLab = true;
+    const res = await this.studentRepository.update(studentId, studentModel);
+    return res;
+  }
+
+  async deleteStudentFromLab(studentId: string){
+    const studentModel = await this.findOne(studentId);
+    if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    studentModel.isApproveToLab = false;
+    studentModel.labId = "";
+    const res = await this.studentRepository.update(studentId, studentModel);
+    return res;
+  }
 }

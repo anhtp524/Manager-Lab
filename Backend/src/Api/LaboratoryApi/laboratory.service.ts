@@ -25,7 +25,7 @@ export class LabboratoryService {
   }
 
   async add(newLab: CreateLaboratoryDto){
-    var newLabModel = await this.labRepository.create();
+    var newLabModel = await this.labRepository.create(newLab);
     await this.labRepository.save(newLabModel);
     return newLabModel;
   }
