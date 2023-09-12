@@ -7,16 +7,8 @@ import {
   WechatOutlined
 } from '@ant-design/icons'
 import { Menu } from 'antd'
-import { Route, Routes, useNavigate } from 'react-router-dom'
-import Homepage from '~/pages/Homepage/Homepage'
-import Labs from '~/pages/Labs/Labs'
-import ManagementProduct from '~/pages/ManagementProduct/ManagementProduct'
-import ManagementStudent from '~/pages/ManagementStudent/ManagementStudent'
-import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
-import ProfileLecture from '~/pages/ProfileLecture/ProfileLecture'
-import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Headertop from '../Headertop/Headertop'
-import LabDetail from './../../pages/Labs/LabDetail'
 import './layout.scss'
 
 function Layout() {
@@ -78,26 +70,26 @@ function Layout() {
           ></Menu>
         </div>
         <div className='content'>
-          <Content />
+          <Outlet />
         </div>
       </div>
     </div>
   )
 }
-function Content() {
-  return (
-    <div>
-      <Routes>
-        <Route path='/' element={<Homepage />}></Route>
-        <Route path='/profile/lecture' element={<ProfileLecture />}></Route>
-        <Route path='/profile/student' element={<ProfileStudent />}></Route>
-        <Route path='/labs' element={<Labs />}></Route>
-        <Route path='/labsdetail/:id' element={<LabDetail />}></Route>
-        <Route path='/studentmanagement' element={<ManagementStudent />}></Route>
-        <Route path='/productmanagement' element={<ManagementProduct />}></Route>
-        <Route path='/personalinfo' element={<Personalinfo />}></Route>
-      </Routes>
-    </div>
-  )
-}
+// function Content() {
+//   return (
+//     <div>
+//       <Routes>
+//         <Route path='/' element={<Homepage />}></Route>
+//         <Route path='/profile/lecture' element={<ProfileLecture />}></Route>
+//         <Route path='/profile/student' element={<ProfileStudent />}></Route>
+//         <Route path='/labs' element={<Labs />}></Route>
+//         <Route path='/labsdetail/:id' element={<LabDetail />}></Route>
+//         <Route path='/studentmanagement' element={<ManagementStudent />}></Route>
+//         <Route path='/productmanagement' element={<ManagementProduct />}></Route>
+//         <Route path='/personalinfo' element={<Personalinfo />}></Route>
+//       </Routes>
+//     </div>
+//   )
+// }
 export default Layout
