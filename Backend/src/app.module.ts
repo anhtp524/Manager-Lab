@@ -20,6 +20,9 @@ import { TeacherModule } from './Api/TeacherApi/teacher.module';
       entities: [__dirname + '/**/entity/*.entity{.ts,.js}'], 
       synchronize: true,
       autoLoadEntities: true,
+      migrations: ["dist/migrations/*{.ts,.js}"],
+      migrationsTableName: "migrations_typeorm",
+      migrationsRun: true
     }),
     UsersModule,
     ProjectModule,

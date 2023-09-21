@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TeacherEntity } from "src/entity/teacher.entity";
 import { Repository } from "typeorm";
@@ -28,5 +28,21 @@ export class TeacherService {
     const data = await this.teacherRepository.create(newTeacher);
     await this.teacherRepository.save(data);
     return 1;
+  }
+
+  async deleteTeacherFromLab(teacherId: string){
+    const teacherModel = await this.findOne(teacherId);
+    if (!teacherModel) throw new HttpException("Error when delete teacher", HttpStatus.BAD_REQUEST);
+    teacherModel.labId = "";
+    const res = this.teacherRepository.update(teacherId, teacherModel);
+    return res;
+  }
+
+  async addTeacherToLab(teacherId: string, labId: string){
+    const teacherModel = await this.findOne(teacherId);
+    if (!teacherModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    teacherModel.labId = labId;
+    const res = await this.teacherRepository.update(teacherId, teacherModel);
+    return res;
   }
 }

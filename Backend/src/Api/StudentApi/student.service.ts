@@ -59,7 +59,7 @@ export class StudentService {
 
   async deleteStudentFromLab(studentId: string){
     const studentModel = await this.findOne(studentId);
-    if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    if (!studentModel) throw new HttpException("Error when delete student", HttpStatus.BAD_REQUEST);
     studentModel.isApproveToLab = false;
     studentModel.labId = "";
     const res = await this.studentRepository.update(studentId, studentModel);

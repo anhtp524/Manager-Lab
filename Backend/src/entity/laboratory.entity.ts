@@ -12,7 +12,7 @@ export class LaboratoryEntity {
     @Column()
     description: string;
 
-    @OneToOne(() => TeacherEntity)
-    @JoinColumn()
-    idTeacher: TeacherEntity;
+    @OneToOne(() => TeacherEntity, {eager : false})
+    @JoinColumn({referencedColumnName : "id"})
+    idTeacher: string;
 }

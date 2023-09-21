@@ -27,9 +27,9 @@ export class TeacherEntity {
 
     @ManyToOne(() => ProjectEntity)
     @JoinColumn()
-    projectId: ProjectEntity
+    projectId: string
 
     @ManyToOne(() => LaboratoryEntity)
     @JoinColumn()
-    labId: LaboratoryEntity;
+    labId: string;
 }
