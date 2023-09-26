@@ -7,23 +7,11 @@ import { ProjectModule } from './Api/ProjectApi/project.module';
 import { LaboratoryModule } from './Api/LaboratoryApi/laboratory.module';
 import { StudentModule } from './Api/StudentApi/student.module';
 import { TeacherModule } from './Api/TeacherApi/teacher.module';
+import { dataSourceOptions } from 'db/dataSource';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '17112001',
-      database: 'hello_postgre',
-      entities: [__dirname + '/**/entity/*.entity{.ts,.js}'], 
-      synchronize: true,
-      autoLoadEntities: true,
-      migrations: ["dist/migrations/*{.ts,.js}"],
-      migrationsTableName: "migrations_typeorm",
-      migrationsRun: true
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     UsersModule,
     ProjectModule,
     LaboratoryModule,
