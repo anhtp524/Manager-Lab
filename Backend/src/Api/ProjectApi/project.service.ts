@@ -6,6 +6,8 @@ import { CreateProject } from "./Dto/project.dto";
 import { StudentEntity } from "src/entity/student.entity";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
 import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
+import { DetailProjectModel } from "./Dto/projectView,dto";
+import { json } from "stream/consumers";
 
 @Injectable()
 export class ProjectService {
@@ -39,15 +41,19 @@ export class ProjectService {
 
   async getDetailProject(id: string){
     var studentInProject = await this.studentRepository.createQueryBuilder("s")
-    .select(["s.name", "s.msv"])
+    //.select(["s.name", "s.msv"])
     .leftJoinAndSelect("s.project", "project", "project.id = :id", {id: id})
     .getMany();
     var teacherInProject = await this.teacherProjectRepo.createQueryBuilder("tp")
     //.select(["tp.project.id", "tp.teacher.id"])
     .leftJoinAndSelect("tp.project", "project", "project.id = :id", {id: id})
     .leftJoinAndSelect("tp.teacher", "teacher")    
-    .getMany()
+    .getMany();
     //var tes3 = await this.studentRepository.find({relations: ["project"]});
-    return teacherInProject;             
+    // var detailProject: DetailProjectModel = {
+    //   name: studentInProject[0].project.
+    // }
+    var test = JSON.parse(studentInProject[0].project)
+    return test.name;             
   }
 }
