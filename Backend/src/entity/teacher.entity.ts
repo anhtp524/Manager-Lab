@@ -25,10 +25,6 @@ export class TeacherEntity {
     @Column()
     email: string;
 
-    @ManyToOne(() => ProjectEntity)
-    @JoinColumn()
-    projectId: string
-
     @ManyToOne(() => LaboratoryEntity)
     @JoinColumn()
     labId: string;

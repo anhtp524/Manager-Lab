@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import { CreateProject } from "./Dto/project.dto";
 import { StudentEntity } from "src/entity/student.entity";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
+import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
 
 @Injectable()
 export class ProjectService {
@@ -13,6 +14,8 @@ export class ProjectService {
     private projectRepository: Repository<ProjectEntity>,
     @InjectRepository(StudentEntity)
     private studentRepository: Repository<StudentEntity>,
+    @InjectRepository(TeacherProjectEntity)
+    private teacherProjectRepo: Repository<TeacherProjectEntity>,
   ) {}
 
   findAll() {
@@ -35,16 +38,16 @@ export class ProjectService {
   }
 
   async getDetailProject(id: string){
-    //var testid = UUID.createFromHexString(id)
-    // var studentInProject = await this.projectRepository.createQueryBuilder("Project")
-    //                         .where("Project.id = :id", {id: id})
-    //                         .leftJoinAndSelect("Student.projectIdId", 'Student', "Student.projectIdId = Project.id")
-    //                         .getMany()
-    var tes1 = await this.studentRepository.createQueryBuilder("Student")
-    //  .leftJoinAndSelect("Student.project", "Project", "Student.project = Project.Id")
+    var studentInProject = await this.studentRepository.createQueryBuilder("s")
+    .select(["s.name", "s.msv"])
+    .leftJoinAndSelect("s.project", "project", "project.id = :id", {id: id})
     .getMany();
-    //var tes2 = tes1[0].projectId;
-    var tes3 = await this.studentRepository.find({relations: ["project"]});
-    return tes3;               
+    var teacherInProject = await this.teacherProjectRepo.createQueryBuilder("tp")
+    //.select(["tp.project.id", "tp.teacher.id"])
+    .leftJoinAndSelect("tp.project", "project", "project.id = :id", {id: id})
+    .leftJoinAndSelect("tp.teacher", "teacher")    
+    .getMany()
+    //var tes3 = await this.studentRepository.find({relations: ["project"]});
+    return teacherInProject;             
   }
 }
