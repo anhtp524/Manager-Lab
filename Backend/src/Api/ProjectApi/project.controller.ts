@@ -13,15 +13,21 @@ export class ProjectController {
     return this.projectService.findAll();
   }
 
-  @Get("/:id")
-  GetProjectById(@Param('id') id: string){
-    return this.projectService.findOne(id)
-  }
+  // @Get("/:id")
+  // GetProjectById(@Param('id') id: string){
+  //   return this.projectService.findOne(id)
+  // }
 
   @ApiBody({type: CreateProject})
   @Post("addproject")
   async AddProject(@Body() newProject: CreateProject){
     const result = await this.projectService.add(newProject);
+    return result;
+  }
+
+  @Get("getdetail/:id")
+  async GetDetailProject(@Param('id') id: string){
+    var result = await this.projectService.getDetailProject(id);
     return result;
   }
 

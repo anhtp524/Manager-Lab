@@ -26,8 +26,8 @@ export class StudentEntity {
     email: string;
 
     @ManyToOne(() => ProjectEntity)
-    @JoinColumn()
-    projectId: ProjectEntity;
+    @JoinColumn({name : "projectId"})
+    project: ProjectEntity;
     
     @ManyToOne(() => LaboratoryEntity)
     @JoinColumn()
