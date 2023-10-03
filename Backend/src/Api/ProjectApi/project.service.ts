@@ -40,9 +40,10 @@ export class ProjectService {
   }
 
   async getDetailProject(id: string){
+    var detailProject = new DetailProjectModel();
     var studentInProject = await this.studentRepository.createQueryBuilder("s")
-    //.select(["s.name", "s.msv"])
-    .leftJoinAndSelect("s.project", "project", "project.id = :id", {id: id})
+    //.select(["s.project"])
+    .leftJoinAndSelect("s.project", "Project", "Project.id = :id", {id: id})
     .getMany();
     var teacherInProject = await this.teacherProjectRepo.createQueryBuilder("tp")
     //.select(["tp.project.id", "tp.teacher.id"])
@@ -53,7 +54,6 @@ export class ProjectService {
     // var detailProject: DetailProjectModel = {
     //   name: studentInProject[0].project.
     // }
-    var test = JSON.parse(studentInProject[0].project)
-    return test.name;             
+    return studentInProject;             
   }
 }

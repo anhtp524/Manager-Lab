@@ -9,9 +9,9 @@ export class TeacherProjectEntity {
 
     @ManyToOne(() => TeacherEntity, {eager : false})
     @JoinColumn({referencedColumnName : "id"})
-    teacher: string;
+    teacher: TeacherEntity;
 
     @ManyToOne(() => ProjectEntity, {eager : false})
     @JoinColumn({referencedColumnName : "id"})
-    project: string;
+    project: ProjectEntity;
 }

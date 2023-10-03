@@ -14,5 +14,5 @@ export class LaboratoryEntity {
 
     @OneToOne(() => TeacherEntity, {eager : false})
     @JoinColumn({referencedColumnName : "id"})
-    idTeacher: string;
+    teacher: TeacherEntity;
 }

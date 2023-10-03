@@ -25,13 +25,13 @@ export class StudentEntity {
     @Column()
     email: string;
 
-    @ManyToOne(() => ProjectEntity)
-    @JoinColumn({name : "projectId"})
-    project: string;
+    @ManyToOne(() => ProjectEntity, {eager : true})
+    @JoinColumn({referencedColumnName : "id"})
+    project: ProjectEntity;
     
     @ManyToOne(() => LaboratoryEntity)
-    @JoinColumn()
-    labId: string;
+    @JoinColumn({referencedColumnName : "id"})
+    lab: LaboratoryEntity;
 
     @Column()
     isApproveToLab: boolean;

@@ -25,7 +25,7 @@ export class TeacherEntity {
     @Column()
     email: string;
 
-    @ManyToOne(() => LaboratoryEntity)
+    @ManyToOne(() => LaboratoryEntity, {eager : true})
     @JoinColumn()
-    labId: string;
+    lab: LaboratoryEntity;
 }
