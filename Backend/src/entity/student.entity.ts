@@ -33,6 +33,9 @@ export class StudentEntity {
     @JoinColumn({referencedColumnName : "id"})
     lab: LaboratoryEntity;
 
-    @Column()
+    @Column({nullable: true})
     isApproveToLab: boolean;
+
+    @Column({nullable: true})
+    isApproveToProject: boolean;
 }

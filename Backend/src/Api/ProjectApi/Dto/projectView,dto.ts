@@ -4,16 +4,17 @@ export class TeacherInProject {
 
 export class StudentInProject {
     name: string;
-    msv: string;
+    msv: number;
     class: string;
 }
 
 export class DetailProjectModel {
+    id: string;
     name: string;
     coreTech: string;
     description: string;
     students: StudentInProject[];
-    teacher: TeacherInProject[];
+    teachers: TeacherInProject[];
 }
 
 

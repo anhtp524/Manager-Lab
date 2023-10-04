@@ -10,3 +10,11 @@ export class CreateProject{
     @ApiProperty()
     coreTech: string;
 }
+
+export class RegisterStudentToProjectDto {
+    @ApiProperty()
+    projectId: string;
+
+    @ApiProperty()
+    studentId: string;
+}
