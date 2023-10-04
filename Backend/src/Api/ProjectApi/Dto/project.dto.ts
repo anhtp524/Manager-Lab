@@ -18,3 +18,12 @@ export class RegisterStudentToProjectDto {
     @ApiProperty()
     studentId: string;
 }
+
+export class AprrovalStudentToProjectDto {
+    @ApiProperty()
+    projectId: string;
+
+    @ApiProperty()
+    studentId: string;
+}
+

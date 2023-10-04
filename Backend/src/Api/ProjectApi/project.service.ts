@@ -44,7 +44,7 @@ export class ProjectService {
     var studentInProject = await this.studentRepository.createQueryBuilder("s")
     //.select(["s.project"])
     .leftJoinAndSelect("s.project", "Project", "Project.id = :id", {id: id})
-    .where("s.isApproveToProject = :isApproval", {isApproval: true})
+    //.where("s.isApproveToProject = :isApproval", {isApproval: true})
     .getMany();
     var teacherInProject = await this.teacherProjectRepo.createQueryBuilder("tp")
     .leftJoin("tp.project", "project", "project.id = :id", {id: id})
@@ -79,6 +79,15 @@ export class ProjectService {
     studentModel.project = new ProjectEntity();
     studentModel.project.id = projectId;
     studentModel.isApproveToProject = false;
+    const res = await this.studentRepository.update(studentId, studentModel);
+    return res;
+  }
+
+  async approveToProjectByTeacher(projectId, studentId: string, teacherId: string){
+    var studentModel = await this.studentRepository.findOneBy({id: studentId});
+    if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
+    if (studentModel.project.id !== projectId) throw new HttpException("Invalid project", HttpStatus.BAD_REQUEST);
+    studentModel.isApproveToProject = true;
     const res = await this.studentRepository.update(studentId, studentModel);
     return res;
   }
