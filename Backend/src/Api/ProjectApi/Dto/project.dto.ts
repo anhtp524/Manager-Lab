@@ -27,3 +27,20 @@ export class AprrovalStudentToProjectDto {
     studentId: string;
 }
 
+export class StudentAddDto {
+    
+}
+
+export class ProjectAddDto {
+    @ApiProperty()
+    projectAdd: CreateProject;
+    
+    @ApiProperty()
+    listStudent?: string[];
+
+    @ApiProperty()
+    listTeacher?: string[];
+}
+
+
+

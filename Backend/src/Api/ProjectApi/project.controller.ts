@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { ProjectService } from "./project.service";
-import { AprrovalStudentToProjectDto, CreateProject, RegisterStudentToProjectDto } from "./Dto/project.dto";
+import { AprrovalStudentToProjectDto, CreateProject, ProjectAddDto, RegisterStudentToProjectDto } from "./Dto/project.dto";
 
 @ApiTags("Project")
 @Controller("project")
@@ -42,6 +42,13 @@ export class ProjectController {
   @Post("approvestudenttoproject")
   async ApproveStudentToProject(@Body() registerStudentDto: AprrovalStudentToProjectDto){
     var result = await this.projectService.approveToProjectByTeacher(registerStudentDto.projectId, registerStudentDto.studentId, "");
+    return result;
+  }
+
+  @ApiBody({type: ProjectAddDto})
+  @Post("createproject")
+  async CreateProject(@Body() projectAddDto: ProjectAddDto){
+    var result = await this.projectService.createProject(projectAddDto);
     return result;
   }
 

@@ -1,13 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadGatewayException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ProjectEntity } from "src/entity/project.entity";
-import { Repository } from "typeorm";
-import { CreateProject } from "./Dto/project.dto";
+import { In, Repository } from "typeorm";
+import { CreateProject, ProjectAddDto } from "./Dto/project.dto";
 import { StudentEntity } from "src/entity/student.entity";
 import { UUID } from "typeorm/driver/mongodb/bson.typings";
 import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
 import { DetailProjectModel, StudentInProject, TeacherInProject } from "./Dto/projectView,dto";
 import { json } from "stream/consumers";
+import { TeacherEntity } from "src/entity/teacher.entity";
 
 @Injectable()
 export class ProjectService {
@@ -18,6 +19,8 @@ export class ProjectService {
     private studentRepository: Repository<StudentEntity>,
     @InjectRepository(TeacherProjectEntity)
     private teacherProjectRepo: Repository<TeacherProjectEntity>,
+    @InjectRepository(TeacherEntity)
+    private teacherRepo: Repository<TeacherEntity>
   ) {}
 
   findAll() {
@@ -90,5 +93,39 @@ export class ProjectService {
     studentModel.isApproveToProject = true;
     const res = await this.studentRepository.update(studentId, studentModel);
     return res;
+  }
+
+  async createProject(projectAddDto: ProjectAddDto){
+    const projectModel = this.projectRepository.create(projectAddDto.projectAdd);
+    await this.projectRepository.save(projectModel);
+    if (projectAddDto.listStudent) {
+      var studentsModel = await this.studentRepository.find({where : {id: In(projectAddDto.listStudent)}});
+      if(studentsModel.length !== projectAddDto.listStudent.length) throw new HttpException("", HttpStatus.INTERNAL_SERVER_ERROR);
+      var updateStudentModel = studentsModel.map(student => {
+        student.project = new ProjectEntity();
+        student.project.id = projectModel.id;
+        //student.isApproveToProject = true;
+        return student;
+      })
+
+      await this.studentRepository.save(updateStudentModel);
+    }
+
+    if(projectAddDto.listTeacher) {
+      var teachersModel = await this.teacherRepo.find({where: {id: In(projectAddDto.listTeacher)}});
+      if(teachersModel.length !== projectAddDto.listTeacher.length) throw new BadGatewayException();
+      var teacherProjectsModel = teachersModel.map(teacher => {
+          var teacherProjectModel = new TeacherProjectEntity();
+          teacherProjectModel.teacher = new TeacherEntity();
+          teacherProjectModel.project = new ProjectEntity();
+          teacherProjectModel.teacher.id = teacher.id;
+          teacherProjectModel.project.id = projectModel.id;
+          
+          return this.teacherProjectRepo.create(teacherProjectModel);
+      })
+
+      await this.teacherProjectRepo.save(teacherProjectsModel);
+    }
+    return 1;
   }
 }
