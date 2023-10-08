@@ -1,14 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/entity/user.entity';
-import { CreateUser } from './Dto/users.dto';
+import { CreateUserDto } from './Dto/users.dto';
+import { Role } from 'Core/Enum/role.enum';
+import { StudentEntity } from 'src/entity/student.entity';
+import { TeacherEntity } from 'src/entity/teacher.entity';
+import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { emptyUUID } from 'Core/Constant/uuid.constant';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    @InjectRepository(StudentEntity)
+    private studentRepository: Repository<StudentEntity>,
+    @InjectRepository(TeacherEntity)
+    private teacherRepository: Repository<TeacherEntity>
   ) {}
 
   findAll() {
@@ -20,13 +29,58 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    await this.usersRepository.delete(id);
+    try {
+
+      await this.usersRepository.delete(id);
+      return 1;
+    }
+    catch (e) {
+      throw new BadRequestException("Error when delete user");
+    }
+  }
+
+  async add(newuser: CreateUserDto){
+    var userAdd = {
+      email: newuser.email,
+      password: newuser.password,
+      role: newuser.role
+    }
+    const userModel = await this.usersRepository.create(userAdd);
+    if(newuser.role === Role.Student) {
+      var studentModel = this.studentRepository.create(newuser.studentAdd);
+      studentModel.email = newuser.email;
+      try {
+        await this.studentRepository.save(studentModel);
+      }
+      catch (error) {
+        throw new BadRequestException(error.message);
+      }
+      userModel.memberId = studentModel.id;
+    }
+    else if(newuser.role === Role.Teacher) {
+      var teacherModel = this.teacherRepository.create(newuser.teacherAdd);
+      teacherModel.email = newuser.email;
+      try {
+        await this.teacherRepository.save(teacherModel);
+      }
+      catch (ex) {
+        throw new BadRequestException(ex.message);
+      }
+      userModel.memberId = teacherModel.id;
+    }
+    else {
+      userModel.memberId = emptyUUID;
+    }
+
+    await this.usersRepository.save(userModel);
     return 1;
   }
 
-  async add(newuser: CreateUser){
-    const data = await this.usersRepository.create(newuser);
-    await this.usersRepository.save(data);
-    return 1;
+  async findUserByEmail(email: string){
+    const userModel = await this.usersRepository.findOneBy({email: email});
+    if(!userModel) throw new UnauthorizedException("Error when find user");
+    return userModel;
   }
+
+
 }

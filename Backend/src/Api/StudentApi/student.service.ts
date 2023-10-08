@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { StudentEntity } from "src/entity/student.entity";
 import { IsNull, Repository } from "typeorm";
@@ -15,8 +15,13 @@ export class StudentService {
     return this.studentRepository.find();
   }
 
-  findOne(id: string) {
-    return this.studentRepository.findOneBy({ id });
+  async findStudentById(id: string) {
+    try{
+      return await this.studentRepository.findOneBy({ id : id });
+    }
+    catch (e) {
+      throw new BadRequestException("Error when find student");
+    }
   }
 
   async remove(id: number) {
@@ -31,7 +36,7 @@ export class StudentService {
   }
 
   async updateStudent(id: string, updateModel: UpdateStudentDto){
-    const studentModel = await this.findOne(id);
+    const studentModel = await this.findStudentById(id);
     if (!studentModel) throw new HttpException("Error when update student", HttpStatus.BAD_REQUEST);
     studentModel.dateOfBirth = updateModel.dateOfBirth;
     studentModel.email = updateModel.email;
@@ -41,7 +46,7 @@ export class StudentService {
   }
 
   async registerForLab(studentId: string, labId: string){
-    const studentModel = await this.findOne(studentId);
+    const studentModel = await this.findStudentById(studentId);
     if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
     //studentModel.lab = labId;
     studentModel.isApproveToLab = false;
@@ -50,7 +55,7 @@ export class StudentService {
   }
 
   async approveStudentToLab(studentId: string){
-    const studentModel = await this.findOne(studentId);
+    const studentModel = await this.findStudentById(studentId);
     if (!studentModel || studentModel.lab === null) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
     studentModel.isApproveToLab = true;
     const res = await this.studentRepository.update(studentId, studentModel);
@@ -58,7 +63,7 @@ export class StudentService {
   }
 
   async deleteStudentFromLab(studentId: string){
-    const studentModel = await this.findOne(studentId);
+    const studentModel = await this.findStudentById(studentId);
     if (!studentModel) throw new HttpException("Error when delete student", HttpStatus.BAD_REQUEST);
     studentModel.isApproveToLab = false;
     studentModel.lab = null;

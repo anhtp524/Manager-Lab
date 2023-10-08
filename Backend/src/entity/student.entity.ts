@@ -13,7 +13,7 @@ export class StudentEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column({})
     dateOfBirth: string;
 
     @Column()

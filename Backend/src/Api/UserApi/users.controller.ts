@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUser } from './Dto/users.dto';
+import { CreateUserDto } from './Dto/users.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 
@@ -9,9 +9,9 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @ApiBody({type: CreateUser})
+  @ApiBody({type: CreateUserDto})
   @Post("adduser")
-  CreateUsers(@Body() newUser: CreateUser) {
+  CreateUsers(@Body() newUser: CreateUserDto) {
     return this.userService.add(newUser);
   }
 

@@ -10,7 +10,7 @@ export class TeacherEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column({})
     dateOfBirth: string;
 
     @Column()

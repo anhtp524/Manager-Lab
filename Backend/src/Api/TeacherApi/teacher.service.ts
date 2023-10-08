@@ -15,7 +15,7 @@ export class TeacherService {
     return this.teacherRepository.find();
   }
 
-  findOne(id: string) {
+  findTeacherById(id: string) {
     return this.teacherRepository.findOneBy({ id });
   }
 
@@ -31,7 +31,7 @@ export class TeacherService {
   }
 
   async deleteTeacherFromLab(teacherId: string){
-    const teacherModel = await this.findOne(teacherId);
+    const teacherModel = await this.findTeacherById(teacherId);
     if (!teacherModel) throw new HttpException("Error when delete teacher", HttpStatus.BAD_REQUEST);
     //teacherModel.lab = "";
     const res = this.teacherRepository.update(teacherId, teacherModel);
@@ -39,7 +39,7 @@ export class TeacherService {
   }
 
   async addTeacherToLab(teacherId: string, labId: string){
-    const teacherModel = await this.findOne(teacherId);
+    const teacherModel = await this.findTeacherById(teacherId);
     if (!teacherModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
     //teacherModel.lab = labId;
     const res = await this.teacherRepository.update(teacherId, teacherModel);

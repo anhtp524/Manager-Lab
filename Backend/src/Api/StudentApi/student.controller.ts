@@ -15,7 +15,7 @@ export class StudentController {
 
   @Get("/:id")
   GetProjectById(@Param('id') id: string){
-    return this.studentService.findOne(id)
+    return this.studentService.findStudentById(id)
   }
 
   @ApiBody({type: CreateStudentDto})

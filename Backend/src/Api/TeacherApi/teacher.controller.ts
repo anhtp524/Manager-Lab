@@ -15,7 +15,7 @@ export class TeacherController {
 
   @Get("/:id")
   GetTeacherById(@Param('id') id: string){
-    return this.teacherService.findOne(id)
+    return this.teacherService.findTeacherById(id)
   }
 
   @ApiBody({type: CreateTeacherDto})
