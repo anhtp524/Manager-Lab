@@ -6,8 +6,8 @@ import { CreateUserDto } from './Dto/users.dto';
 import { Role } from 'Core/Enum/role.enum';
 import { StudentEntity } from 'src/entity/student.entity';
 import { TeacherEntity } from 'src/entity/teacher.entity';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 import { emptyUUID } from 'Core/Constant/uuid.constant';
+import * as bcrypt from "bcrypt"
 
 @Injectable()
 export class UsersService {
@@ -71,7 +71,7 @@ export class UsersService {
     else {
       userModel.memberId = emptyUUID;
     }
-
+    userModel.password = await bcrypt.hash(newuser.password, 10);
     await this.usersRepository.save(userModel);
     return 1;
   }
