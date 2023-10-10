@@ -2,6 +2,7 @@ import { UserOutlined } from '@ant-design/icons'
 import { Dropdown, MenuProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import './headertop.scss'
+import Image from '~/assets/Image'
 const Headertop = () => {
   const navigate = useNavigate()
   const handleClickgotoInfoPage = () => {
@@ -23,7 +24,8 @@ const Headertop = () => {
     <div className='headertop'>
       <div className='hdleft'>
         <div className='img'>
-          <img src='https://dongphucgiadinh.com/wp-content/uploads/2022/09/logo-dai-hoc-bach-khoa.png' alt='' />
+          <img src={Image.logoUat} alt='' />
+          <p className='img-title'>Quản lí sinh viên trong phòng thí nghiệm</p>
         </div>
       </div>
       <Dropdown menu={{ items }} placement='bottomRight' arrow>

@@ -10,9 +10,21 @@
     width: 100px;
     height: 100%;
     object-fit: cover;
-    img {
-      height: 100%;
-      width: 100%;
+    .img {
+      width: 480px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      img {
+        width: 10%;
+      }
+      .img-title {
+        margin-left: 10px;
+        height: 50px;
+        line-height: 50px;
+        margin-bottom: -4px;
+        text-transform: uppercase;
+      }
     }
   }
   .hdright {
