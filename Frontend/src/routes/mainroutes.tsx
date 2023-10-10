@@ -16,7 +16,7 @@ import Login from '~/pages/Login/Login'
 
 const router = createBrowserRouter([
   {
-    path: RoutePath.Index,
+    path: RoutePath.HomePage,
     element: <Layout />,
     errorElement: <ErrorPage />,
     children: [
@@ -29,15 +29,15 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.ProfileLecture,
+        path: RoutePath.Labs,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <ProfileLecture />
+            <Labs />
           </Suspense>
         )
       },
       {
-        path: RoutePath.ProfileStudent,
+        path: RoutePath.ContestSprizes,
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ProfileStudent />
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.ManagementProduct,
+        path: RoutePath.Newfeed,
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ManagementProduct />
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.ManagementStudent,
+        path: RoutePath.Project,
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ManagementStudent />
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.Personalinfo,
+        path: RoutePath.Newfeed,
         element: (
           <Suspense fallback={<Lazyloading />}>
             <Personalinfo />
@@ -69,10 +69,10 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.Labs,
+        path: RoutePath.Chat,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <Labs />
+            <ProfileLecture />
           </Suspense>
         )
       },

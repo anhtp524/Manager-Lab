@@ -1,5 +1,9 @@
 export enum RoutePath {
-  Index = '/',
+  HomePage = '/',
+  ContestSprizes = '/contestsprizes',
+  Project = '/project',
+  Newfeed = '/newfeed',
+  Chat = '/chat',
   Login = '/login',
   NotFoundPage = '/notfoundpage',
   ProfileLecture = '/profile/lecture',
