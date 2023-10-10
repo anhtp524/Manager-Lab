@@ -15,7 +15,7 @@ function Layout() {
   const navigate = useNavigate()
   const items = [
     {
-      label: 'Trang chủ',
+      label: 'Home',
       key: '/',
       icon: <HomeOutlined />
     },
@@ -25,7 +25,7 @@ function Layout() {
       icon: <HeatMapOutlined />
     },
     {
-      label: 'Cuộc thi và giải thưởng',
+      label: 'Contests and prizes',
       key: '/contestsprizes',
       icon: <GiftOutlined />
     },
@@ -35,7 +35,7 @@ function Layout() {
       icon: <FolderOutlined />
     },
     {
-      label: 'Bảng tin',
+      label: 'New feed',
       key: '/newfeed',
       icon: <ReadOutlined />
     },

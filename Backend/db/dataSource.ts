@@ -1,4 +1,4 @@
-import { DataSource, DataSourceOptions } from "typeorm";
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const dataSourceOptions: DataSourceOptions  = {
     type: 'postgres',
@@ -6,7 +6,7 @@ export const dataSourceOptions: DataSourceOptions  = {
     port: 5432,
     username: 'postgres',
     //password: 'anhtp524',
-    password: '17112001',
+    password: '1',
     database: 'hello_postgre',
     entities: ['dist/src/entity/*.entity{.ts,.js}'], 
     synchronize: true,
