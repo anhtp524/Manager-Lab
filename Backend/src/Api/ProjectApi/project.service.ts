@@ -61,7 +61,7 @@ export class ProjectService {
     detailProject.students = studentInProject.map(x => {
       let student: StudentInProject = {
         name: x.name,
-        msv: x.msv,
+        msv: x.studentCode,
         class: x.class
       }
       return student;

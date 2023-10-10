@@ -8,7 +8,7 @@ export class StudentEntity {
     id: string;
 
     @Column({unique: true})
-    msv: number;
+    studentCode: number;
 
     @Column()
     name: string;

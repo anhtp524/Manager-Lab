@@ -24,11 +24,11 @@ export class AuthService {
         if (!checkPassword) throw new UnauthorizedException("Password is wrong");
         if(userModel.role == Role.Student) {
             const studentModel = this.studentService.findStudentById(userModel.memberId);
-            if (!studentModel) throw new UnauthorizedException("User in not valid");
+            if (!studentModel) throw new UnauthorizedException("User is not valid");
         }
         else if (userModel.role == Role.Teacher) {
             const teacherModel = this.teacherService.findTeacherById(userModel.memberId);
-            if (!teacherModel) throw new UnauthorizedException("User in not valid");
+            if (!teacherModel) throw new UnauthorizedException("User is not valid");
         }
         const accessKey =  "access_key";
         const accessToken = await this.signToken(userModel, accessKey, "2h");

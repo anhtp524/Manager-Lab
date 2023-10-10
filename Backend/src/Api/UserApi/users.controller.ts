@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './Dto/users.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @ApiTags("User")
@@ -15,8 +16,11 @@ export class UsersController {
     return this.userService.add(newUser);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get("getall")
-  GetAllUser(){
+  GetAllUser(@Req() req){
+    var test = req.user;
+    console.log(test);
     return this.userService.findAll();
   }
 }

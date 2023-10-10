@@ -70,4 +70,9 @@ export class StudentService {
     const res = await this.studentRepository.update(studentId, studentModel);
     return res;
   }
+
+  async findStudentByStudentCode(studentCode: number) {
+    var studentModel = await this.studentRepository.findOneBy({studentCode : studentCode});
+    return studentModel;
+  }
 }

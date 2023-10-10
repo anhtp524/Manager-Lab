@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { StudentService } from "./student.service";
 import { CreateStudentDto, UpdateStudentDto } from "./Dto/student.dto";
@@ -13,7 +13,7 @@ export class StudentController {
     return this.studentService.findAll();
   }
 
-  @Get("/:id")
+  @Get("getstudentbyid/:id")
   GetProjectById(@Param('id') id: string){
     return this.studentService.findStudentById(id)
   }
@@ -29,5 +29,11 @@ export class StudentController {
   async UpdateStudent(@Body() updateStudent: UpdateStudentDto){
     var res = await this.studentService.updateStudent(updateStudent.id, updateStudent);
     return res;
+  }
+
+  @Get("getstudentbycode")
+  async GetStudentByStudentCode(@Query('studentCode') studentCode: number ){
+    var result = this.studentService.findStudentByStudentCode(studentCode);
+    return result;
   }
 }
