@@ -1,7 +1,7 @@
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import config from './config'
 
-const fetchHandler = axios.create(config.api)
+const fetchHandler = axios.create(config)
 
 // Request interceptor
 fetchHandler.interceptors.request.use(
@@ -13,7 +13,7 @@ fetchHandler.interceptors.request.use(
   }
 )
 
-const downloadHandler = axios.create(config.api)
+const downloadHandler = axios.create(config)
 // Request interceptor
 downloadHandler.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {

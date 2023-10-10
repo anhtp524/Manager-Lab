@@ -12,7 +12,10 @@ import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
 import ProfileLecture from '~/pages/ProfileLecture/ProfileLecture'
 import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
 import { RoutePath } from './util'
-import Login from '~/pages/Login/Login'
+import AuthenLayout from '~/components/Layout/AuthenLayout'
+import Login from '~/pages/Authen/Login'
+import ForgotPassword from '~/pages/Authen/ForgotPassword'
+import ProtectedRoutes from './ProtectedRoutes'
 
 const router = createBrowserRouter([
   {
@@ -87,10 +90,35 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: RoutePath.Login,
+    path: RoutePath.Auth,
+    element: <AuthenLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: RoutePath.Login,
+        element: (
+          <Suspense fallback={<Lazyloading />}>
+            <Login />
+          </Suspense>
+        )
+      },
+      {
+        path: RoutePath.Forgotpass,
+        element: (
+          <Suspense fallback={<Lazyloading />}>
+            <ForgotPassword />
+          </Suspense>
+        )
+      }
+    ]
+  },
+  {
+    path: '*',
     element: (
       <Suspense fallback={<Lazyloading />}>
-        <Login />
+        <ProtectedRoutes>
+          <ErrorPage />
+        </ProtectedRoutes>
       </Suspense>
     )
   }

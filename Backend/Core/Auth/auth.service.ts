@@ -31,7 +31,7 @@ export class AuthService {
             if (!teacherModel) throw new UnauthorizedException("User in not valid");
         }
         const accessKey =  "access_key";
-        const accessToken = this.signToken(userModel, accessKey, "2h");
+        const accessToken = await this.signToken(userModel, accessKey, "2h");
         return {
             id: userModel.id,
             role: userModel.role,
