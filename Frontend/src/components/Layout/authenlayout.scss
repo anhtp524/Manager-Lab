@@ -1,0 +1,13 @@
+.main-auth {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(#80FFDB, #5390D9);
+    .content {
+        width: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

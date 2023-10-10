@@ -8,6 +8,7 @@ import { LaboratoryModule } from './Api/LaboratoryApi/laboratory.module';
 import { StudentModule } from './Api/StudentApi/student.module';
 import { TeacherModule } from './Api/TeacherApi/teacher.module';
 import { dataSourceOptions } from 'db/dataSource';
+import { AuthModule } from 'Core/Auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { dataSourceOptions } from 'db/dataSource';
     LaboratoryModule,
     StudentModule,
     TeacherModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],

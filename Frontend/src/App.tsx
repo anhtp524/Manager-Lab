@@ -1,5 +1,5 @@
 import { RouterProvider } from 'react-router-dom'
-import './App.css'
+import 'antd/dist/reset.css'
 import router from './routes/mainroutes'
 
 function App() {
