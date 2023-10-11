@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
+import { IsUUID } from "class-validator";
 
 export class CreateStudentDto {
     @ApiProperty()
@@ -31,4 +32,14 @@ export class UpdateStudentDto {
     @ApiProperty()
     email: string;
 
+}
+
+export class RegisterToLabDto {
+    @ApiProperty()
+    @IsUUID()
+    studentId: string;
+
+    @ApiProperty()
+    @IsUUID()
+    labId: string;
 }

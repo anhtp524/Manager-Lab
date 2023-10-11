@@ -18,3 +18,19 @@ export class CreateTeacherDto {
     @ApiProperty()
     phoneNumber: string;
 }
+
+export class SearchTeacherDto {
+    @ApiProperty()
+    searchName: string;
+
+    @ApiProperty()
+    labId: string;
+}
+
+export class AddTeacherLabDto {
+    @ApiProperty()
+    teacherId: string;
+
+    @ApiProperty()
+    labId: string;
+}

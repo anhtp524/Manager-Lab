@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TeacherEntity } from "src/entity/teacher.entity";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { CreateTeacherDto } from "./Dto/teacher.dto";
+import { LaboratoryEntity } from "src/entity/laboratory.entity";
 
 @Injectable()
 export class TeacherService {
@@ -11,12 +12,12 @@ export class TeacherService {
     private teacherRepository: Repository<TeacherEntity>,
   ) {}
 
-  findAll() {
-    return this.teacherRepository.find();
+  async findAll() {
+    return await this.teacherRepository.find();
   }
 
-  findTeacherById(id: string) {
-    return this.teacherRepository.findOneBy({ id });
+  async findTeacherById(id: string) {
+    return await this.teacherRepository.findOneBy({ id });
   }
 
   async remove(id: number) {
@@ -33,7 +34,7 @@ export class TeacherService {
   async deleteTeacherFromLab(teacherId: string){
     const teacherModel = await this.findTeacherById(teacherId);
     if (!teacherModel) throw new HttpException("Error when delete teacher", HttpStatus.BAD_REQUEST);
-    //teacherModel.lab = "";
+    teacherModel.lab = null
     const res = this.teacherRepository.update(teacherId, teacherModel);
     return res;
   }
@@ -41,8 +42,26 @@ export class TeacherService {
   async addTeacherToLab(teacherId: string, labId: string){
     const teacherModel = await this.findTeacherById(teacherId);
     if (!teacherModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
-    //teacherModel.lab = labId;
+    teacherModel.lab = new LaboratoryEntity();
+    teacherModel.lab.id = labId;
     const res = await this.teacherRepository.update(teacherId, teacherModel);
     return res;
+  }
+
+  async getListTeacherByNameInLab(searchName: string, labId: string) {
+    var listTeacherModel = await this.teacherRepository.find({
+      relations : {
+        lab : true,
+      },
+      where : {
+        lab : {
+          id : labId
+        },
+        name : Like(`%${searchName}%`)
+      }
+    })
+
+    return listTeacherModel;
+
   }
 }

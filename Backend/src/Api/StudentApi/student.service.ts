@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { StudentEntity } from "src/entity/student.entity";
 import { IsNull, Repository } from "typeorm";
 import { CreateStudentDto, UpdateStudentDto } from "./Dto/student.dto";
+import { LaboratoryEntity } from "src/entity/laboratory.entity";
 
 @Injectable()
 export class StudentService {
@@ -48,7 +49,8 @@ export class StudentService {
   async registerForLab(studentId: string, labId: string){
     const studentModel = await this.findStudentById(studentId);
     if (!studentModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
-    //studentModel.lab = labId;
+    studentModel.lab = new LaboratoryEntity();
+    studentModel.lab.id =labId;
     studentModel.isApproveToLab = false;
     const res = await this.studentRepository.update(studentId, studentModel);
     return res;
@@ -62,7 +64,7 @@ export class StudentService {
     return res;
   }
 
-  async deleteStudentFromLab(studentId: string){
+  async deleteOrRejectStudentFromLab(studentId: string){
     const studentModel = await this.findStudentById(studentId);
     if (!studentModel) throw new HttpException("Error when delete student", HttpStatus.BAD_REQUEST);
     studentModel.isApproveToLab = false;
