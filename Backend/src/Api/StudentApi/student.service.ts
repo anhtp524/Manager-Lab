@@ -77,4 +77,19 @@ export class StudentService {
     var studentModel = await this.studentRepository.findOneBy({studentCode : studentCode});
     return studentModel;
   }
+
+  async getStudentInLab(labId: string) {
+    var listStudent = await this.studentRepository.find({
+      relations : {
+        lab : true
+      },
+      where : {
+        lab : {
+          id : labId
+        },
+        isApproveToLab : true
+      }
+    });
+    return listStudent;
+  }
 }

@@ -58,4 +58,10 @@ export class StudentController {
     return result;
   }
 
+  @Get("getstudentinlab/:labId")
+  async GetStuentInLab(@Param('labId')labId: string) {
+    var res = await this.studentService.getStudentInLab(labId);
+    return res;
+  }
+
 }
