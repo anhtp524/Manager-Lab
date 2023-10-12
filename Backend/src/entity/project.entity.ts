@@ -1,5 +1,6 @@
 import { ProjectStatus } from "Core/Enum/ProjectEnum";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { LaboratoryEntity } from "./laboratory.entity";
 
 @Entity({name: "Project"})
 export class ProjectEntity {
@@ -17,6 +18,10 @@ export class ProjectEntity {
 
     @Column({type : "enum", enum : ProjectStatus, default : ProjectStatus.Draft })
     status: ProjectStatus;
+
+    @ManyToOne(() => LaboratoryEntity, {eager : true})
+    @JoinColumn({referencedColumnName : 'id'})
+    lab: LaboratoryEntity;
 }
 
 

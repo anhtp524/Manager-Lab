@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { TeacherService } from "./teacher.service";
 import { AddTeacherLabDto, CreateTeacherDto, SearchTeacherDto } from "./Dto/teacher.dto";
+import { AuthGuard } from "@nestjs/passport";
 
 @ApiTags("Teacher")
+@UseGuards(AuthGuard('jwt'))
 @Controller("teacher")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
@@ -46,4 +48,9 @@ export class TeacherController {
     return res;
   }
 
+  @Get("getteacherinlab/:labId")
+  async GetTeacherInLab(@Param('labId') labId: string){
+    var res = await this.teacherService.getTeacherInLab(labId);
+    return res;
+  }
 }

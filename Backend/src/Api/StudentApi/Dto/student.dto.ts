@@ -4,7 +4,7 @@ import { IsUUID } from "class-validator";
 
 export class CreateStudentDto {
     @ApiProperty()
-    msv: number;
+    studentCode: number;
 
     @ApiProperty()
     name: string;

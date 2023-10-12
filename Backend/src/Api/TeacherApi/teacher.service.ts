@@ -59,9 +59,23 @@ export class TeacherService {
         },
         name : Like(`%${searchName}%`)
       }
-    })
+    });
 
     return listTeacherModel;
+  }
 
+  async getTeacherInLab(labId: string) {
+    var listTeacherInLab = await this.teacherRepository.find({
+      relations : {
+        lab : true
+      },
+      where : {
+        lab : {
+          id : labId
+        }
+      }
+    });
+
+    return listTeacherInLab;
   }
 }

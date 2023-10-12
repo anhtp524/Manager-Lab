@@ -1,15 +1,19 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { ProjectService } from "./project.service";
 import { AprrovalStudentToProjectDto, CreateProject, ProjectAddDto, RegisterStudentToProjectDto } from "./Dto/project.dto";
+import { AuthGuard } from "@nestjs/passport";
 
 @ApiTags("Project")
+@UseGuards(AuthGuard('jwt'))
 @Controller("project")
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Get("getall")
-  GetAllProject(){
+  GetAllProject(@Req() req){
+    console.log(req.user);
+    
     return this.projectService.findAll();
   }
 
@@ -50,6 +54,12 @@ export class ProjectController {
   async CreateProject(@Body() projectAddDto: ProjectAddDto){
     var result = await this.projectService.createProject(projectAddDto);
     return result;
+  }
+
+  @Get("getprojectinlab/:id")
+  async GetProjectInLab(labId: string) {
+    var res = await this.projectService.GetProjectInLab(labId);
+    return res;
   }
 
 }

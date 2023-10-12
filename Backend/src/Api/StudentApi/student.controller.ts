@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiBody, ApiTags } from "@nestjs/swagger";
 import { StudentService } from "./student.service";
 import { CreateStudentDto, RegisterToLabDto, UpdateStudentDto } from "./Dto/student.dto";
+import { AuthGuard } from "@nestjs/passport";
 
 @ApiTags("Student")
+@UseGuards(AuthGuard('jwt'))
 @Controller("student")
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}

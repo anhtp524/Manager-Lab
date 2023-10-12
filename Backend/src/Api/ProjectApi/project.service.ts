@@ -128,4 +128,18 @@ export class ProjectService {
     }
     return 1;
   }
+
+  async GetProjectInLab(labId: string) {
+    var listProjectModel = await this.projectRepository.find({
+      relations : {
+        lab : true
+      },
+      where : {
+        lab : {
+          id : labId
+        }
+      }
+    });
+    return 1;
+  }
 }
