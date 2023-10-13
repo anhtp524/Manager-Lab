@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { TeacherService } from "./teacher.service";
 import { AddTeacherLabDto, CreateTeacherDto, SearchTeacherDto } from "./Dto/teacher.dto";
 import { AuthGuard } from "@nestjs/passport";
 
 @ApiTags("Teacher")
+@ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller("teacher")
 export class TeacherController {

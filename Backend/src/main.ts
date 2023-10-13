@@ -10,9 +10,10 @@ async function bootstrap() {
     credentials: true,});
   app.setGlobalPrefix('v1/api')
   const config = new DocumentBuilder()
-    .setTitle('Managerment Lab')
-    .setDescription('The Managerment Lab API description')
+    .setTitle('Laboratory management')
+    .setDescription('The Laboratory management API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

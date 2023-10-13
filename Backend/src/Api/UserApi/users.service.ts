@@ -20,8 +20,8 @@ export class UsersService {
     private teacherRepository: Repository<TeacherEntity>
   ) {}
 
-  findAll() {
-    return this.usersRepository.find();
+  async findAll() {
+    return await this.usersRepository.find();
   }
 
   findOne(id: string) {
@@ -80,6 +80,34 @@ export class UsersService {
     const userModel = await this.usersRepository.findOneBy({email: email});
     if(!userModel) throw new UnauthorizedException("Error when find user");
     return userModel;
+  }
+
+  async getProfileUser(memberId: string, role : Role ) {
+    var profileUser : (StudentEntity | TeacherEntity);
+    if (role == Role.Student) {
+      profileUser = await this.studentRepository.findOne({
+        relations : {
+          project : true,
+          lab : true
+        },
+        where : {
+          id : memberId
+        }
+      });
+    }
+    else if (role == Role.Teacher) {
+      profileUser = await this.teacherRepository.findOne({
+        relations : {
+          lab : true
+        },
+        where : {
+          id : memberId
+        }
+      });
+    }
+
+    return profileUser;
+
   }
 
 

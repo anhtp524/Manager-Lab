@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { LabboratoryService } from "./laboratory.service";
 import { CreateLaboratoryDto } from "./Dto/laboratory.dto";
 import { AuthGuard } from "@nestjs/passport";
 
 @ApiTags("Lab")
+@ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller("lab")
 export class LaboratoryController {

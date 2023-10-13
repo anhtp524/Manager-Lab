@@ -1,10 +1,13 @@
 import { Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UploadFileDto } from './Dto/users.dto';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CloudinaryService } from 'Core/Cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
+import { Payload } from 'Core/CoreModel/Payload.model';
+import { plainToInstance } from 'class-transformer';
 
 
 @ApiTags("User")
@@ -18,12 +21,13 @@ export class UsersController {
     return this.userService.add(newUser);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Get("getall")
-  GetAllUser(@Req() req){
-    var test = req.user;
-    console.log(test);
-    return this.userService.findAll();
+  @UseGuards(AuthGuard('jwt'))
+  async GetAllUser(@Req() req: Request){
+    var test = plainToInstance(Payload, req.user);
+    console.log(test, test.memberId, test.role);
+    return await this.userService.findAll();
   }
 
   @ApiConsumes('multipart/form-data')
@@ -34,4 +38,14 @@ export class UsersController {
     const result = await this.cloudService.uploadImageToCloudinary(file);
     return result.url;
   }
+  
+  @ApiBearerAuth()
+  @Get("getprofileuser")
+  @UseGuards(AuthGuard('jwt'))
+  async GetProfileUser(@Req() req ) {
+    const userPayload : Payload = req.user;
+    var result = await this.userService.getProfileUser(userPayload.memberId, userPayload.role);
+    return result;
+  }
+  
 }
