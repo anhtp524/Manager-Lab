@@ -40,7 +40,7 @@ export class AuthService {
     }
 
     async signToken(user: UserEntity, key: string, time: string){
-        const payload = {sub : {memberId : user.memberId, role : user.role}};
+        const payload = {sub : {id: user.id, memberId : user.memberId, role : user.role}};
         const token = await this.jwtService.sign(payload, {secret: key, expiresIn: time});
         return token;
     }

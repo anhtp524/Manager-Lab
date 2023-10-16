@@ -18,7 +18,7 @@ export class DocumentEntity {
     @Column()
     size : number;
     
-    @Column()
+    @Column({type: 'uuid'})
     createdBy : string;
 
     @Column()

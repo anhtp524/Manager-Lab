@@ -5,6 +5,7 @@ import { DocumentRuleEntity } from "src/entity/documentRule.entity";
 import { Repository } from "typeorm";
 import { CreateDocumentDto } from "./Dto/document.dto";
 import { emptyUUID } from "Core/Constant/uuid.constant";
+import { DocumentModelResponse } from "./Dto/documentView";
 
 @Injectable()
 export class DocumentService {
@@ -15,7 +16,7 @@ export class DocumentService {
         private documentRuleRepo: Repository<DocumentRuleEntity>
     ){}
 
-    async addDocument(creatdocumentDto : CreateDocumentDto, folderPath: string) {
+    async addDocument(creatdocumentDto : CreateDocumentDto, folderPath: string, userId: string) {
         var documentRuleDto = {
             folderPath: folderPath,
             regardingId: emptyUUID
@@ -25,7 +26,29 @@ export class DocumentService {
         const documentModel = await this.documentRepo.create(creatdocumentDto);
         documentModel.documentRule = new DocumentRuleEntity();
         documentModel.documentRule.id = documentRuleModel.id;
-        console.log(documentModel)
-        return 1;
+        documentModel.createdBy = userId;
+        await this.documentRepo.save(documentModel);
+        const documentResponse: DocumentModelResponse = {
+            id: documentModel.id,
+            documentName: documentModel.documentName,
+            documentType: documentModel.documentType,
+            size: documentModel.size,
+            mimeType: documentModel.mimeType,
+            documentRuleId: documentModel.documentRule.id
+        };
+        return documentResponse;
+    }
+
+    async getDocumentById(fileId: string){
+        var documentModel = await this.documentRepo.findOneBy({id : fileId})
+        var documentResponse: DocumentModelResponse = {
+            id: documentModel.id,
+            documentName: documentModel.documentName,
+            documentType: documentModel.documentType,
+            size: documentModel.size,
+            mimeType: documentModel.mimeType,
+        }
+
+        return documentResponse;
     }
 }
