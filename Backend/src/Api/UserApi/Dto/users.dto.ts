@@ -21,7 +21,3 @@ export class CreateUserDto {
     teacherAdd: CreateTeacherDto;
 
 }
-
-export class UploadFileDto {
-    file: string;
-}

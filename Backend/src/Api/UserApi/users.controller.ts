@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UploadFileDto } from './Dto/users.dto';
+import { CreateUserDto } from './Dto/users.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { CloudinaryService } from 'Core/Cloudinary/cloudinary.service';
@@ -30,15 +30,15 @@ export class UsersController {
     return await this.userService.findAll();
   }
 
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({type : UploadFileDto})
-  @UseInterceptors(FileInterceptor('file'))
-  @Post("uploadFile")
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.cloudService.uploadImageToCloudinary(file);
-    return result.url;
-  }
-  
+  // @Post("TestuploadFile")
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({type : UploadFileDto})
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   const result = await this.cloudService.uploadImageToCloudinary(file);
+  //   return result.url;
+  // }
+
   @ApiBearerAuth()
   @Get("getprofileuser")
   @UseGuards(AuthGuard('jwt'))

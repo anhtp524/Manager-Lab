@@ -9,6 +9,7 @@ import { StudentModule } from './Api/StudentApi/student.module';
 import { TeacherModule } from './Api/TeacherApi/teacher.module';
 import { dataSourceOptions } from 'db/dataSource';
 import { AuthModule } from 'Core/Auth/auth.module';
+import { DocumentModule } from './Api/DocumentApi/document.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { AuthModule } from 'Core/Auth/auth.module';
     LaboratoryModule,
     StudentModule,
     TeacherModule,
-    AuthModule
+    AuthModule,
+    DocumentModule
   ],
   controllers: [],
   providers: [],
