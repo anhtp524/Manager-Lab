@@ -41,6 +41,7 @@ export class DocumentService {
 
     async getDocumentById(fileId: string){
         var documentModel = await this.documentRepo.findOneBy({id : fileId})
+        if(documentModel === null) return documentModel;
         var documentResponse: DocumentModelResponse = {
             id: documentModel.id,
             documentName: documentModel.documentName,
@@ -50,5 +51,14 @@ export class DocumentService {
         }
 
         return documentResponse;
+    }
+
+    async deleteDocument(id: string){
+        var result = await this.documentRepo.delete(id);
+        return result;
+    }
+
+    async UpdateRegardingId(listFile: string[], regardingId: string, folderPath: string, isCreated: boolean){
+
     }
 }
