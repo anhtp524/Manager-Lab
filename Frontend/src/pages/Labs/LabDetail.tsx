@@ -1,4 +1,8 @@
 import { GoogleOutlined, PhoneOutlined } from '@ant-design/icons'
+import { Tabs } from 'antd'
+import { Projects, Students, Teachers } from './components'
+
+const TabPane = Tabs.TabPane
 
 const LabDetail = () => {
   return (
@@ -35,6 +39,19 @@ const LabDetail = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className='tab-lab-details'>
+        <Tabs defaultActiveKey='2'>
+          <TabPane tab={<span>Student</span>} key='1'>
+            <Students />
+          </TabPane>
+          <TabPane tab={<span>Teacher</span>} key='2'>
+            <Teachers />
+          </TabPane>
+          <TabPane tab={<span>Project</span>} key='3'>
+            <Projects />
+          </TabPane>
+        </Tabs>
       </div>
     </div>
   )
