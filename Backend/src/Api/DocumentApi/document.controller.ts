@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { DocumentService } from "./document.service";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -33,5 +33,12 @@ export class DocumentController {
         }
         const result = await this.documentService.addDocument(createDocumentDto, uploadFileDto.folderPath, req.user.userId);
         return result;
+    }
+
+    @Get("getdocumentbyid/:id")
+    @ApiBearerAuth()
+    async GetDocumentById(@Param('id') id: string){
+        var res = await this.documentService.getDocumentById(id);
+        return res;
     }
 }

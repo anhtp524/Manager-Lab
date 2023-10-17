@@ -40,17 +40,28 @@ export class DocumentService {
     }
 
     async getDocumentById(fileId: string){
-        var documentModel = await this.documentRepo.findOneBy({id : fileId})
-        if(documentModel === null) return documentModel;
-        var documentResponse: DocumentModelResponse = {
-            id: documentModel.id,
-            documentName: documentModel.documentName,
-            documentType: documentModel.documentType,
-            size: documentModel.size,
-            mimeType: documentModel.mimeType,
-        }
+        var documentModel = await this.documentRepo.findOne({
+            relations : {
+                documentRule: true
+            },
+            where: {
+                id : fileId
+            },
 
-        return documentResponse;
+        })
+        //if(documentModel === null) return documentModel;
+        documentModel.documentContent = null;
+        return documentModel;
+    }
+
+    async getDocumentRuleByRegardingId(regardingId: string, folderPath: string) {
+        var documentRuleModel = await this.documentRuleRepo.findOne({
+            where : {
+                regardingId: regardingId,
+                folderPath: folderPath
+            }
+        })
+        return documentRuleModel;
     }
 
     async deleteDocument(id: string){
@@ -59,6 +70,51 @@ export class DocumentService {
     }
 
     async UpdateRegardingId(listFile: string[], regardingId: string, folderPath: string, isCreated: boolean){
+        var keepFile = "";
+        if(!isCreated)
+        {
+            var documentRule = await this.getDocumentRuleByRegardingId(regardingId,folderPath);
+            if(documentRule !== null) {
+                var documentItems = await this.documentRepo.find({
+                    where : {
+                        documentRule : {
+                            id : documentRule.id
+                        }
+                    }
+                });
+                if (documentItems.length > 0) {
+                    for(let item of documentItems) {
+                        keepFile = item.documentRule.id;
+                        if (listFile.includes(item.id)) {
+                            listFile = listFile.filter(x => x !== item.id);
+                        }
+                        else {
+                            await this.documentRepo.delete(item.id)
+                        }
+                    }
+                }
+            }
+        }
 
+        if(listFile.length > 0) 
+        {
+            var firstFileId = listFile[0];
+            var firstDocument = await this.getDocumentById(firstFileId);
+            var firstDocumentRule = await this.documentRuleRepo.findOneBy({id: firstDocument.documentRule.id})
+            for(let file of listFile) {
+                var documentItem = await this.getDocumentById(file);
+                var currentDocumentRuleId = documentItem.documentRule.id;
+                documentItem.documentRule.id = keepFile !== "" ? keepFile : firstDocumentRule.id;
+                await this.documentRepo.save(documentItem);
+            }
+        }
+
+        if(isCreated || keepFile === "")
+        {
+            firstDocumentRule.folderPath = folderPath;
+            firstDocumentRule.regardingId = regardingId;
+
+            await this.documentRuleRepo.save(firstDocumentRule);
+        }
     }
 }
