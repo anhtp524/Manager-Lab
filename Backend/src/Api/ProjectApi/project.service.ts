@@ -102,7 +102,7 @@ export class ProjectService {
   async createProject(projectAddDto: ProjectAddDto){
     const projectModel = this.projectRepository.create(projectAddDto.projectAdd);
     await this.projectRepository.save(projectModel);
-    if (projectAddDto.listStudent) {
+    if (projectAddDto.listStudent.length !== 0) {
       var studentsModel = await this.studentRepository.find({where : {id: In(projectAddDto.listStudent)}});
       if(studentsModel.length !== projectAddDto.listStudent.length) throw new HttpException("", HttpStatus.INTERNAL_SERVER_ERROR);
       var updateStudentModel = studentsModel.map(student => {
@@ -115,7 +115,7 @@ export class ProjectService {
       await this.studentRepository.save(updateStudentModel);
     }
 
-    if(projectAddDto.listTeacher) {
+    if(projectAddDto.listTeacher.length !== 0) {
       var teachersModel = await this.teacherRepo.find({where: {id: In(projectAddDto.listTeacher)}});
       if(teachersModel.length !== projectAddDto.listTeacher.length) throw new BadGatewayException();
       var teacherProjectsModel = teachersModel.map(teacher => {
@@ -129,11 +129,11 @@ export class ProjectService {
       })
 
       await this.teacherProjectRepo.save(teacherProjectsModel);
+    }
 
-      if(projectAddDto.listAttachment !== null || projectAddDto.listAttachment.length !== 0) {
-        await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, false);
-        
-      }
+    if(projectAddDto.listAttachment !== null && projectAddDto.listAttachment.length !== 0) {
+      await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, true);
+      
     }
     return 1;
   }

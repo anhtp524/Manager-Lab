@@ -50,7 +50,7 @@ export class DocumentService {
 
         })
         //if(documentModel === null) return documentModel;
-        documentModel.documentContent = null;
+        //documentModel.documentContent = null;
         return documentModel;
     }
 
@@ -66,15 +66,18 @@ export class DocumentService {
 
     async getDocumentByRegarding(regardingId: string, folderPath: string){
         var documentRuleModel = await this.getDocumentRuleByRegardingId(regardingId, folderPath);
-        const document = await this.documentRepo.findOne({
+        const listdocument = await this.documentRepo.find({
             where : {
                 documentRule: {
                     id : documentRuleModel.id
                 }
             }
         });
-        document.documentContent = null;
-        return document;
+        var documents = listdocument.map(document => {
+            document.documentContent = null;
+            return document;
+        } );
+        return documents;
     }
 
     async deleteDocument(id: string){

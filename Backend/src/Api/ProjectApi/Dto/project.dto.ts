@@ -36,13 +36,13 @@ export class ProjectAddDto {
     projectAdd: CreateProject;
     
     @ApiProperty()
-    listStudent?: string[];
+    listStudent: string[];
 
     @ApiProperty()
-    listTeacher?: string[];
+    listTeacher: string[];
 
     @ApiProperty()
-    listAttachment?: string[];
+    listAttachment: string[];
 }
 
 

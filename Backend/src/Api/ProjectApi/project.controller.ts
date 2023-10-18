@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { ProjectService } from "./project.service";
 import { AprrovalStudentToProjectDto, CreateProject, ProjectAddDto, RegisterStudentToProjectDto } from "./Dto/project.dto";
 import { AuthGuard } from "@nestjs/passport";
+import { Role } from "Core/Enum/role.enum";
 
 @ApiTags("Project")
 @ApiBearerAuth()
@@ -52,7 +53,10 @@ export class ProjectController {
 
   @ApiBody({type: ProjectAddDto})
   @Post("createproject")
-  async CreateProject(@Body() projectAddDto: ProjectAddDto){
+  async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req){
+    var userProfile = req.user;
+    if(userProfile.role === Role.Student) projectAddDto.listStudent.push(userProfile.memberId);
+    else if (userProfile.role === Role.Teacher) projectAddDto.listTeacher.push(userProfile.memberId);
     var result = await this.projectService.createProject(projectAddDto);
     return result;
   }
