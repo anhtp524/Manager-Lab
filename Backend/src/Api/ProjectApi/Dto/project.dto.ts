@@ -40,6 +40,9 @@ export class ProjectAddDto {
 
     @ApiProperty()
     listTeacher?: string[];
+
+    @ApiProperty()
+    listAttachment?: string[];
 }
 
 

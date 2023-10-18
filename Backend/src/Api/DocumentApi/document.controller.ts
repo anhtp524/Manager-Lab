@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseIn
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { DocumentService } from "./document.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { CreateDocumentDto } from "./Dto/document.dto";
+import { ByRegardingDto, CreateDocumentDto } from "./Dto/document.dto";
 import { UploadFileDto } from "Core/CoreDto/uploadFile.dto";
 import { AuthGuard } from "@nestjs/passport";
 
@@ -35,10 +35,18 @@ export class DocumentController {
         return result;
     }
 
-    @Get("getdocumentbyid/:id")
     @ApiBearerAuth()
+    @Get("getdocumentbyid/:id") 
     async GetDocumentById(@Param('id') id: string){
         var res = await this.documentService.getDocumentById(id);
+        return res;
+    }
+
+    @ApiBody({type: ByRegardingDto})
+    @ApiBearerAuth()
+    @Post("byregarding")
+    async GetDocumentByRegarding(@Body() byRegardingDto: ByRegardingDto){
+        var res = await this.documentService.getDocumentByRegarding(byRegardingDto.regarding, byRegardingDto.folderPath);
         return res;
     }
 }

@@ -9,6 +9,9 @@ import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
 import { DetailProjectModel, StudentInProject, TeacherInProject } from "./Dto/projectView,dto";
 import { json } from "stream/consumers";
 import { TeacherEntity } from "src/entity/teacher.entity";
+import { DocumentEntity } from "src/entity/document.entity";
+import { DocumentService } from "../DocumentApi/document.service";
+import { FolderPath } from "Core/Constant/folderPath.constant";
 
 @Injectable()
 export class ProjectService {
@@ -20,7 +23,8 @@ export class ProjectService {
     @InjectRepository(TeacherProjectEntity)
     private teacherProjectRepo: Repository<TeacherProjectEntity>,
     @InjectRepository(TeacherEntity)
-    private teacherRepo: Repository<TeacherEntity>
+    private teacherRepo: Repository<TeacherEntity>,
+    private documentService: DocumentService
   ) {}
 
   findAll() {
@@ -125,6 +129,11 @@ export class ProjectService {
       })
 
       await this.teacherProjectRepo.save(teacherProjectsModel);
+
+      if(projectAddDto.listAttachment !== null || projectAddDto.listAttachment.length !== 0) {
+        await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, false);
+        
+      }
     }
     return 1;
   }

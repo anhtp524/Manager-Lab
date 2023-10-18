@@ -64,6 +64,19 @@ export class DocumentService {
         return documentRuleModel;
     }
 
+    async getDocumentByRegarding(regardingId: string, folderPath: string){
+        var documentRuleModel = await this.getDocumentRuleByRegardingId(regardingId, folderPath);
+        const document = await this.documentRepo.findOne({
+            where : {
+                documentRule: {
+                    id : documentRuleModel.id
+                }
+            }
+        });
+        document.documentContent = null;
+        return document;
+    }
+
     async deleteDocument(id: string){
         var result = await this.documentRepo.delete(id);
         return result;
