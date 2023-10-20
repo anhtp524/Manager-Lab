@@ -37,9 +37,5 @@ export class UpdateStudentDto {
 export class RegisterToLabDto {
     @ApiProperty()
     @IsUUID()
-    studentId: string;
-
-    @ApiProperty()
-    @IsUUID()
     labId: string;
 }

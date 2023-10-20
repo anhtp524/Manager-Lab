@@ -78,7 +78,7 @@ export class StudentService {
     return studentModel;
   }
 
-  async getStudentInLab(labId: string) {
+  async getStudentInLab(labId: string, isApproveToLab: boolean) {
     var listStudent = await this.studentRepository.find({
       relations : {
         lab : true
@@ -87,7 +87,7 @@ export class StudentService {
         lab : {
           id : labId
         },
-        isApproveToLab : true
+        isApproveToLab : isApproveToLab
       }
     });
     return listStudent;

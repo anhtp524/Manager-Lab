@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { StudentService } from "./student.service";
 import { CreateStudentDto, RegisterToLabDto, UpdateStudentDto } from "./Dto/student.dto";
@@ -42,8 +42,8 @@ export class StudentController {
 
   @ApiBody({type: RegisterToLabDto})
   @Post("registertolab")
-  async RegisterToLab(@Body() registerLab: RegisterToLabDto){
-    const result = await this.studentService.registerForLab(registerLab.studentId, registerLab.labId);
+  async RegisterToLab(@Body() registerLab: RegisterToLabDto, @Req() req){
+    const result = await this.studentService.registerForLab(req.user.memberId, registerLab.labId);
     return result;
   }
 
@@ -62,8 +62,14 @@ export class StudentController {
   }
 
   @Get("getstudentinlab/:labId")
-  async GetStuentInLab(@Param('labId')labId: string) {
-    var res = await this.studentService.getStudentInLab(labId);
+  async GetStudentInLab(@Param('labId')labId: string) {
+    var res = await this.studentService.getStudentInLab(labId, true);
+    return res;
+  }
+
+  @Get("getstudentregisterinlab/:labId")
+  async GetStudentRegisterInLab(@Param('labId')labId: string) {
+    var res = await this.studentService.getStudentInLab(labId, false);
     return res;
   }
 
