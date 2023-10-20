@@ -16,6 +16,7 @@ import AuthenLayout from '~/components/Layout/AuthenLayout'
 import Login from '~/pages/Authen/Login'
 import ForgotPassword from '~/pages/Authen/ForgotPassword'
 import ProtectedRoutes from './ProtectedRoutes'
+import Chat from '~/pages/Chat/Chat'
 
 const router = createBrowserRouter([
   {
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
         path: RoutePath.Chat,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <ProfileLecture />
+            <Chat />
           </Suspense>
         )
       },

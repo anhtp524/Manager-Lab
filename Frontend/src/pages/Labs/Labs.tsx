@@ -6,8 +6,8 @@ const Labs = () => {
   return (
     <div className='labsParent'>
       <div className='labscontent'>
-        {dataLab.map((data) => (
-          <div className='labscontentChild'>
+        {dataLab.map((data, i) => (
+          <div className='labscontentChild' key={i}>
             <LabsChildren title={data.title} img={data.img} />
           </div>
         ))}
