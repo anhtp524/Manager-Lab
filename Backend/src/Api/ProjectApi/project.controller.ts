@@ -39,15 +39,15 @@ export class ProjectController {
 
   @ApiBody({type: RegisterStudentToProjectDto})
   @Post("registerstudenttoproject")
-  async RegisterStudentToProject(@Body() registerStudentDto: RegisterStudentToProjectDto){
-    var result = await this.projectService.registerStudentIntoProject(registerStudentDto.projectId, registerStudentDto.studentId);
+  async RegisterStudentToProject(@Body() registerStudentDto: RegisterStudentToProjectDto, @Req() req){
+    var result = await this.projectService.registerStudentIntoProject(registerStudentDto.projectId, req.user.memberId);
     return result;
   }
 
   @ApiBody({type: AprrovalStudentToProjectDto})
   @Post("approvestudenttoproject")
-  async ApproveStudentToProject(@Body() registerStudentDto: AprrovalStudentToProjectDto){
-    var result = await this.projectService.approveToProjectByTeacher(registerStudentDto.projectId, registerStudentDto.studentId, "");
+  async ApproveStudentToProject(@Body() approvalStudentDto: AprrovalStudentToProjectDto){
+    var result = await this.projectService.approveToProjectByTeacher(approvalStudentDto.projectId, approvalStudentDto.studentId, "");
     return result;
   }
 

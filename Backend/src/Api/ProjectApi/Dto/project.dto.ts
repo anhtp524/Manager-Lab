@@ -14,9 +14,6 @@ export class CreateProject{
 export class RegisterStudentToProjectDto {
     @ApiProperty()
     projectId: string;
-
-    @ApiProperty()
-    studentId: string;
 }
 
 export class AprrovalStudentToProjectDto {

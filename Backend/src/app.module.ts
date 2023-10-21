@@ -10,6 +10,8 @@ import { TeacherModule } from './Api/TeacherApi/teacher.module';
 import { dataSourceOptions } from 'db/dataSource';
 import { AuthModule } from 'Core/Auth/auth.module';
 import { DocumentModule } from './Api/DocumentApi/document.module';
+import { TopicModule } from './Api/TopicApi/topic.module';
+import { CommentModule } from './Api/CommentApi/comment.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { DocumentModule } from './Api/DocumentApi/document.module';
     StudentModule,
     TeacherModule,
     AuthModule,
-    DocumentModule
+    DocumentModule,
+    TopicModule,
+    CommentModule
   ],
   controllers: [],
   providers: [],
