@@ -3,11 +3,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { TopicEntity } from "src/entity/topic.entity";
 import { TopicService } from "./topic.service";
 import { TopicController } from "./topic.controller";
-import { DocumentService } from "../DocumentApi/document.service";
+import { DocumentModule } from "../DocumentApi/document.module";
 
 @Module({
     imports: [TypeOrmModule.forFeature([TopicEntity]),
-        DocumentService
+        DocumentModule
     ],
     providers: [TopicService],
     controllers: [TopicController],
