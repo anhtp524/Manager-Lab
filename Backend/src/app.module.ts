@@ -12,6 +12,8 @@ import { AuthModule } from 'Core/Auth/auth.module';
 import { DocumentModule } from './Api/DocumentApi/document.module';
 import { TopicModule } from './Api/TopicApi/topic.module';
 import { CommentModule } from './Api/CommentApi/comment.module';
+import { ChatModulde } from './gateway/chat.module';
+import { MessageModule } from './Api/MessageApi/message.module';
 
 @Module({
   imports: [
@@ -24,7 +26,9 @@ import { CommentModule } from './Api/CommentApi/comment.module';
     AuthModule,
     DocumentModule,
     TopicModule,
-    CommentModule
+    CommentModule,
+    MessageModule,
+    ChatModulde,
   ],
   controllers: [],
   providers: [],
