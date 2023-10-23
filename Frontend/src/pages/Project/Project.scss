@@ -1,0 +1,25 @@
+.project {
+    display: flex;
+    gap: 24px;
+    flex-direction: column;
+    .title-header-project {
+        font-size: 20px;
+    }
+    .column-name-project {
+        &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+}
+
+.project-children {
+    display: flex;
+    gap: 24px;
+    flex-direction: column;
+    .project-children-content-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

@@ -1,21 +1,34 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
-import { ProjectService } from "./project.service";
-import { AprrovalStudentToProjectDto, CreateProject, ProjectAddDto, RegisterStudentToProjectDto } from "./Dto/project.dto";
-import { AuthGuard } from "@nestjs/passport";
-import { Role } from "Core/Enum/role.enum";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ProjectService } from './project.service';
+import {
+  AprrovalStudentToProjectDto,
+  CreateProject,
+  ProjectAddDto,
+  RegisterStudentToProjectDto,
+} from './Dto/project.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Role } from 'Core/Enum/role.enum';
 
-@ApiTags("Project")
+@ApiTags('Project')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
-@Controller("project")
+@Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Get("getall")
-  GetAllProject(@Req() req){
+  @Get('getall')
+  GetAllProject(@Req() req) {
     console.log(req.user);
-    
+
     return this.projectService.findAll();
   }
 
@@ -24,47 +37,60 @@ export class ProjectController {
   //   return this.projectService.findOne(id)
   // }
 
-  @ApiBody({type: CreateProject})
-  @Post("addproject")
-  async AddProject(@Body() newProject: CreateProject){
+  @ApiBody({ type: CreateProject })
+  @Post('addproject')
+  async AddProject(@Body() newProject: CreateProject) {
     const result = await this.projectService.add(newProject);
     return result;
   }
 
-  @Get("getdetail/:id")
-  async GetDetailProject(@Param('id') id: string){
-    var result = await this.projectService.getDetailProject(id);
+  @Get('getdetail/:id')
+  async GetDetailProject(@Param('id') id: string) {
+    const result = await this.projectService.getDetailProject(id);
     return result;
   }
 
-  @ApiBody({type: RegisterStudentToProjectDto})
-  @Post("registerstudenttoproject")
-  async RegisterStudentToProject(@Body() registerStudentDto: RegisterStudentToProjectDto, @Req() req){
-    var result = await this.projectService.registerStudentIntoProject(registerStudentDto.projectId, req.user.memberId);
+  @ApiBody({ type: RegisterStudentToProjectDto })
+  @Post('registerstudenttoproject')
+  async RegisterStudentToProject(
+    @Body() registerStudentDto: RegisterStudentToProjectDto,
+    @Req() req,
+  ) {
+    const result = await this.projectService.registerStudentIntoProject(
+      registerStudentDto.projectId,
+      req.user.memberId,
+    );
     return result;
   }
 
-  @ApiBody({type: AprrovalStudentToProjectDto})
-  @Post("approvestudenttoproject")
-  async ApproveStudentToProject(@Body() approvalStudentDto: AprrovalStudentToProjectDto){
-    var result = await this.projectService.approveToProjectByTeacher(approvalStudentDto.projectId, approvalStudentDto.studentId, "");
+  @ApiBody({ type: AprrovalStudentToProjectDto })
+  @Post('approvestudenttoproject')
+  async ApproveStudentToProject(
+    @Body() approvalStudentDto: AprrovalStudentToProjectDto,
+  ) {
+    const result = await this.projectService.approveToProjectByTeacher(
+      approvalStudentDto.projectId,
+      approvalStudentDto.studentId,
+      '',
+    );
     return result;
   }
 
-  @ApiBody({type: ProjectAddDto})
-  @Post("createproject")
-  async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req){
-    var userProfile = req.user;
-    if(userProfile.role === Role.Student) projectAddDto.listStudent.push(userProfile.memberId);
-    else if (userProfile.role === Role.Teacher) projectAddDto.listTeacher.push(userProfile.memberId);
-    var result = await this.projectService.createProject(projectAddDto);
+  @ApiBody({ type: ProjectAddDto })
+  @Post('createproject')
+  async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req) {
+    const userProfile = req.user;
+    if (userProfile.role === Role.Student)
+      projectAddDto.listStudent.push(userProfile.memberId);
+    else if (userProfile.role === Role.Teacher)
+      projectAddDto.listTeacher.push(userProfile.memberId);
+    const result = await this.projectService.createProject(projectAddDto);
     return result;
   }
 
-  @Get("getprojectinlab/:id")
+  @Get('getprojectinlab/:id')
   async GetProjectInLab(labId: string) {
-    var res = await this.projectService.GetProjectInLab(labId);
+    const res = await this.projectService.GetProjectInLab(labId);
     return res;
   }
-
 }
