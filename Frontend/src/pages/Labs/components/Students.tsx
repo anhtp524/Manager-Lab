@@ -13,38 +13,6 @@ interface IStudentRowData {
   email: string
 }
 
-const columns: ColumnsType<IStudentRowData> = [
-  {
-    title: 'Student Code',
-    dataIndex: 'studentCode',
-    width: 150
-  },
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    width: 300
-  },
-  {
-    title: 'Date Of Birth',
-    dataIndex: 'dateOfBirth',
-    width: 150
-  },
-  {
-    title: 'Class',
-    dataIndex: 'class',
-    width: 150
-  },
-  {
-    title: 'Phone Number',
-    dataIndex: 'phoneNumber',
-    width: 150
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email'
-  }
-]
-
 const data: IStudentRowData[] = []
 for (let i = 0; i < 46; i++) {
   data.push({
@@ -59,6 +27,54 @@ for (let i = 0; i < 46; i++) {
 }
 
 function Students() {
+  const columns: ColumnsType<IStudentRowData> = [
+    {
+      title: 'Student Code',
+      dataIndex: 'studentCode',
+      width: 150,
+      onCell: (record) => {
+        return {
+          onClick: () => onOpenPanel(record)
+        }
+      },
+      render: (value) => {
+        return (
+          <a
+            href=''
+            onClick={(e) => {
+              e.preventDefault()
+            }}
+          >
+            {value}
+          </a>
+        )
+      }
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      width: 300
+    },
+    {
+      title: 'Date Of Birth',
+      dataIndex: 'dateOfBirth',
+      width: 150
+    },
+    {
+      title: 'Class',
+      dataIndex: 'class',
+      width: 150
+    },
+    {
+      title: 'Phone Number',
+      dataIndex: 'phoneNumber',
+      width: 150
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email'
+    }
+  ]
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -103,9 +119,13 @@ function Students() {
       }
     ]
   }
+
+  const onOpenPanel = (record: IStudentRowData) => {
+    console.log(record)
+  }
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} scroll={{ y: 400 }} />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
     </div>
   )
 }

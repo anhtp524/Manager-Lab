@@ -6,10 +6,8 @@ import Layout from '~/components/Layout/Layout'
 import Homepage from '~/pages/Homepage/Homepage'
 import LabDetail from '~/pages/Labs/LabDetail'
 import Labs from '~/pages/Labs/Labs'
-import ManagementProduct from '~/pages/ManagementProduct/ManagementProduct'
 import ManagementStudent from '~/pages/ManagementStudent/ManagementStudent'
-import Personalinfo from '~/pages/PersonalInfo/Personalinfo'
-import ProfileLecture from '~/pages/ProfileLecture/ProfileLecture'
+// import ProfileLecture from '~/pages/ProfileLecture/ProfileLecture'
 import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
 import { RoutePath } from './util'
 import AuthenLayout from '~/components/Layout/AuthenLayout'
@@ -17,6 +15,7 @@ import Login from '~/pages/Authen/Login'
 import ForgotPassword from '~/pages/Authen/ForgotPassword'
 import ProtectedRoutes from './ProtectedRoutes'
 import Chat from '~/pages/Chat/Chat'
+import Forum from '~/pages/Forum/Forum'
 
 const router = createBrowserRouter([
   {
@@ -52,7 +51,8 @@ const router = createBrowserRouter([
         path: RoutePath.Newfeed,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <ManagementProduct />
+            {/* <ManagementProduct /> */}
+            <Forum />
           </Suspense>
         )
       },
@@ -61,14 +61,6 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ManagementStudent />
-          </Suspense>
-        )
-      },
-      {
-        path: RoutePath.Newfeed,
-        element: (
-          <Suspense fallback={<Lazyloading />}>
-            <Personalinfo />
           </Suspense>
         )
       },

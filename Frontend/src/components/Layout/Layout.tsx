@@ -55,9 +55,9 @@ function Layout() {
           <Menu
             style={{
               backgroundColor: '#0E2554',
-              height: '100vh',
-              color: 'white',
-              marginTop: '51px'
+              height: '100%',
+              color: 'white'
+              // marginTop: '51px'
             }}
             onClick={({ key }) => {
               if (key === 'signout') {
