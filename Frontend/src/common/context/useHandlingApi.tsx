@@ -2,8 +2,11 @@ import { createContext, useContext, useState } from 'react'
 
 export interface IContext {
   isLoading: boolean
+  hasError: boolean
   showLoading: VoidFunction
   closeLoading: VoidFunction
+  showError: VoidFunction
+  closeError: VoidFunction
 }
 
 export interface IProps {
@@ -12,12 +15,16 @@ export interface IProps {
 
 export const LoadingContext = createContext<IContext>({
   isLoading: false,
+  hasError: false,
   showLoading: () => 1,
-  closeLoading: () => 1
+  closeLoading: () => 1,
+  showError: () => 1,
+  closeError: () => 1
 })
 
 export const LoadingProvider = (props: IProps) => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [hasError, setHasError] = useState<boolean>(false)
 
   const showLoading = () => {
     setLoading(true)
@@ -26,8 +33,17 @@ export const LoadingProvider = (props: IProps) => {
     setLoading(false)
   }
 
+  const showError = () => {
+    setLoading(false)
+    setHasError(true)
+  }
+
+  const closeError = () => {
+    setHasError(false)
+  }
+
   return (
-    <LoadingContext.Provider value={{ isLoading: loading, showLoading, closeLoading }}>
+    <LoadingContext.Provider value={{ isLoading: loading, hasError, showLoading, closeLoading, showError, closeError }}>
       {props.children}
     </LoadingContext.Provider>
   )
@@ -35,4 +51,4 @@ export const LoadingProvider = (props: IProps) => {
 
 export const LoadingConsumer = LoadingContext.Consumer
 
-export const useLoading = () => useContext(LoadingContext)
+export const useHandlingApi = () => useContext(LoadingContext)

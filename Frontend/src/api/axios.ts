@@ -6,6 +6,8 @@ const fetchHandler = axios.create(config)
 // Request interceptor
 fetchHandler.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('token')
+    request.headers.Authorization = `Bearer ${token}`
     return request
   },
   (error: AxiosResponse) => {

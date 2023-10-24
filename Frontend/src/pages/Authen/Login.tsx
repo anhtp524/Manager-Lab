@@ -38,6 +38,7 @@ function Login() {
     if (res.status === 201) {
       const cookies = new Cookies()
       cookies.set('tokenUser', res.data.accessToken, { path: '/' })
+      localStorage.setItem('token', res.data.accessToken)
       navigate('/')
     }
     if (res.status === 401) {

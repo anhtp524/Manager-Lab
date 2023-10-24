@@ -41,7 +41,7 @@ const LabDetail = () => {
         </div>
       </div>
       <div className='tab-lab-details'>
-        <Tabs defaultActiveKey='2'>
+        <Tabs defaultActiveKey='2' destroyInactiveTabPane>
           <TabPane tab={<span>Student</span>} key='1'>
             <Students />
           </TabPane>
