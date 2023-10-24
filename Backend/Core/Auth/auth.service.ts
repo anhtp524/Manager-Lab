@@ -22,13 +22,9 @@ export class AuthService {
         if (!userModel) throw new UnauthorizedException("User does not exist");
         const checkPassword = await bcrypt.compare(userLogin.password, userModel.password);
         if (!checkPassword) throw new UnauthorizedException("Password is wrong");
-        if(userModel.role == Role.Student) {
-            const studentModel = this.studentService.findStudentById(userModel.memberId);
-            if (!studentModel) throw new UnauthorizedException("User is not valid");
-        }
-        else if (userModel.role == Role.Teacher) {
-            const teacherModel = this.teacherService.findTeacherById(userModel.memberId);
-            if (!teacherModel) throw new UnauthorizedException("User is not valid");
+        if(userModel.role != Role.Admin) {
+            const userProfile = this.userService.getProfileUser(userModel.id, userModel.role);
+            if (!userProfile) throw new UnauthorizedException("User is not valid");
         }
         const accessKey =  "access_key";
         const accessToken = await this.signToken(userModel, accessKey, "2h");
@@ -40,7 +36,7 @@ export class AuthService {
     }
 
     async signToken(user: UserEntity, key: string, time: string){
-        const payload = {sub : {id: user.id, memberId : user.memberId, role : user.role}};
+        const payload = {sub : {userId: user.id, role : user.role}};
         const token = await this.jwtService.sign(payload, {secret: key, expiresIn: time});
         return token;
     }

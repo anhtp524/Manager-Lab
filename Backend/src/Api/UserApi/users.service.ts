@@ -46,33 +46,30 @@ export class UsersService {
       role: newuser.role
     }
     const userModel = await this.usersRepository.create(userAdd);
+    userModel.password = await bcrypt.hash(newuser.password, 10);
+    await this.usersRepository.save(userModel);
     if(newuser.role === Role.Student) {
       var studentModel = this.studentRepository.create(newuser.studentAdd);
       studentModel.email = newuser.email;
+      studentModel.user = userModel;
       try {
         await this.studentRepository.save(studentModel);
       }
       catch (error) {
         throw new BadRequestException(error.message);
       }
-      userModel.memberId = studentModel.id;
     }
     else if(newuser.role === Role.Teacher) {
       var teacherModel = this.teacherRepository.create(newuser.teacherAdd);
       teacherModel.email = newuser.email;
+      teacherModel.user = userModel;
       try {
         await this.teacherRepository.save(teacherModel);
       }
       catch (ex) {
         throw new BadRequestException(ex.message);
       }
-      userModel.memberId = teacherModel.id;
     }
-    else {
-      userModel.memberId = emptyUUID;
-    }
-    userModel.password = await bcrypt.hash(newuser.password, 10);
-    await this.usersRepository.save(userModel);
     return 1;
   }
 
@@ -82,16 +79,18 @@ export class UsersService {
     return userModel;
   }
 
-  async getProfileUser(memberId: string, role : Role ) {
+  async getProfileUser(userId: string, role : Role ) {
     var profileUser : (StudentEntity | TeacherEntity);
     if (role == Role.Student) {
       profileUser = await this.studentRepository.findOne({
         relations : {
           project : true,
-          lab : true
+          lab : true,
         },
         where : {
-          id : memberId
+          user : {
+            id: userId
+          }
         }
       });
     }
@@ -101,7 +100,9 @@ export class UsersService {
           lab : true
         },
         where : {
-          id : memberId
+          user : {
+            id: userId
+          }
         }
       });
     }

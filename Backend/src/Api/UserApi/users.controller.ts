@@ -26,7 +26,6 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   async GetAllUser(@Req() req: Request){
     var test = plainToInstance(Payload, req.user);
-    console.log(test, test.memberId, test.role);
     return await this.userService.findAll();
   }
 
@@ -44,7 +43,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   async GetProfileUser(@Req() req ) {
     const userPayload : Payload = req.user;
-    var result = await this.userService.getProfileUser(userPayload.memberId, userPayload.role);
+    var result = await this.userService.getProfileUser(userPayload.userId, userPayload.role);
     return result;
   }
   

@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ProjectEntity } from "./project.entity";
 import { LaboratoryEntity } from "./laboratory.entity";
+import { UserEntity } from "./user.entity";
 
 @Entity({name: "Teacher"})
 export class TeacherEntity {
@@ -28,4 +29,8 @@ export class TeacherEntity {
     @ManyToOne(() => LaboratoryEntity, {eager : true})
     @JoinColumn()
     lab: LaboratoryEntity;
+
+    @OneToOne(() => UserEntity)
+    @JoinColumn({referencedColumnName: "id"})
+    user: UserEntity;
 }

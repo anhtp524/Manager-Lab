@@ -1,5 +1,6 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import {Server} from "socket.io";
+import { CreateMessageDto } from "src/Api/MessageApi/Dto/createMessage.dto";
 import { MessageService } from "src/Api/MessageApi/message.service";
 
 @WebSocketGateway({
@@ -16,9 +17,9 @@ export class ChatGateway {
     ){}
 
     @SubscribeMessage("sendMessage")
-    async handleSendMessage(@MessageBody() message: string){
-        var test = await this.messageService.createMessage(message);
-        console.log(test);
-        return test;
+    async handleSendMessage(@MessageBody() message: CreateMessageDto){
+        var response = await this.messageService.createMessage(message);
+        console.log(response);
+        return response;
     }
 }

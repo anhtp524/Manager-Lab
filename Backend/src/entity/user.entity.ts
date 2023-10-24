@@ -14,7 +14,4 @@ export class UserEntity {
 
   @Column({type: "enum", enum: Role, nullable: true})
   role: Role;
-  
-  @Column({type: "uuid", unique: true})
-  memberId: string;
 }

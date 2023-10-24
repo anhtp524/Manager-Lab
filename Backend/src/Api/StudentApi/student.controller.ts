@@ -3,13 +3,17 @@ import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { StudentService } from "./student.service";
 import { CreateStudentDto, RegisterToLabDto, UpdateStudentDto } from "./Dto/student.dto";
 import { AuthGuard } from "@nestjs/passport";
+import { UsersService } from "../UserApi/users.service";
 
 @ApiTags("Student")
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller("student")
 export class StudentController {
-  constructor(private readonly studentService: StudentService) {}
+  constructor(
+    private readonly studentService: StudentService,
+    private readonly userService: UsersService
+  ) {}
 
   @Get("getall")
   GetAllProject(){
@@ -43,7 +47,8 @@ export class StudentController {
   @ApiBody({type: RegisterToLabDto})
   @Post("registertolab")
   async RegisterToLab(@Body() registerLab: RegisterToLabDto, @Req() req){
-    const result = await this.studentService.registerForLab(req.user.memberId, registerLab.labId);
+    const userProfile = await this.userService.getProfileUser(req.user.userId, req.user.role);
+    const result = await this.studentService.registerForLab(userProfile.id, registerLab.labId);
     return result;
   }
 

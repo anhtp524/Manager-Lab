@@ -1,14 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { BoxChatEntity } from "./boxChat.entity";
 import { UserEntity } from "./user.entity";
 
-@Entity("Message")
-export class MessageEntity {
-    @PrimaryGeneratedColumn("uuid")
+export class BoxChat_UserEntity {
+    @PrimaryGeneratedColumn()
     id: string;
-
-    @Column()
-    message: string;
 
     @ManyToOne(() => BoxChatEntity)
     @JoinColumn({referencedColumnName: "id"})
@@ -16,8 +12,5 @@ export class MessageEntity {
 
     @ManyToOne(() => UserEntity)
     @JoinColumn({referencedColumnName: "id"})
-    sender: UserEntity;
-
-    @Column({type: 'date', nullable : true})
-    createdDate: Date
+    user: UserEntity;
 }

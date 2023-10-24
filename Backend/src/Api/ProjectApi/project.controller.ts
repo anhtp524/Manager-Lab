@@ -17,13 +17,17 @@ import {
 } from './Dto/project.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'Core/Enum/role.enum';
+import { UsersService } from '../UserApi/users.service';
 
 @ApiTags('Project')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller('project')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(
+    private readonly projectService: ProjectService,
+    private readonly userService: UsersService
+  ) {}
 
   @Get('getall')
   GetAllProject(@Req() req) {
@@ -58,7 +62,7 @@ export class ProjectController {
   ) {
     const result = await this.projectService.registerStudentIntoProject(
       registerStudentDto.projectId,
-      req.user.memberId,
+      req.user.userId,
     );
     return result;
   }
@@ -79,11 +83,12 @@ export class ProjectController {
   @ApiBody({ type: ProjectAddDto })
   @Post('createproject')
   async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req) {
-    const userProfile = req.user;
-    if (userProfile.role === Role.Student)
-      projectAddDto.listStudent.push(userProfile.memberId);
-    else if (userProfile.role === Role.Teacher)
-      projectAddDto.listTeacher.push(userProfile.memberId);
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role)
+    if (user.role === Role.Student)
+      projectAddDto.listStudent.push(userProfile.id);
+    else if (user.role === Role.Teacher)
+      projectAddDto.listTeacher.push(userProfile.id);
     const result = await this.projectService.createProject(projectAddDto);
     return result;
   }
