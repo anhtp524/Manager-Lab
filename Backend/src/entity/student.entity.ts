@@ -25,10 +25,6 @@ export class StudentEntity {
 
     @Column()
     email: string;
-
-    @ManyToOne(() => ProjectEntity, {eager : true})
-    @JoinColumn({referencedColumnName : "id"})
-    project: ProjectEntity;
     
     @ManyToOne(() => LaboratoryEntity)
     @JoinColumn({referencedColumnName : "id"})
@@ -36,9 +32,6 @@ export class StudentEntity {
 
     @Column({nullable: true})
     isApproveToLab: boolean;
-
-    @Column({nullable: true})
-    isApproveToProject: boolean;
 
     @OneToOne(() => UserEntity)
     @JoinColumn({referencedColumnName: "id"})

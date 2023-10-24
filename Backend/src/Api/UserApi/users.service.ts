@@ -8,6 +8,7 @@ import { StudentEntity } from 'src/entity/student.entity';
 import { TeacherEntity } from 'src/entity/teacher.entity';
 import { emptyUUID } from 'Core/Constant/uuid.constant';
 import * as bcrypt from "bcrypt"
+import { Project_StudentEntity } from 'src/entity/projectStudent.entity';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,9 @@ export class UsersService {
     @InjectRepository(StudentEntity)
     private studentRepository: Repository<StudentEntity>,
     @InjectRepository(TeacherEntity)
-    private teacherRepository: Repository<TeacherEntity>
+    private teacherRepository: Repository<TeacherEntity>,
+    @InjectRepository(Project_StudentEntity)
+    private projectStudentRepo: Repository<Project_StudentEntity>
   ) {}
 
   async findAll() {
@@ -84,7 +87,7 @@ export class UsersService {
     if (role == Role.Student) {
       profileUser = await this.studentRepository.findOne({
         relations : {
-          project : true,
+          //project : true,
           lab : true,
         },
         where : {
@@ -109,6 +112,11 @@ export class UsersService {
 
     return profileUser;
 
+  }
+
+  async getLabIdByUserId(userId: string, role: Role) {
+    const userProfile = await this.getProfileUser(userId, role);
+    return userProfile.lab.id;
   }
 
 

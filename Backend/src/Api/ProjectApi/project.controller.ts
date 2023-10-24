@@ -54,42 +54,45 @@ export class ProjectController {
     return result;
   }
 
-  @ApiBody({ type: RegisterStudentToProjectDto })
-  @Post('registerstudenttoproject')
-  async RegisterStudentToProject(
-    @Body() registerStudentDto: RegisterStudentToProjectDto,
-    @Req() req,
-  ) {
-    const result = await this.projectService.registerStudentIntoProject(
-      registerStudentDto.projectId,
-      req.user.userId,
-    );
-    return result;
-  }
+  // @ApiBody({ type: RegisterStudentToProjectDto })
+  // @Post('registerstudenttoproject')
+  // async RegisterStudentToProject(
+  //   @Body() registerStudentDto: RegisterStudentToProjectDto,
+  //   @Req() req,
+  // ) {
+  //   const result = await this.projectService.registerStudentIntoProject(
+  //     registerStudentDto.projectId,
+  //     req.user.userId,
+  //   );
+  //   return result;
+  // }
 
-  @ApiBody({ type: AprrovalStudentToProjectDto })
-  @Post('approvestudenttoproject')
-  async ApproveStudentToProject(
-    @Body() approvalStudentDto: AprrovalStudentToProjectDto,
-  ) {
-    const result = await this.projectService.approveToProjectByTeacher(
-      approvalStudentDto.projectId,
-      approvalStudentDto.studentId,
-      '',
-    );
-    return result;
-  }
+  // @ApiBody({ type: AprrovalStudentToProjectDto })
+  // @Post('approvestudenttoproject')
+  // async ApproveStudentToProject(
+  //   @Body() approvalStudentDto: AprrovalStudentToProjectDto,
+  // ) {
+  //   const result = await this.projectService.approveToProjectByTeacher(
+  //     approvalStudentDto.projectId,
+  //     approvalStudentDto.studentId,
+  //     '',
+  //   );
+  //   return result;
+  // }
 
   @ApiBody({ type: ProjectAddDto })
   @Post('createproject')
   async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req) {
     const user = req.user;
     const userProfile = await this.userService.getProfileUser(user.userId, user.role)
-    if (user.role === Role.Student)
+    var isStudent: boolean = false;
+    if (user.role === Role.Student){
       projectAddDto.listStudent.push(userProfile.id);
+      isStudent = true;
+    }
     else if (user.role === Role.Teacher)
       projectAddDto.listTeacher.push(userProfile.id);
-    const result = await this.projectService.createProject(projectAddDto);
+    const result = await this.projectService.createProject(projectAddDto, isStudent);
     return result;
   }
 

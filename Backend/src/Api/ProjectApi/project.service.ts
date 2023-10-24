@@ -12,6 +12,8 @@ import { TeacherEntity } from "src/entity/teacher.entity";
 import { DocumentEntity } from "src/entity/document.entity";
 import { DocumentService } from "../DocumentApi/document.service";
 import { FolderPath } from "Core/Constant/folderPath.constant";
+import { ProjectStatus } from "Core/Enum/ProjectEnum";
+import { Project_StudentEntity } from "src/entity/projectStudent.entity";
 
 @Injectable()
 export class ProjectService {
@@ -24,6 +26,8 @@ export class ProjectService {
     private teacherProjectRepo: Repository<TeacherProjectEntity>,
     @InjectRepository(TeacherEntity)
     private teacherRepo: Repository<TeacherEntity>,
+    @InjectRepository(Project_StudentEntity)
+    private projectStudentRepo: Repository<Project_StudentEntity>,
     private documentService: DocumentService
   ) {}
 
@@ -48,11 +52,17 @@ export class ProjectService {
 
   async getDetailProject(id: string){
     var detailProject = new DetailProjectModel();
-    var studentInProject = await this.studentRepository.createQueryBuilder("s")
-    //.select(["s.project"])
-    .leftJoinAndSelect("s.project", "Project", "Project.id = :id", {id: id})
-    //.where("s.isApproveToProject = :isApproval", {isApproval: true})
-    .getMany();
+    var studentInProject = await this.projectStudentRepo.find({
+      relations: {
+        project: true,
+        student: true
+      },
+      where: {
+        project: {
+          id: id
+        }
+      }
+    });
     var teacherInProject = await this.teacherProjectRepo.createQueryBuilder("tp")
     .leftJoin("tp.project", "project", "project.id = :id", {id: id})
     .leftJoinAndSelect("tp.teacher", "teacher")    
@@ -64,9 +74,9 @@ export class ProjectService {
     detailProject.description = studentInProject[0].project.description;
     detailProject.students = studentInProject.map(x => {
       let student: StudentInProject = {
-        name: x.name,
-        msv: x.studentCode,
-        class: x.class
+        name: x.student.name,
+        msv: x.student.studentCode,
+        class: x.student.class
       }
       return student;
     })
@@ -77,42 +87,44 @@ export class ProjectService {
       return teacher;
     })
 
-    return studentInProject;             
+    return detailProject;             
   }
 
-  async registerStudentIntoProject(projectId: string, studentId: string){
-    var studentModel = await this.studentRepository.findOneBy({id: studentId});
-    if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
-    studentModel.project = new ProjectEntity();
-    studentModel.project.id = projectId;
-    studentModel.isApproveToProject = false;
-    const res = await this.studentRepository.update(studentId, studentModel);
-    return res;
-  }
+  // async registerStudentIntoProject(projectId: string, studentId: string){
+  //   var studentModel = await this.studentRepository.findOneBy({id: studentId});
+  //   if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
+  //   studentModel.project = new ProjectEntity();
+  //   studentModel.project.id = projectId;
+  //   studentModel.isApproveToProject = false;
+  //   const res = await this.studentRepository.update(studentId, studentModel);
+  //   return res;
+  // }
 
-  async approveToProjectByTeacher(projectId, studentId: string, teacherId: string){
-    var studentModel = await this.studentRepository.findOneBy({id: studentId});
-    if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
-    if (studentModel.project.id !== projectId) throw new HttpException("Invalid project", HttpStatus.BAD_REQUEST);
-    studentModel.isApproveToProject = true;
-    const res = await this.studentRepository.update(studentId, studentModel);
-    return res;
-  }
+  // async approveToProjectByTeacher(projectId, studentId: string, teacherId: string){
+  //   var studentModel = await this.studentRepository.findOneBy({id: studentId});
+  //   if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
+  //   if (studentModel.project.id !== projectId) throw new HttpException("Invalid project", HttpStatus.BAD_REQUEST);
+  //   studentModel.isApproveToProject = true;
+  //   const res = await this.studentRepository.update(studentId, studentModel);
+  //   return res;
+  // }
 
-  async createProject(projectAddDto: ProjectAddDto){
+  async createProject(projectAddDto: ProjectAddDto, isStudent: boolean){
     const projectModel = this.projectRepository.create(projectAddDto.projectAdd);
+    if (isStudent) projectModel.status = ProjectStatus.UnConfirm;
     await this.projectRepository.save(projectModel);
     if (projectAddDto.listStudent.length !== 0) {
       var studentsModel = await this.studentRepository.find({where : {id: In(projectAddDto.listStudent)}});
       if(studentsModel.length !== projectAddDto.listStudent.length) throw new HttpException("", HttpStatus.INTERNAL_SERVER_ERROR);
-      var updateStudentModel = studentsModel.map(student => {
-        student.project = new ProjectEntity();
-        student.project.id = projectModel.id;
-        //student.isApproveToProject = true;
-        return student;
+      var studentProjectModel = studentsModel.map(student => {
+        var studentProjectModel = new Project_StudentEntity();
+        studentProjectModel.project = new ProjectEntity();
+        studentProjectModel.project.id = projectModel.id;
+        studentProjectModel.student = student;
+        return studentProjectModel;
       })
 
-      await this.studentRepository.save(updateStudentModel);
+      await this.projectStudentRepo.save(studentProjectModel);
     }
 
     if(projectAddDto.listTeacher.length !== 0) {
@@ -120,9 +132,8 @@ export class ProjectService {
       if(teachersModel.length !== projectAddDto.listTeacher.length) throw new BadGatewayException();
       var teacherProjectsModel = teachersModel.map(teacher => {
           var teacherProjectModel = new TeacherProjectEntity();
-          teacherProjectModel.teacher = new TeacherEntity();
+          teacherProjectModel.teacher = teacher;
           teacherProjectModel.project = new ProjectEntity();
-          teacherProjectModel.teacher.id = teacher.id;
           teacherProjectModel.project.id = projectModel.id;
           
           return this.teacherProjectRepo.create(teacherProjectModel);
@@ -131,10 +142,10 @@ export class ProjectService {
       await this.teacherProjectRepo.save(teacherProjectsModel);
     }
 
-    if(projectAddDto.listAttachment !== null && projectAddDto.listAttachment.length !== 0) {
-      await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, true);
+    // if(projectAddDto.listAttachment !== null && projectAddDto.listAttachment.length !== 0) {
+    //   await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, true);
       
-    }
+    // }
     return 1;
   }
 

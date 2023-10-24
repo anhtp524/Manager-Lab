@@ -6,9 +6,11 @@ import { UserEntity } from 'src/entity/user.entity';
 import { StudentEntity } from 'src/entity/student.entity';
 import { TeacherEntity } from 'src/entity/teacher.entity';
 import { CloudinaryModule } from 'Core/Cloudinary/cloudinary.module';
+import { Project_StudentEntity } from 'src/entity/projectStudent.entity';
+import { TeacherProjectEntity } from 'src/entity/teacherProject.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, StudentEntity, TeacherEntity]), CloudinaryModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, StudentEntity, TeacherEntity, Project_StudentEntity, TeacherProjectEntity]), CloudinaryModule],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService]

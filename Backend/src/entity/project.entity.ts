@@ -16,7 +16,7 @@ export class ProjectEntity {
     @Column()
     description: string;
 
-    @Column({type : "enum", enum : ProjectStatus, default : ProjectStatus.Draft })
+    @Column({type : "enum", enum : ProjectStatus, default : ProjectStatus.UnConfirm })
     status: ProjectStatus;
 
     @ManyToOne(() => LaboratoryEntity, {eager : true})
