@@ -37,7 +37,7 @@ const columns: ColumnsType<ITeacherRowData> = [
   }
 ]
 
-const convertStatusEnumToValue = (status: ProjectStatus) => {
+export const convertStatusEnumToValue = (status: ProjectStatus) => {
   switch (status) {
     case ProjectStatus.Draft:
       return <Tag color='default'>Draft</Tag>
