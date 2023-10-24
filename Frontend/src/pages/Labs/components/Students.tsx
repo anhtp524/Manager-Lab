@@ -1,31 +1,10 @@
-import { Button, Drawer, Space, Table } from 'antd'
+import { Avatar, Button, Drawer, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
 import { useEffect, useMemo, useState } from 'react'
 import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
-
-// export interface IStudentRowData {
-//   key: React.Key
-//   studentCode: number
-//   name: string
-//   dateOfBirth: string
-//   class: string
-//   phoneNumber: string
-//   email: string
-// }
-
-// const data: IStudentRowData[] = []
-// for (let i = 0; i < 46; i++) {
-//   data.push({
-//     key: i,
-//     studentCode: i + 200000,
-//     name: `Dennis Dang ${i}`,
-//     dateOfBirth: '01/01/2000',
-//     class: `IT ${i}`,
-//     phoneNumber: '0987654321',
-//     email: `dennis_${i}@email.com`
-//   })
-// }
+import Lazyloading from '~/common/components/lazyloading/Lazyloading'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
 
 function Students() {
   const columns: ColumnsType<DetailStudent> = useMemo(
@@ -33,7 +12,12 @@ function Students() {
       {
         title: 'Student Code',
         dataIndex: 'studentCode',
-        width: 150,
+        width: 150
+      },
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        width: 300,
         onCell: (record) => {
           return {
             onClick: () => onOpenPanel(record)
@@ -51,11 +35,6 @@ function Students() {
             </a>
           )
         }
-      },
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        width: 300
       },
       {
         title: 'Date Of Birth',
@@ -82,6 +61,8 @@ function Students() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [studentList, setStudentList] = useState<ListStudent>([])
   const [open, setOpen] = useState<boolean>(false)
+  const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
+  const { isLoading, showLoading, closeLoading, showError } = useHandlingApi()
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -89,12 +70,15 @@ function Students() {
 
     const handleGetAllStudent = async () => {
       try {
+        showLoading()
         const response = await studentAPI.getAll({ signal: signal })
         if (response.data && response.data.length > 0) {
           setStudentList(response.data)
+          closeLoading()
         }
       } catch (error) {
         console.error(error)
+        showError()
       }
     }
 
@@ -147,9 +131,19 @@ function Students() {
     ]
   }
 
-  const onOpenPanel = (record: DetailStudent) => {
-    console.log(record)
-    setOpen(true)
+  const onOpenPanel = async (record: DetailStudent) => {
+    try {
+      showLoading()
+      const response = await studentAPI.getStudentById(record.id)
+      if (response && response.data) {
+        setOpen(true)
+        setStudentDetail(response.data)
+        closeLoading()
+      }
+    } catch (error: Dennis) {
+      showError()
+      console.error(error)
+    }
   }
 
   const onClose = () => {
@@ -157,19 +151,19 @@ function Students() {
   }
   return (
     <div>
+      {isLoading && <Lazyloading />}
       <Table rowSelection={rowSelection} columns={columns} dataSource={studentList} />
       <Drawer
         title='View student information'
         className='student-detail-info'
         placement='right'
-        width={500}
+        width={700}
         onClose={onClose}
         open={open}
         keyboard={false}
         maskClosable={false}
         motion={{ motionDeadline: 0 }}
         headerStyle={{ flexDirection: 'row-reverse' }}
-        closeIcon
         footer={
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
             <Button onClick={onClose} type='primary'>
@@ -178,9 +172,11 @@ function Students() {
           </Space>
         }
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <div className='student-avatar'>
+          <Avatar size={160}>
+            <span style={{ fontSize: 40 }}>{studentDetail?.name}</span>
+          </Avatar>
+        </div>
       </Drawer>
     </div>
   )
