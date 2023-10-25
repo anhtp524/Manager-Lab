@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import config from './config'
 
 const fetchHandler = axios.create(config)
@@ -10,7 +10,7 @@ fetchHandler.interceptors.request.use(
     request.headers.Authorization = `Bearer ${token}`
     return request
   },
-  (error: AxiosResponse) => {
+  (error: AxiosError) => {
     return Promise.reject(error)
   }
 )
@@ -21,7 +21,7 @@ downloadHandler.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {
     return request
   },
-  (error: AxiosResponse) => {
+  (error: AxiosError) => {
     return Promise.reject(error)
   }
 )

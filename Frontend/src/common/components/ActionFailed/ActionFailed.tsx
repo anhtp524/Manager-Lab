@@ -21,7 +21,7 @@ function ActionFailed({ open, onClose }: IActionFailedProps) {
         width={464}
         closeIcon
         destroyOnClose
-        mask={false}
+        mask={true}
         maskClosable={false}
         footer={false}
         onCancel={() => onClose()}

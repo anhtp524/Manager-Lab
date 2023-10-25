@@ -1,3 +1,4 @@
+import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Button, Drawer, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
@@ -62,7 +63,7 @@ function Students() {
   const [studentList, setStudentList] = useState<ListStudent>([])
   const [open, setOpen] = useState<boolean>(false)
   const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
-  const { isLoading, showLoading, closeLoading, showError } = useHandlingApi()
+  const { showLoading, closeLoading, showError } = useHandlingApi()
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -151,7 +152,6 @@ function Students() {
   }
   return (
     <div>
-      {isLoading && <Lazyloading />}
       <Table rowSelection={rowSelection} columns={columns} dataSource={studentList} />
       <Drawer
         title='View student information'
@@ -172,10 +172,12 @@ function Students() {
           </Space>
         }
       >
-        <div className='student-avatar'>
-          <Avatar size={160}>
-            <span style={{ fontSize: 40 }}>{studentDetail?.name}</span>
-          </Avatar>
+        <div>
+          <div className='student-avatar'>
+            <Avatar size={160} icon={<UserOutlined />} gap={0} />
+            <span>{studentDetail?.name}</span>
+          </div>
+          <div className='student-info'></div>
         </div>
       </Drawer>
     </div>
