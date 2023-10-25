@@ -21,4 +21,11 @@
 .student-avatar {
   padding: 12px;
   vertical-align: middle;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  span {
+    font-size: 40px;
+  }
 }

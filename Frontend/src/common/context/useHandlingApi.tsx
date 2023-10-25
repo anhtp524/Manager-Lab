@@ -27,6 +27,7 @@ export const LoadingProvider = (props: IProps) => {
   const [hasError, setHasError] = useState<boolean>(false)
 
   const showLoading = () => {
+    document.body.classList.add('hide-scrollbar')
     setLoading(true)
   }
   const closeLoading = () => {
