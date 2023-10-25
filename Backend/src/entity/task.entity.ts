@@ -3,7 +3,7 @@ import { ProjectEntity } from "./project.entity";
 
 @Entity({name: "Task"})
 export class TaskEntity {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: string;
     
     @Column()
@@ -15,10 +15,10 @@ export class TaskEntity {
     @Column()
     dueDate: Date;
     
-    @Column()
+    @Column({nullable: true})
     response: string;
     
-    @Column()
+    @Column({default : false})
     isPass: boolean;
 
     @ManyToOne(() => ProjectEntity)
