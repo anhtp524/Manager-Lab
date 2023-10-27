@@ -8,7 +8,7 @@ export class CreateTaskDto {
     createDate: Date;
     
     @ApiProperty()
-    dueDate: Date;
+    dueDate: Date   ;
     
     @ApiProperty()
     projectId: string;

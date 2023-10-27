@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ProjectEntity } from "./project.entity";
+import { TaskStatus } from "Core/Enum/TaskEnum";
 
 @Entity({name: "Task"})
 export class TaskEntity {
@@ -17,9 +18,12 @@ export class TaskEntity {
     
     @Column({nullable: true})
     response: string;
+
+    @Column()
+    comment: string;
     
-    @Column({default : false})
-    isPass: boolean;
+    @Column({type: "enum", enum: TaskStatus})
+    status: TaskStatus;
 
     @ManyToOne(() => ProjectEntity)
     @JoinColumn({referencedColumnName: "id"})
