@@ -1,21 +1,21 @@
 import './login.scss'
-import { Form, Input, Button, Checkbox, notification } from 'antd'
+import { Form, Input, Button, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import Image from '~/assets/Image'
 import fetchHandler from '~/api/axios'
 import { Store } from 'antd/es/form/interface'
 import { useNavigate } from 'react-router-dom'
-import Cookies from 'universal-cookie'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
 
 function Login() {
   const navigate = useNavigate()
-
-  const openNotificationWithIcon = (type: string | number, message: string, description: string) => {
-    notification[type]({
-      message: message,
-      description: description
-    })
-  }
+  const { showLoading, closeLoading } = useHandlingApi()
+  // const openNotificationWithIcon = (type: string | number, message: string, description: string) => {
+  //   notification[type]({
+  //     message: message,
+  //     description: description
+  //   })
+  // }
   const ruleRequired = (msg: string, isRequired: boolean) => {
     return {
       required: isRequired,
@@ -34,15 +34,20 @@ function Login() {
       email: values.email,
       password: values.password
     }
-    const res = await fetchHandler.post('/authentication/login', body)
-    if (res.status === 201) {
-      const cookies = new Cookies()
-      cookies.set('tokenUser', res.data.accessToken, { path: '/' })
-      localStorage.setItem('token', res.data.accessToken)
-      navigate('/')
-    }
-    if (res.status === 401) {
-      openNotificationWithIcon('error', res.data, 'Please contact with admin to help')
+    try {
+      showLoading()
+      const res = await fetchHandler.post('/authentication/login', body)
+
+      if (res.status === 201) {
+        // const cookies = new Cookies()
+        // cookies.set('tokenUser', res.data.accessToken, { path: '/' })
+        closeLoading()
+        localStorage.setItem('token', res.data.accessToken)
+        navigate('/')
+      }
+    } catch (error: Dennis) {
+      closeLoading()
+      console.error(error)
     }
   }
   return (

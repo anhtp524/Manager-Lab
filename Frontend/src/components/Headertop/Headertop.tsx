@@ -9,8 +9,8 @@ const Headertop = () => {
     // navigate('/personalinfo');
   }
   const hanleLogout = () => {
-    localStorage.removeItem('accessToken')
-    navigate('/login')
+    localStorage.removeItem('token')
+    navigate('/auth/login')
   }
 
   const items: MenuProps['items'] = [

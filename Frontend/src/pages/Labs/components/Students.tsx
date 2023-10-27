@@ -4,7 +4,6 @@ import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
 import { useEffect, useMemo, useState } from 'react'
 import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
-import Lazyloading from '~/common/components/lazyloading/Lazyloading'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 
 function Students() {
@@ -63,7 +62,7 @@ function Students() {
   const [studentList, setStudentList] = useState<ListStudent>([])
   const [open, setOpen] = useState<boolean>(false)
   const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
-  const { showLoading, closeLoading, showError } = useHandlingApi()
+  const { showLoading, closeLoading } = useHandlingApi()
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -79,7 +78,6 @@ function Students() {
         }
       } catch (error) {
         console.error(error)
-        showError()
       }
     }
 
@@ -142,7 +140,6 @@ function Students() {
         closeLoading()
       }
     } catch (error: Dennis) {
-      showError()
       console.error(error)
     }
   }
