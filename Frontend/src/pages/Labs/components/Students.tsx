@@ -1,10 +1,10 @@
-import { UserOutlined } from '@ant-design/icons'
-import { Avatar, Button, Drawer, Space, Table } from 'antd'
+import { Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
 import { useEffect, useMemo, useState } from 'react'
 import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
+import DetailPanel from './common/DetailPanel'
 
 function Students() {
   const columns: ColumnsType<DetailStudent> = useMemo(
@@ -74,10 +74,11 @@ function Students() {
         const response = await studentAPI.getAll({ signal: signal })
         if (response.data && response.data.length > 0) {
           setStudentList(response.data)
-          closeLoading()
         }
       } catch (error) {
         console.error(error)
+      } finally {
+        closeLoading()
       }
     }
 
@@ -141,6 +142,8 @@ function Students() {
       }
     } catch (error: Dennis) {
       console.error(error)
+    } finally {
+      closeLoading()
     }
   }
 
@@ -149,34 +152,8 @@ function Students() {
   }
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={studentList} />
-      <Drawer
-        title='View student information'
-        className='student-detail-info'
-        placement='right'
-        width={700}
-        onClose={onClose}
-        open={open}
-        keyboard={false}
-        maskClosable={false}
-        motion={{ motionDeadline: 0 }}
-        headerStyle={{ flexDirection: 'row-reverse' }}
-        footer={
-          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Button onClick={onClose} type='primary'>
-              OK
-            </Button>
-          </Space>
-        }
-      >
-        <div>
-          <div className='student-avatar'>
-            <Avatar size={160} icon={<UserOutlined />} gap={0} />
-            <span>{studentDetail?.name}</span>
-          </div>
-          <div className='student-info'></div>
-        </div>
-      </Drawer>
+      <Table rowSelection={rowSelection} columns={columns} dataSource={studentList} bordered />
+      <DetailPanel open={open} onClose={onClose} data={studentDetail} type='student' />
     </div>
   )
 }

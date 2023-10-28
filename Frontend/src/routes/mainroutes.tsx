@@ -4,23 +4,26 @@ import Lazyloading from '~/common/components/lazyloading/Lazyloading'
 import ErrorPage from '~/components/ErrorPage/ErrorPage'
 import Layout from '~/components/Layout/Layout'
 import Homepage from '~/pages/Homepage/Homepage'
-import LabDetail from '~/pages/Labs/LabDetail'
 import Labs from '~/pages/Labs/Labs'
 import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
-import { RoutePath } from './util'
+import { Role, RoutePath } from './util'
 import AuthenLayout from '~/components/Layout/AuthenLayout'
 import Login from '~/pages/Authen/Login'
 import ForgotPassword from '~/pages/Authen/ForgotPassword'
 import ProtectedRoutes from './ProtectedRoutes'
 import Chat from '~/pages/Chat/Chat'
-import Forum from '~/pages/Forum/Forum'
 import Project from '~/pages/Project/Project'
 import ProjectChildren from '~/pages/Project/components/ProjectChildren'
+import LabDetail from '~/pages/Labs/LabDetail'
 
 const router = createBrowserRouter([
   {
     path: RoutePath.HomePage,
-    element: <Layout />,
+    element: (
+      // <ProtectedRoutes>
+      <Layout />
+      // </ProtectedRoutes>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
@@ -44,15 +47,6 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ProfileStudent />
-          </Suspense>
-        )
-      },
-      {
-        path: RoutePath.Newfeed,
-        element: (
-          <Suspense fallback={<Lazyloading />}>
-            {/* <ManagementProduct /> */}
-            <Forum />
           </Suspense>
         )
       },
@@ -87,6 +81,16 @@ const router = createBrowserRouter([
             <LabDetail />
           </Suspense>
         )
+      },
+      {
+        path: RoutePath.ManagementAccount,
+        element: (
+          <Suspense fallback={<Lazyloading />}>
+            <ProtectedRoutes role={[Role.Admin]}>
+              <div>Management Account</div>
+            </ProtectedRoutes>
+          </Suspense>
+        )
       }
     ]
   },
@@ -117,9 +121,9 @@ const router = createBrowserRouter([
     path: '*',
     element: (
       <Suspense fallback={<Lazyloading />}>
-        <ProtectedRoutes>
-          <ErrorPage />
-        </ProtectedRoutes>
+        {/* <ProtectedRoutes> */}
+        <ErrorPage />
+        {/* </ProtectedRoutes> */}
       </Suspense>
     )
   }

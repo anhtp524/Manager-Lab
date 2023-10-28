@@ -1,50 +1,87 @@
-import {
-  FolderOutlined,
-  GiftOutlined,
-  HeatMapOutlined,
-  HomeOutlined,
-  ReadOutlined,
-  WechatOutlined
-} from '@ant-design/icons'
+import { FolderOutlined, GiftOutlined, HeatMapOutlined, HomeOutlined, WechatOutlined } from '@ant-design/icons'
 import { Menu } from 'antd'
 import { Outlet, useNavigate } from 'react-router-dom'
 import Headertop from '../Headertop/Headertop'
 import './layout.scss'
+import { useEffect } from 'react'
+import fetchHandler from '~/api/axios'
+import { Role } from '~/routes/util'
+import { useAuth } from '~/common/context/useAuth'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
+
+let items = [
+  {
+    label: 'Home',
+    key: '/',
+    icon: <HomeOutlined />
+  },
+  {
+    label: 'Labs',
+    key: '/labs',
+    icon: <HeatMapOutlined />
+  },
+  {
+    label: 'Contests and prizes',
+    key: '/contestsprizes',
+    icon: <GiftOutlined />
+  },
+  {
+    label: 'Project',
+    key: '/project',
+    icon: <FolderOutlined />
+  },
+  {
+    label: 'Chat',
+    key: '/chat',
+    icon: <WechatOutlined />
+  },
+  {
+    label: 'Account Management',
+    key: '/account',
+    icon: <WechatOutlined />
+  }
+]
 
 function Layout() {
+  const { authInfo, setAuthInfo } = useAuth()
+  const { showLoading, closeLoading } = useHandlingApi()
   const navigate = useNavigate()
-  const items = [
-    {
-      label: 'Home',
-      key: '/',
-      icon: <HomeOutlined />
-    },
-    {
-      label: 'Labs',
-      key: '/labs',
-      icon: <HeatMapOutlined />
-    },
-    {
-      label: 'Contests and prizes',
-      key: '/contestsprizes',
-      icon: <GiftOutlined />
-    },
-    {
-      label: 'Project',
-      key: '/project',
-      icon: <FolderOutlined />
-    },
-    {
-      label: 'New feed',
-      key: '/newfeed',
-      icon: <ReadOutlined />
-    },
-    {
-      label: 'Chat',
-      key: '/chat',
-      icon: <WechatOutlined />
+
+  useEffect(() => {
+    const abortController = new AbortController()
+    const signal = abortController.signal
+    const handleCheckAuthentication = async () => {
+      showLoading()
+      try {
+        const response = await fetchHandler.get<{ isAuthenticated: boolean; role: Role }>(
+          'authentication/checkauthentication',
+          { signal: signal }
+        )
+        if (response && response.data) {
+          setAuthInfo({
+            roles: response.data.role,
+            isAuthenticated: response.data.isAuthenticated
+          })
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        closeLoading()
+      }
     }
-  ]
+
+    handleCheckAuthentication()
+    return () => {
+      abortController.abort()
+    }
+  }, [])
+
+  if (!authInfo?.isAuthenticated) return null
+
+  if (authInfo.roles !== Role.Admin) {
+    items = items.filter((x) => x.key === '/account')
+  }
+
   return (
     <div className='layout'>
       <div className='layoutheadertop'>

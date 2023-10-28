@@ -24,6 +24,7 @@ export const LoadingProvider = (props: IProps) => {
     setLoading(true)
   }
   const closeLoading = () => {
+    document.body.classList.remove('hide-scrollbar')
     setLoading(false)
   }
 
