@@ -1,6 +1,6 @@
 .labsParent {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   span {
     font-weight: 600;
     font-size: 18px;
@@ -19,13 +19,56 @@
 }
 
 .student-avatar {
-  padding: 12px;
-  vertical-align: middle;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 24px;
-  span {
+  span:first-child {
     font-size: 40px;
+  }
+  span:nth-child(2) {
+    font-size: 16px;
+    color: grey;
+  }
+}
+
+.info-container {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  .detail-info {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    justify-content: stretch;
+    align-items: center;
+    column-gap: 12px;
+    font-size: 16px;
+    .detail-left {
+      width: 100%;
+      padding: 12px;
+      background: #e7e7e7;
+      font-weight: 500;
+    }
+  }
+}
+
+.ant-drawer-header {
+  &-title {
+    flex-direction: row-reverse;
+    button {
+      margin-inline-end: 0 !important;
+    }
+  }
+}
+
+.ant-avatar {
+  span {
+    transform: translate(0, -10px);
+  }
+}
+.labdetail {
+  .ant-collapse-header {
+    align-items: center !important;
   }
 }

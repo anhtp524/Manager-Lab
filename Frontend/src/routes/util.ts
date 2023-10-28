@@ -15,7 +15,8 @@ export enum RoutePath {
   LabDetail = '/labsdetail/:id',
   ManagementStudent = '/studentmanagement',
   ManagementProduct = '/productmanagement',
-  Personalinfo = '/personalinfo'
+  Personalinfo = '/personalinfo',
+  ManagementAccount = '/account'
 }
 
 export enum ProjectStatus {
@@ -24,4 +25,10 @@ export enum ProjectStatus {
   OnGoing = 101,
   Finish = 102,
   Cancel = 103
+}
+
+export enum Role {
+  Admin = 0,
+  Student = 1,
+  Teacher = 2
 }

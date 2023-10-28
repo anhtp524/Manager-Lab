@@ -3,14 +3,27 @@ import { Dropdown, MenuProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import './headertop.scss'
 import Image from '~/assets/Image'
+import fetchHandler from '~/api/axios'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
 const Headertop = () => {
   const navigate = useNavigate()
+  const { showLoading, closeLoading } = useHandlingApi()
   const handleClickgotoInfoPage = () => {
     // navigate('/personalinfo');
   }
-  const hanleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/auth/login')
+  const hanleLogout = async () => {
+    showLoading()
+    try {
+      const response = await fetchHandler.get<boolean>('authentication/logout')
+      if (response) {
+        localStorage.removeItem('token')
+        navigate('/auth/login')
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
   }
 
   const items: MenuProps['items'] = [

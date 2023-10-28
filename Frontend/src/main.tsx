@@ -4,6 +4,7 @@ import App from './App.tsx'
 import { store } from './app/store.ts'
 import { LoadingProvider } from './common/context/useHandlingApi.tsx'
 import { ConfigProvider } from 'antd'
+import { AuthProvider } from './common/context/useAuth.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       }}
     >
       <LoadingProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </LoadingProvider>
     </ConfigProvider>
   </Provider>

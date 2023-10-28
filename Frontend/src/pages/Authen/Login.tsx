@@ -6,10 +6,13 @@ import fetchHandler from '~/api/axios'
 import { Store } from 'antd/es/form/interface'
 import { useNavigate } from 'react-router-dom'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
+import { useAuth } from '~/common/context/useAuth'
+import { Role } from '~/routes/util'
 
 function Login() {
   const navigate = useNavigate()
   const { showLoading, closeLoading } = useHandlingApi()
+  const { setAuthInfo } = useAuth()
   // const openNotificationWithIcon = (type: string | number, message: string, description: string) => {
   //   notification[type]({
   //     message: message,
@@ -36,11 +39,12 @@ function Login() {
     }
     try {
       showLoading()
-      const res = await fetchHandler.post('/authentication/login', body)
+      const res = await fetchHandler.post<{ id: GUID; accessToken: string; role: Role }>('/authentication/login', body)
 
       if (res.status === 201) {
-        // const cookies = new Cookies()
-        // cookies.set('tokenUser', res.data.accessToken, { path: '/' })
+        setAuthInfo({
+          roles: res.data.role
+        })
         closeLoading()
         localStorage.setItem('token', res.data.accessToken)
         navigate('/')

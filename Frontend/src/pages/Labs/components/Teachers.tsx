@@ -1,70 +1,102 @@
 import { Table } from 'antd'
 import { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import teacherAPI, { DetailTeacher, ListTeacher } from '~/api/teacher.api'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
+import DetailPanel from './common/DetailPanel'
 
-interface ITeacherRowData {
-  key: React.Key
-  name: string
-  dateOfBirth: string
-  department: string
-  major: string
-  phoneNumber: string
-  email: string
-}
-
-const columns: ColumnsType<ITeacherRowData> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    width: 200
-  },
-  {
-    title: 'Date Of Birth',
-    dataIndex: 'dateOfBirth',
-    width: 150
-  },
-  {
-    title: 'Department',
-    dataIndex: 'department',
-    width: 150
-  },
-  {
-    title: 'Major',
-    dataIndex: 'major',
-    width: 150
-  },
-  {
-    title: 'Phone Number',
-    dataIndex: 'phoneNumber',
-    width: 150
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email'
-  }
-]
-
-const data: ITeacherRowData[] = []
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    name: `Roy Vu ${i}`,
-    dateOfBirth: '01/01/2000',
-    department: `T-IT ${i}`,
-    major: 'Computer Science',
-    phoneNumber: '0987654321',
-    email: `roy_${i}@email.com`
-  })
-}
 function Teachers() {
+  const columns: ColumnsType<DetailTeacher> = useMemo(
+    () => [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        width: 200,
+        onCell: (record) => {
+          return {
+            onClick: () => onOpenPanel(record)
+          }
+        },
+        render: (value) => {
+          return (
+            <a
+              href=''
+              onClick={(e) => {
+                e.preventDefault()
+              }}
+            >
+              {value}
+            </a>
+          )
+        }
+      },
+      {
+        title: 'Date Of Birth',
+        dataIndex: 'dateOfBirth',
+        width: 150
+      },
+      {
+        title: 'Department',
+        dataIndex: 'department',
+        width: 200
+      },
+      {
+        title: 'Major',
+        dataIndex: 'major',
+        width: 150
+      },
+      {
+        title: 'Phone Number',
+        dataIndex: 'phoneNumber',
+        width: 150
+      },
+      {
+        title: 'Email',
+        dataIndex: 'email'
+      }
+    ],
+    []
+  )
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [open, setOpen] = useState<boolean>(false)
+  const [teacherDetail, setTeacherDetail] = useState<DetailTeacher | undefined>(undefined)
+  const [teacherList, setTeacherList] = useState<ListTeacher>([])
+  const { id } = useParams()
+  const { showLoading, closeLoading } = useHandlingApi()
+
+  useEffect(() => {
+    const abortController = new AbortController()
+    const signal = abortController.signal
+
+    const handleGetAllTeacherInLab = async () => {
+      if (id === undefined) return
+      try {
+        showLoading()
+        const response = await teacherAPI.getAllTeacherInLab(id, { signal: signal })
+        if (response.data && response.data.length > 0) {
+          setTeacherList(response.data)
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        closeLoading()
+      }
+    }
+
+    handleGetAllTeacherInLab()
+    return () => {
+      abortController.abort()
+    }
+  }, [])
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys)
   }
 
-  const rowSelection: TableRowSelection<ITeacherRowData> = {
+  const rowSelection: TableRowSelection<DetailTeacher> = {
     selectedRowKeys,
     onChange: onSelectChange,
     selections: [
@@ -101,9 +133,29 @@ function Teachers() {
       }
     ]
   }
+
+  const onOpenPanel = async (record: DetailTeacher) => {
+    try {
+      showLoading()
+      const response = await teacherAPI.getTeacherById(record.id)
+      if (response && response.data) {
+        setOpen(true)
+        setTeacherDetail(response.data)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
+  const onClose = () => {
+    setOpen(false)
+  }
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} scroll={{ y: 400 }} />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={teacherList} bordered />
+      <DetailPanel open={open} onClose={onClose} data={teacherDetail} type='teacher' />
     </div>
   )
 }
