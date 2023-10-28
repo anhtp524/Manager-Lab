@@ -10,7 +10,6 @@ import { TeacherModule } from './Api/TeacherApi/teacher.module';
 import { dataSourceOptions } from 'db/dataSource';
 import { AuthModule } from 'Core/Auth/auth.module';
 import { DocumentModule } from './Api/DocumentApi/document.module';
-import { TopicModule } from './Api/TopicApi/topic.module';
 import { CommentModule } from './Api/CommentApi/comment.module';
 import { ChatModulde } from './gateway/chat.module';
 import { MessageModule } from './Api/MessageApi/message.module';
@@ -26,7 +25,6 @@ import { TaskModule } from './Api/TaskApi/task.module';
     TeacherModule,
     AuthModule,
     DocumentModule,
-    TopicModule,
     CommentModule,
     MessageModule,
     ChatModulde,

@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateCommentDto {
     @ApiProperty()
-    content: string;
+    taskId: string;
     @ApiProperty()
-    listFile: string[];
+    content: string;
 }

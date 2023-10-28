@@ -56,8 +56,13 @@ export class TaskService{
 
     async CloseTask(closeDto: CloseTaskDto){
         var taskModel = await this.GetTaskById(closeDto.taskId);
-        taskModel.comment = closeDto.comment;
-        taskModel.status = TaskStatus.Pass;
+        if (!closeDto.isPass) {
+            taskModel.status = TaskStatus.New;
+        }
+        else {
+            taskModel.status = TaskStatus.Pass;
+            taskModel.feedback = closeDto.feedback
+        }
         await this.taskRepo.save(taskModel);
         return taskModel;
     }

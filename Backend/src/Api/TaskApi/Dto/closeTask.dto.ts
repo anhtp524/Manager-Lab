@@ -4,7 +4,10 @@ export class CloseTaskDto {
     
     @ApiProperty()
     taskId: string;
+
+    @ApiProperty()
+    isPass: boolean;
     
     @ApiProperty()
-    comment: string;
+    feedback?: string;
 }

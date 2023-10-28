@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { TopicEntity } from "./topic.entity";
 import { UserEntity } from "./user.entity";
+import { TaskEntity } from "./task.entity";
 
 @Entity({name: "Comment"})
 export class CommentEntity {
@@ -13,9 +13,9 @@ export class CommentEntity {
     @Column({type: "date"})
     createdDate: Date;
     
-    @ManyToOne(() => TopicEntity)
+    @ManyToOne(() => TaskEntity)
     @JoinColumn()
-    topic: TopicEntity;
+    task: TaskEntity;
     
     @ManyToOne(() => UserEntity)
     @JoinColumn({referencedColumnName: "id"})

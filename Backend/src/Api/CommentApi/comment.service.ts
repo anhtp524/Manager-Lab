@@ -3,9 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CommentEntity } from "src/entity/comment.entity";
 import { Repository } from "typeorm";
 import { CreateCommentDto } from "./Dto/createComment.dto";
-import { TopicEntity } from "src/entity/topic.entity";
 import { UserEntity } from "src/entity/user.entity";
 import { DocumentService } from "../DocumentApi/document.service";
+import { TaskEntity } from "src/entity/task.entity";
 
 @Injectable()
 export class CommentService {
@@ -15,11 +15,11 @@ export class CommentService {
         private documentService: DocumentService
     ){}
 
-    async getAllCommentInTopic(topicId: string){
+    async getAllCommentInTask(taskId: string){
         var listCommentModel = await this.commentRepo.find({
             where: {
-                topic : {
-                    id: topicId
+                task : {
+                    id: taskId
                 }
             }
         });
@@ -27,14 +27,13 @@ export class CommentService {
         return listCommentModel;
     }
 
-    async createComment(createCommentDto: CreateCommentDto, topicId: string, userId: string){
+    async createComment(createCommentDto: CreateCommentDto, userId: string){
         var commentModel = await this.commentRepo.create({content: createCommentDto.content});
         commentModel.createdDate = new Date();
-        commentModel.topic = new TopicEntity();
-        commentModel.topic.id = topicId;
+        commentModel.task = new TaskEntity();
+        commentModel.task.id = createCommentDto.taskId;
         commentModel.owner = new UserEntity();
         commentModel.owner.id = userId;
-        //await this.documentService.UpdateRegardingId(createCommentDto.listFile, )
         var res = await this.commentRepo.save(commentModel);
         return res;
     }

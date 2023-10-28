@@ -3,6 +3,7 @@ import { CommentService } from "./comment.service";
 import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { CreateCommentDto } from "./Dto/createComment.dto";
+import { tasks } from "googleapis/build/src/apis/tasks";
 
 @Controller()
 @ApiTags("Comment")
@@ -13,9 +14,9 @@ export class CommentCotroller {
         private commentService: CommentService
     ){}
 
-    @Get("getallcomment/:topicId")
-    async GetAllCommentInTopic(@Param("topicId") topicId: string) {
-        const result = await this.commentService.getAllCommentInTopic(topicId);
+    @Get("getallcomment/:taskId")
+    async GetAllCommentInTopic(@Param("taskId") taskId: string) {
+        const result = await this.commentService.getAllCommentInTask(taskId);
         return result;
     }
 
