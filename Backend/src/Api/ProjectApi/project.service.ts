@@ -15,6 +15,7 @@ import { FolderPath } from "Core/Constant/folderPath.constant";
 import { ProjectStatus } from "Core/Enum/ProjectEnum";
 import { Project_StudentEntity } from "src/entity/projectStudent.entity";
 import { LaboratoryEntity } from "src/entity/laboratory.entity";
+import { CloseProjectDto } from "./Dto/closeProject.dto";
 
 @Injectable()
 export class ProjectService {
@@ -127,10 +128,10 @@ export class ProjectService {
       await this.teacherProjectRepo.save(teacherProjectsModel);
     }
 
-    // if(projectAddDto.listAttachment !== null && projectAddDto.listAttachment.length !== 0) {
-    //   await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, true);
+    if(projectAddDto.listAttachment !== null && projectAddDto.listAttachment.length !== 0) {
+      await this.documentService.UpdateRegardingId(projectAddDto.listAttachment, projectModel.id, FolderPath.createdProject, true);
       
-    // }
+    }
     return 1;
   }
 
@@ -146,5 +147,18 @@ export class ProjectService {
       }
     });
     return listProjectModel;
+  }
+
+  async CloseProject(closeProjectDto: CloseProjectDto){
+    var projectModel = await this.projectRepository.findOne({
+      where: {
+        id: closeProjectDto.projectId
+      }
+    });
+
+    projectModel.feedback = closeProjectDto.feedback;
+    projectModel.score = closeProjectDto.score;
+    await this.projectRepository.save(projectModel);
+    return projectModel;
   }
 }

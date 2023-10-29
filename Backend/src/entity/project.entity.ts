@@ -22,6 +22,12 @@ export class ProjectEntity {
     @ManyToOne(() => LaboratoryEntity, {eager : true})
     @JoinColumn({referencedColumnName : 'id'})
     lab: LaboratoryEntity;
+
+    @Column({nullable: true})
+    feedback: string;
+
+    @Column({nullable: true})
+    score: number;
 }
 
 

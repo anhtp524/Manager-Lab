@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { DocumentService } from "./document.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ByRegardingDto, CreateDocumentDto } from "./Dto/document.dto";
 import { UploadFileDto } from "Core/CoreDto/uploadFile.dto";
 import { AuthGuard } from "@nestjs/passport";
+import type { Response } from 'express';
+import { Readable } from 'stream';
 
 @Controller('document')
 @ApiTags("Document")
@@ -49,4 +51,23 @@ export class DocumentController {
         var res = await this.documentService.getDocumentByRegarding(byRegardingDto.regarding, byRegardingDto.folderPath);
         return res;
     }
+
+    @Get("download/:id")
+    @ApiBearerAuth()
+    @ApiResponse({
+        schema: {
+          type: 'string',
+          format: 'binary',
+        },
+        status: HttpStatus.OK,
+      })
+    async getFile(@Param("id") id: string, @Res({ passthrough: true }) res: Response) {
+    const file = await this.documentService.getDocumentById(id);
+    const contentFile =  Readable.from(file.documentContent);
+    res.set({
+      'Content-Type': `${file.mimeType}`,
+      'Content-Disposition': `attachment; filename=${file.documentName}`,
+    });
+    return new StreamableFile(contentFile);
+  }
 }

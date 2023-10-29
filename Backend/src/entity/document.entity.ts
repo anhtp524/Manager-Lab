@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DocumentRuleEntity } from "./documentRule.entity";
+import { UserEntity } from "./user.entity";
 
 @Entity({name :"Document"})
 export class DocumentEntity {
@@ -18,7 +19,8 @@ export class DocumentEntity {
     @Column()
     size : number;
     
-    @Column({type: 'uuid'})
+    @OneToOne(() => UserEntity)
+    @JoinColumn({referencedColumnName: "id"})
     createdBy : string;
 
     @Column()

@@ -79,7 +79,7 @@ function Layout() {
   if (!authInfo?.isAuthenticated) return null
 
   if (authInfo.roles !== Role.Admin) {
-    items = items.filter((x) => x.key === '/account')
+    items = items.filter((x) => x.key !== '/account')
   }
 
   return (
