@@ -29,4 +29,16 @@ export class LabboratoryService {
     await this.labRepository.save(newLabModel);
     return newLabModel;
   }
+
+  async getDetailLab(id: string) {
+    var detailLabModel = await this.labRepository.findOne({
+      relations: {
+        teacher: true
+      },
+      where: {
+        id: id
+      }
+    });
+    return detailLabModel;
+  }
 }

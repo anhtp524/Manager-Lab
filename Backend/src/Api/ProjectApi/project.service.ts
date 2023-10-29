@@ -14,6 +14,7 @@ import { DocumentService } from "../DocumentApi/document.service";
 import { FolderPath } from "Core/Constant/folderPath.constant";
 import { ProjectStatus } from "Core/Enum/ProjectEnum";
 import { Project_StudentEntity } from "src/entity/projectStudent.entity";
+import { LaboratoryEntity } from "src/entity/laboratory.entity";
 
 @Injectable()
 export class ProjectService {
@@ -90,28 +91,12 @@ export class ProjectService {
     return detailProject;             
   }
 
-  // async registerStudentIntoProject(projectId: string, studentId: string){
-  //   var studentModel = await this.studentRepository.findOneBy({id: studentId});
-  //   if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
-  //   studentModel.project = new ProjectEntity();
-  //   studentModel.project.id = projectId;
-  //   studentModel.isApproveToProject = false;
-  //   const res = await this.studentRepository.update(studentId, studentModel);
-  //   return res;
-  // }
-
-  // async approveToProjectByTeacher(projectId, studentId: string, teacherId: string){
-  //   var studentModel = await this.studentRepository.findOneBy({id: studentId});
-  //   if (!studentModel) throw new HttpException("Error when find student", HttpStatus.BAD_REQUEST);
-  //   if (studentModel.project.id !== projectId) throw new HttpException("Invalid project", HttpStatus.BAD_REQUEST);
-  //   studentModel.isApproveToProject = true;
-  //   const res = await this.studentRepository.update(studentId, studentModel);
-  //   return res;
-  // }
-
-  async createProject(projectAddDto: ProjectAddDto, isStudent: boolean){
+  async createProject(projectAddDto: ProjectAddDto, isStudent: boolean, labId: string){
     const projectModel = this.projectRepository.create(projectAddDto.projectAdd);
-    if (isStudent) projectModel.status = ProjectStatus.UnConfirm;
+    if (isStudent) projectModel.status = ProjectStatus.UnConfirm
+    else projectModel.status = ProjectStatus.New;
+    projectModel.lab = new LaboratoryEntity();
+    projectModel.lab.id = labId;
     await this.projectRepository.save(projectModel);
     if (projectAddDto.listStudent.length !== 0) {
       var studentsModel = await this.studentRepository.find({where : {id: In(projectAddDto.listStudent)}});
@@ -160,6 +145,6 @@ export class ProjectService {
         }
       }
     });
-    return 1;
+    return listProjectModel;
   }
 }

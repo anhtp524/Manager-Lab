@@ -4,6 +4,8 @@ import { StudentService } from "./student.service";
 import { CreateStudentDto, RegisterToLabDto, UpdateStudentDto } from "./Dto/student.dto";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "../UserApi/users.service";
+import { ApproveStudentDto } from "./Dto/approveStudent.dto";
+import { DeleteStudentDto } from "./Dto/deleteStudent.dto";
 
 @ApiTags("Student")
 @ApiBearerAuth()
@@ -52,17 +54,17 @@ export class StudentController {
     return result;
   }
 
-  //@ApiBody({type: 'string'})
+  @ApiBody({type: ApproveStudentDto})
   @Post("approvetolab")
-  async ApproveStundentToLab(@Body() studentId: string){
-    const result = await this.studentService.approveStudentToLab(studentId);
+  async ApproveStundentToLab(@Body() approveStudent: ApproveStudentDto){
+    const result = await this.studentService.approveStudentToLab(approveStudent.studentId);
     return result;
   }
 
-  @ApiBody({type: 'string'})
+  @ApiBody({type: DeleteStudentDto})
   @Post("deletestudentinlab")
-  async DeleteStudentFromLab(@Body() studentId: string){
-    const result = await this.studentService.deleteOrRejectStudentFromLab(studentId);
+  async DeleteStudentFromLab(@Body() deleteDto: DeleteStudentDto){
+    const result = await this.studentService.deleteOrRejectStudentFromLab(deleteDto.studentId);
     return result;
   }
 

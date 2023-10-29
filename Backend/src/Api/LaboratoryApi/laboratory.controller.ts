@@ -22,8 +22,9 @@ export class LaboratoryController {
     return this.labService.findAll();
   }
 
-  @Get("/:id")
-  GetLabById(@Param('id') id: string){
-    return this.labService.findOne(id);
+  @Get("getdetaillab/:id")
+  async GetDetailLab(@Param("id") id: string) {
+    const result = await this.labService.getDetailLab(id);
+    return result;
   }
 }

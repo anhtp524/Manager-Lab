@@ -92,7 +92,7 @@ export class ProjectController {
     }
     else if (user.role === Role.Teacher)
       projectAddDto.listTeacher.push(userProfile.id);
-    const result = await this.projectService.createProject(projectAddDto, isStudent);
+    const result = await this.projectService.createProject(projectAddDto, isStudent, userProfile.lab.id);
     return result;
   }
 
