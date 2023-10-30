@@ -19,6 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'Core/Enum/role.enum';
 import { UsersService } from '../UserApi/users.service';
 import { CloseProjectDto } from './Dto/closeProject.dto';
+import { CancelProjectDto } from './Dto/cancelProject.dto';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -107,6 +108,13 @@ export class ProjectController {
   @Post("closeproject")
   async CloseProject(@Body() closeProject: CloseProjectDto){
     const res = await this.projectService.CloseProject(closeProject);
+    return res;
+  }
+
+  @ApiBody({type: CancelProjectDto})
+  @Post("cancelproject")
+  async CancelProject(@Body() projectCancel: CancelProjectDto){
+    const res = await this.projectService.CancelProject(projectCancel);
     return res;
   }
 }

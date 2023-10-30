@@ -16,6 +16,7 @@ import { ProjectStatus } from "Core/Enum/ProjectEnum";
 import { Project_StudentEntity } from "src/entity/projectStudent.entity";
 import { LaboratoryEntity } from "src/entity/laboratory.entity";
 import { CloseProjectDto } from "./Dto/closeProject.dto";
+import { CancelProjectDto } from "./Dto/cancelProject.dto";
 
 @Injectable()
 export class ProjectService {
@@ -155,9 +156,21 @@ export class ProjectService {
         id: closeProjectDto.projectId
       }
     });
-
+    projectModel.status = ProjectStatus.Finish;
     projectModel.feedback = closeProjectDto.feedback;
     projectModel.score = closeProjectDto.score;
+    await this.projectRepository.save(projectModel);
+    return projectModel;
+  }
+
+  async CancelProject(projectCancel: CancelProjectDto) {
+    var projectModel = await this.projectRepository.findOne({
+      where: {
+        id: projectCancel.projectId
+      }
+    });
+
+    projectModel.status = ProjectStatus.Cancel
     await this.projectRepository.save(projectModel);
     return projectModel;
   }
