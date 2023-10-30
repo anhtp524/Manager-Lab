@@ -83,7 +83,7 @@ function Projects() {
   }, [])
   return (
     <div>
-      <Table columns={columns} dataSource={projectList} />
+      <Table columns={columns} dataSource={projectList} bordered />
     </div>
   )
 }
