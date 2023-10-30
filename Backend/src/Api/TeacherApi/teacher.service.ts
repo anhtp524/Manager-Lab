@@ -4,12 +4,17 @@ import { TeacherEntity } from "src/entity/teacher.entity";
 import { Like, Repository } from "typeorm";
 import { CreateTeacherDto } from "./Dto/teacher.dto";
 import { LaboratoryEntity } from "src/entity/laboratory.entity";
+import { TeacherProjectDto } from "./Dto/teacherProject.dto";
+import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
+import { ProjectEntity } from "src/entity/project.entity";
 
 @Injectable()
 export class TeacherService {
   constructor(
     @InjectRepository(TeacherEntity)
     private teacherRepository: Repository<TeacherEntity>,
+    @InjectRepository(TeacherProjectEntity)
+    private teacherProjectRepo: Repository<TeacherProjectEntity>
   ) {}
 
   async findAll() {
@@ -77,5 +82,15 @@ export class TeacherService {
     });
 
     return listTeacherInLab;
+  }
+
+  async addTeacherToProject(teacherProject: TeacherProjectDto) {
+    var teacherProjectModel = new TeacherProjectEntity();
+    teacherProjectModel.project = new ProjectEntity();
+    teacherProjectModel.project.id = teacherProject.projectId;
+    teacherProjectModel.teacher = new TeacherEntity();
+    teacherProjectModel.teacher.id = teacherProject.teacherId;
+    await this.teacherProjectRepo.save(teacherProjectModel);
+    return 1;
   }
 }
