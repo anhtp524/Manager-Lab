@@ -7,6 +7,7 @@ import { useHandlingApi } from '~/common/context/useHandlingApi'
 import DetailPanel from './common/DetailPanel'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '~/common/context/useAuth'
+import { Role } from '~/routes/util'
 
 function Students() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
@@ -14,70 +15,122 @@ function Students() {
   const [open, setOpen] = useState<boolean>(false)
   const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
   const { showLoading, closeLoading } = useHandlingApi()
-  const { profileUserInfo, setProfileUserInfo } = useAuth()
+  const { authInfo, profileUserInfo, setProfileUserInfo } = useAuth()
   const { id } = useParams()
-
   const columns: ColumnsType<DetailStudent> = useMemo(
-    () => [
-      {
-        title: 'Student Code',
-        dataIndex: 'studentCode',
-        width: 150
-      },
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        width: 300,
-        onCell: (record) => {
-          return {
-            onClick: () => onOpenPanel(record)
-          }
-        },
-        render: (value) => {
-          return (
-            <a
-              href=''
-              onClick={(e) => {
-                e.preventDefault()
-              }}
-            >
-              {value}
-            </a>
-          )
-        }
-      },
-      {
-        title: 'Date Of Birth',
-        dataIndex: 'dateOfBirth',
-        width: 150
-      },
-      {
-        title: 'Class',
-        dataIndex: 'class',
-        width: 150
-      },
-      {
-        title: 'Phone Number',
-        dataIndex: 'phoneNumber',
-        width: 150
-      },
-      {
-        title: 'Email',
-        dataIndex: 'email'
-      },
-      {
-        title: '',
-        render: (_, record) => (
-          <Space size='middle'>
-            <Button type='primary' onClick={() => onDelete(record.id)}>
-              Remove
-            </Button>
-          </Space>
-        )
-      }
-    ],
+    () =>
+      authInfo?.roles !== Role.Student
+        ? [
+            {
+              title: 'Student Code',
+              dataIndex: 'studentCode',
+              width: 150
+            },
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              width: 300,
+              onCell: (record) => {
+                return {
+                  onClick: () => onOpenPanel(record)
+                }
+              },
+              render: (value) => {
+                return (
+                  <a
+                    href=''
+                    onClick={(e) => {
+                      e.preventDefault()
+                    }}
+                  >
+                    {value}
+                  </a>
+                )
+              }
+            },
+            {
+              title: 'Date Of Birth',
+              dataIndex: 'dateOfBirth',
+              width: 150
+            },
+            {
+              title: 'Class',
+              dataIndex: 'class',
+              width: 150
+            },
+            {
+              title: 'Phone Number',
+              dataIndex: 'phoneNumber',
+              width: 150
+            },
+            {
+              title: 'Email',
+              dataIndex: 'email'
+            },
+            {
+              render: (_, record) => (
+                <Space size='middle'>
+                  <Button type='primary' onClick={() => onDelete(record.id)}>
+                    Remove
+                  </Button>
+                </Space>
+              )
+            }
+          ]
+        : [
+            {
+              title: 'Student Code',
+              dataIndex: 'studentCode',
+              width: 150
+            },
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              width: 300,
+              onCell: (record) => {
+                return {
+                  onClick: () => onOpenPanel(record)
+                }
+              },
+              render: (value) => {
+                return (
+                  <a
+                    href=''
+                    onClick={(e) => {
+                      e.preventDefault()
+                    }}
+                  >
+                    {value}
+                  </a>
+                )
+              }
+            },
+            {
+              title: 'Date Of Birth',
+              dataIndex: 'dateOfBirth',
+              width: 150
+            },
+            {
+              title: 'Class',
+              dataIndex: 'class',
+              width: 150
+            },
+            {
+              title: 'Phone Number',
+              dataIndex: 'phoneNumber',
+              width: 150
+            },
+            {
+              title: 'Email',
+              dataIndex: 'email'
+            }
+          ],
     []
   )
+
+  if (authInfo?.roles !== Role.Student) {
+    columns.push()
+  }
   useEffect(() => {
     const abortController = new AbortController()
     const signal = abortController.signal

@@ -1,25 +1,39 @@
 .project {
-    display: flex;
-    gap: 24px;
-    flex-direction: column;
-    .title-header-project {
-        font-size: 20px;
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+  .title-header-project {
+    font-size: 20px;
+  }
+  .column-name-project {
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
     }
-    .column-name-project {
-        &:hover {
-            cursor: pointer;
-            text-decoration: underline;
-        }
-    }
+  }
 }
 
 .project-children {
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+  .project-children-content-top {
     display: flex;
-    gap: 24px;
-    flex-direction: column;
-    .project-children-content-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.input-field {
+  & > div {
+    margin-bottom: 8px;
+    &::after {
+      display: inline-block;
+      margin-inline-start: 2px;
+      color: #ff4d4f;
+      font-size: 16px;
+      line-height: 1;
+      content: '*';
     }
+  }
 }
