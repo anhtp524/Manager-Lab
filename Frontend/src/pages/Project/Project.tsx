@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
@@ -44,6 +44,8 @@ function Project() {
     ],
     [navigate]
   )
+
+  useEffect(() => {}, [])
 
   const onRenderContent = useCallback(() => {
     return (

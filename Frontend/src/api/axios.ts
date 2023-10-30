@@ -31,7 +31,10 @@ fetchHandler.interceptors.response.use(
       case HttpStatusCode.Unauthorized:
         Modal.error({
           title: '401 Unauthorized',
-          onOk: () => (window.location.href = '/auth/login')
+          onOk: () => {
+            window.location.href = '/auth/login'
+            localStorage.clear()
+          }
         })
         break
       case HttpStatusCode.Forbidden:

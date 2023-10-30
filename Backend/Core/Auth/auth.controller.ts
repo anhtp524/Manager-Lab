@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -44,7 +45,11 @@ export class AuthController {
     try {
       const dateTimeNow = Math.floor(Date.now() / 1000);
       const authInfo = this.jwtService.decode(request.cookies['Token']);
-      if (authInfo === null) {
+      if (authInfo === null || dateTimeNow > authInfo['exp']) {
+        throw new UnauthorizedException({
+          message: 'Invalid token',
+          status: HttpStatus.UNAUTHORIZED,
+        });
       }
       return {
         isAuthenticated: dateTimeNow < authInfo['exp'],
@@ -53,12 +58,12 @@ export class AuthController {
     } catch (error) {
       throw new HttpException(
         {
-          status: HttpStatus.UNAUTHORIZED,
-          // error: 'Loi',
+          status: error.status,
+          errorMessage: error.message,
         },
-        HttpStatus.UNAUTHORIZED,
+        error.status,
         {
-          cause: error,
+          cause: error.message,
         },
       );
     }
