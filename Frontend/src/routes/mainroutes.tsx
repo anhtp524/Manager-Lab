@@ -19,11 +19,7 @@ import LabDetail from '~/pages/Labs/LabDetail'
 const router = createBrowserRouter([
   {
     path: RoutePath.HomePage,
-    element: (
-      // <ProtectedRoutes>
-      <Layout />
-      // </ProtectedRoutes>
-    ),
+    element: <Layout />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -86,7 +82,7 @@ const router = createBrowserRouter([
         path: RoutePath.ManagementAccount,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <ProtectedRoutes role={[Role.Admin]}>
+            <ProtectedRoutes role={[Role.Teacher]}>
               <div>Management Account</div>
             </ProtectedRoutes>
           </Suspense>

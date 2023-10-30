@@ -75,7 +75,7 @@ function Teachers() {
       try {
         showLoading()
         const response = await teacherAPI.getAllTeacherInLab(id, { signal: signal })
-        if (response.data && response.data.length > 0) {
+        if (response.data) {
           setTeacherList(response.data)
         }
       } catch (error) {

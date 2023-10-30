@@ -8,6 +8,7 @@ import fetchHandler from '~/api/axios'
 import { Role } from '~/routes/util'
 import { useAuth } from '~/common/context/useAuth'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
+import userAPI from '~/api/user.api'
 
 let items = [
   {
@@ -43,7 +44,7 @@ let items = [
 ]
 
 function Layout() {
-  const { authInfo, setAuthInfo } = useAuth()
+  const { authInfo, setAuthInfo, setProfileUserInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
   const navigate = useNavigate()
 
@@ -53,15 +54,22 @@ function Layout() {
     const handleCheckAuthentication = async () => {
       showLoading()
       try {
-        const response = await fetchHandler.get<{ isAuthenticated: boolean; role: Role }>(
-          'authentication/checkauthentication',
-          { signal: signal }
-        )
-        if (response && response.data) {
+        const response = await Promise.all([
+          fetchHandler.get<{ isAuthenticated: boolean; role: Role }>('authentication/checkauthentication', {
+            signal: signal
+          }),
+          userAPI.getProfileUser({ signal: signal })
+        ])
+        if (response && response.length > 0) {
+          const authData = response[0].data
+          const profileData = response[1].data
+
           setAuthInfo({
-            roles: response.data.role,
-            isAuthenticated: response.data.isAuthenticated
+            roles: authData.role,
+            isAuthenticated: authData.isAuthenticated
           })
+
+          setProfileUserInfo(profileData)
         }
       } catch (error) {
         console.error(error)

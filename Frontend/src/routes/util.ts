@@ -20,7 +20,7 @@ export enum RoutePath {
 }
 
 export enum ProjectStatus {
-  Draft = 0,
+  UnConfirm = 0,
   New = 100,
   OnGoing = 101,
   Finish = 102,

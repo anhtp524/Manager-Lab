@@ -1,46 +1,15 @@
 import { Table, Tag } from 'antd'
-import { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import React, { useState } from 'react'
+import { ColumnsType } from 'antd/es/table/interface'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import projectAPI, { Project, ProjectList } from '~/api/project.api'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { ProjectStatus } from '~/routes/util'
-
-interface ITeacherRowData {
-  key: React.Key
-  name: string
-  coreTech: string
-  description: string
-  status: ProjectStatus
-}
-
-const columns: ColumnsType<ITeacherRowData> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    width: 300
-  },
-  {
-    title: 'Core Technology',
-    dataIndex: 'coreTech',
-    width: 150
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    width: 150
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    width: 150,
-    render: (status) => {
-      return convertStatusEnumToValue(status)
-    }
-  }
-]
 
 export const convertStatusEnumToValue = (status: ProjectStatus) => {
   switch (status) {
-    case ProjectStatus.Draft:
-      return <Tag color='default'>Draft</Tag>
+    case ProjectStatus.UnConfirm:
+      return <Tag color='default'>Unconfirm</Tag>
     case ProjectStatus.New:
       return <Tag color='green'>New</Tag>
     case ProjectStatus.OnGoing:
@@ -54,92 +23,67 @@ export const convertStatusEnumToValue = (status: ProjectStatus) => {
   }
 }
 
-const data: ITeacherRowData[] = [
-  {
-    key: 1,
-    name: `Nghiên cứu, thiết kế, chế tạo thiết bị đo lường và theo dõi tín hiệu sinh học`,
-    coreTech: `React`,
-    description: '',
-    status: ProjectStatus.Draft
-  },
-  {
-    key: 2,
-    name: `Thiết kế, chế tạo thiết bị nuôi cấy vi sinh vật`,
-    coreTech: `React`,
-    description: '',
-    status: ProjectStatus.New
-  },
-  {
-    key: 3,
-    name: `Nghiên cứu các phương pháp thu nhận và truyền lên điện thoại di động các thông số sinh học của cơ thể người`,
-    coreTech: `React`,
-    description: '',
-    status: ProjectStatus.OnGoing
-  },
-  {
-    key: 4,
-    name: `Nghiên cứu, thiết kế và chế tạo thiết bị hỗ trợ học tương tác BK-iclicker kết nối không dây`,
-    coreTech: `React`,
-    description: '',
-    status: ProjectStatus.Finish
-  },
-  {
-    key: 5,
-    name: `Thiết kế bộ đảm bảo nguồn liên tục thông minh sử dụng Chip Atpiny13 công nghệ AVR ứng dụng trong các thiết kế y tế`,
-    coreTech: `React`,
-    description: '',
-    status: ProjectStatus.Cancel
-  }
-]
-
 function Projects() {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const { showLoading, closeLoading } = useHandlingApi()
+  const { id } = useParams()
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys)
-    setSelectedRowKeys(newSelectedRowKeys)
-  }
+  const [projectList, setProjectList] = useState<ProjectList>([])
 
-  const rowSelection: TableRowSelection<ITeacherRowData> = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
+  const columns: ColumnsType<Project> = useMemo(
+    () => [
       {
-        key: 'odd',
-        text: 'Select Odd Row',
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = []
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return false
-            }
-            return true
-          })
-          setSelectedRowKeys(newSelectedRowKeys)
-        }
+        title: 'Name',
+        dataIndex: 'name',
+        width: 300
       },
       {
-        key: 'even',
-        text: 'Select Even Row',
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = []
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return true
-            }
-            return false
-          })
-          setSelectedRowKeys(newSelectedRowKeys)
+        title: 'Core Technology',
+        dataIndex: 'coreTech',
+        width: 150
+      },
+      {
+        title: 'Description',
+        dataIndex: 'description',
+        width: 150
+      },
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        width: 150,
+        render: (status) => {
+          return convertStatusEnumToValue(status)
         }
       }
-    ]
-  }
+    ],
+    []
+  )
+  useEffect(() => {
+    const abortController = new AbortController()
+    const signal = abortController.signal
+
+    const handleGetProjectInLab = async () => {
+      if (id === undefined) return
+      try {
+        showLoading()
+        const response = await projectAPI.getProjectInLab(id, { signal: signal })
+        if (response.data) {
+          setProjectList(response.data)
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        closeLoading()
+      }
+    }
+
+    handleGetProjectInLab()
+    return () => {
+      abortController.abort()
+    }
+  }, [])
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={projectList} />
     </div>
   )
 }

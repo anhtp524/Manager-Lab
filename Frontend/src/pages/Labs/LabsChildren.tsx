@@ -1,7 +1,10 @@
 import { EllipsisOutlined, FundViewOutlined } from '@ant-design/icons'
-import { Avatar, Card } from 'antd'
+import { Avatar, Card, Tag } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { Lab } from '~/api/lab.api'
+import { useAuth } from '~/common/context/useAuth'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
+import { Role } from '~/routes/util'
 
 export interface ILabchildren {
   data: Lab
@@ -9,8 +12,11 @@ export interface ILabchildren {
 const { Meta } = Card
 const LabsChildren = (props: ILabchildren) => {
   const { data } = props
+  const { showLoading } = useHandlingApi()
+  const { authInfo, profileUserInfo } = useAuth()
   const navigate = useNavigate()
   const handleNavigate = (id: string) => {
+    showLoading()
     navigate(`/labsdetail/${id}`)
   }
 
@@ -32,6 +38,14 @@ const LabsChildren = (props: ILabchildren) => {
           description={data.description}
         />
       </Card>
+      {authInfo?.roles === Role.Student &&
+        profileUserInfo?.lab &&
+        profileUserInfo.lab.id === data.id &&
+        !profileUserInfo.isApproveToLab && (
+          <div className='approve-status'>
+            <Tag color='blue'>Waiting for approve</Tag>
+          </div>
+        )}
     </div>
   )
 }

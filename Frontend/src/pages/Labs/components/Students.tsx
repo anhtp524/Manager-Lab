@@ -1,12 +1,22 @@
-import { Table } from 'antd'
+import { Button, Modal, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
 import { useEffect, useMemo, useState } from 'react'
 import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import DetailPanel from './common/DetailPanel'
+import { useParams } from 'react-router-dom'
+import { useAuth } from '~/common/context/useAuth'
 
 function Students() {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [studentList, setStudentList] = useState<ListStudent>([])
+  const [open, setOpen] = useState<boolean>(false)
+  const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
+  const { showLoading, closeLoading } = useHandlingApi()
+  const { profileUserInfo, setProfileUserInfo } = useAuth()
+  const { id } = useParams()
+
   const columns: ColumnsType<DetailStudent> = useMemo(
     () => [
       {
@@ -54,25 +64,30 @@ function Students() {
       {
         title: 'Email',
         dataIndex: 'email'
+      },
+      {
+        title: '',
+        render: (_, record) => (
+          <Space size='middle'>
+            <Button type='primary' onClick={() => onDelete(record.id)}>
+              Remove
+            </Button>
+          </Space>
+        )
       }
     ],
     []
   )
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const [studentList, setStudentList] = useState<ListStudent>([])
-  const [open, setOpen] = useState<boolean>(false)
-  const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
-  const { showLoading, closeLoading } = useHandlingApi()
-
   useEffect(() => {
     const abortController = new AbortController()
     const signal = abortController.signal
 
     const handleGetAllStudent = async () => {
+      if (id === undefined || id === null) return
       try {
         showLoading()
-        const response = await studentAPI.getAll({ signal: signal })
-        if (response.data && response.data.length > 0) {
+        const response = await studentAPI.getStudentInLab(id, { signal: signal })
+        if (response.data) {
           setStudentList(response.data)
         }
       } catch (error) {
@@ -86,7 +101,7 @@ function Students() {
     return () => {
       abortController.abort()
     }
-  }, [])
+  }, [profileUserInfo?.lab])
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)
@@ -129,6 +144,29 @@ function Students() {
         }
       }
     ]
+  }
+
+  const onDelete = (id: GUID) => {
+    Modal.confirm({
+      title: 'Remove from lab?',
+      onOk: () => handleDelete(id)
+    })
+  }
+
+  const handleDelete = async (id: GUID) => {
+    showLoading()
+    try {
+      const response = await studentAPI.removeFromLab({ studentId: id })
+      if (response && response.data) {
+        closeLoading()
+        Modal.success({
+          title: 'Successfully removed!',
+          onOk: () => setProfileUserInfo(response.data)
+        })
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    }
   }
 
   const onOpenPanel = async (record: DetailStudent) => {
