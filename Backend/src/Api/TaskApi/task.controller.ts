@@ -39,4 +39,10 @@ export class TaskController{
         return result;
     }
 
+    @Get("getdetailtask/:taskId")
+    async GetDetailTask(@Param('taskId') taskId: string) {
+        const result = await this.taskService.GetTaskById(taskId);
+        return result;
+    }
+
 }
