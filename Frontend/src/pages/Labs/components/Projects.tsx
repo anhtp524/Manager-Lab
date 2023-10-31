@@ -3,6 +3,7 @@ import { ColumnsType } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import projectAPI, { Project, ProjectList } from '~/api/project.api'
+import { TaskStatus } from '~/api/task.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { ProjectStatus } from '~/routes/util'
 
@@ -18,6 +19,20 @@ export const convertStatusEnumToValue = (status: ProjectStatus) => {
       return <Tag color='blue'>Finished</Tag>
     case ProjectStatus.Cancel:
       return <Tag color='red'>Cancelled</Tag>
+    default:
+      return <span>N/A</span>
+  }
+}
+
+export const convertTaskStatusToValue = (status: TaskStatus) => {
+  switch (status) {
+    case TaskStatus.New:
+      return <Tag color='blue'>New</Tag>
+    case TaskStatus.Resolve:
+      return <Tag color='orange'>Resolve</Tag>
+    case TaskStatus.Pass:
+      return <Tag color='green'>Pass</Tag>
+
     default:
       return <span>N/A</span>
   }

@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
-export class CancelProject {
-    @ApiProperty()
-    projectId: string;
+export class CancelProjectDto {
+  @ApiProperty()
+  projectId: string;
 }

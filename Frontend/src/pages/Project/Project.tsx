@@ -1,21 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  AutoComplete,
-  Button,
-  Cascader,
-  CascaderProps,
-  Checkbox,
-  Col,
-  Drawer,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select,
-  Space,
-  Table
-} from 'antd'
+import { Button, Drawer, Form, FormInstance, Input, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { convertStatusEnumToValue } from '../Labs/components/Projects'
 import './Project.scss'
@@ -23,11 +8,11 @@ import { useAuth } from '~/common/context/useAuth'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import projectAPI, { Project, ProjectList } from '~/api/project.api'
 
-interface DataNodeType {
-  value: string
-  label: string
-  children?: DataNodeType[]
-}
+// interface DataNodeType {
+//   value: string
+//   label: string
+//   children?: DataNodeType[]
+// }
 
 function Project() {
   const navigate = useNavigate()
@@ -39,48 +24,16 @@ function Project() {
 
   const [form] = Form.useForm()
 
-  const prefixSelector = (
-    <Form.Item name='prefix' noStyle>
-      <Select style={{ width: 70 }}>
-        <Select.Option value='86'>+86</Select.Option>
-        <Select.Option value='87'>+87</Select.Option>
-      </Select>
-    </Form.Item>
-  )
-
-  const suffixSelector = (
-    <Form.Item name='suffix' noStyle>
-      <Select style={{ width: 70 }}>
-        <Select.Option value='USD'>$</Select.Option>
-        <Select.Option value='CNY'>¥</Select.Option>
-      </Select>
-    </Form.Item>
-  )
-
-  const [autoCompleteResult, setAutoCompleteResult] = useState<string[]>([])
-
-  const onWebsiteChange = (value: string) => {
-    if (!value) {
-      setAutoCompleteResult([])
-    } else {
-      setAutoCompleteResult(['.com', '.org', '.net'].map((domain) => `${value}${domain}`))
-    }
-  }
-
-  const websiteOptions = autoCompleteResult.map((website) => ({
-    label: website,
-    value: website
-  }))
   const columnProjectList: ColumnsType<Project> = useMemo(
     () => [
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (text) => {
+        render: (text, record) => {
           return (
             <a
               onClick={() => {
-                navigate('/project/details/' + profileUserInfo?.lab?.id)
+                navigate('/project/details/' + record?.id)
               }}
               className='column-name-project'
             >
@@ -90,12 +43,12 @@ function Project() {
         }
       },
       {
-        title: 'Date',
-        dataIndex: 'date'
-      },
-      {
         title: 'Description',
         dataIndex: 'description'
+      },
+      {
+        title: 'Core technology',
+        dataIndex: 'coreTech'
       },
       {
         title: 'Status',
@@ -141,26 +94,52 @@ function Project() {
         <div className='title-header-project'>
           <span>Project</span>
         </div>
-        <Space size='small'>
-          <Button type='primary' onClick={onCreateProject}>
-            Create project
-          </Button>
-          <Button type='default' disabled>
-            Edit
-          </Button>
-          <Button type='default' disabled>
-            Delete
-          </Button>
-        </Space>
+        {profileUserInfo?.lab && profileUserInfo?.isApproveToLab && (
+          <Space size='small'>
+            <Button type='primary' onClick={onCreateProject}>
+              Create project
+            </Button>
+            <Button type='default' disabled>
+              Edit
+            </Button>
+            <Button type='default' disabled>
+              Delete
+            </Button>
+          </Space>
+        )}
         <div className='table-project'>
           <Table columns={columnProjectList} dataSource={labProjects} bordered />
         </div>
       </div>
     )
-  }, [columnProjectList])
+  }, [labProjects])
 
   const onCreateProject = () => {
     setShowCreate(true)
+  }
+
+  const handleSubmit = async (form: FormInstance<Dennis>) => {
+    showLoading()
+    const requestBody = {
+      projectAdd: {
+        ...form.getFieldsValue()
+      },
+      listStudent: [],
+      listTeacher: [],
+      listAttachment: []
+    }
+    console.log(requestBody)
+    try {
+      const response = await projectAPI.createProject(requestBody)
+      if (response && response.data) {
+        form.resetFields()
+        setShowCreate(false)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
   }
 
   return (
@@ -171,19 +150,28 @@ function Project() {
         className='create-project-panel'
         placement='right'
         width={600}
-        onClose={() => setShowCreate(false)}
+        onClose={() => {
+          form.resetFields()
+          setShowCreate(false)
+        }}
         open={showCreate}
         keyboard={false}
         maskClosable={false}
         headerStyle={{ flexDirection: 'row-reverse' }}
         footer={
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setShowCreate(false)} type='default'>
+            <Button
+              onClick={() => {
+                form.resetFields()
+                setShowCreate(false)
+              }}
+              type='default'
+            >
               Back
             </Button>
             <Button
               onClick={() => {
-                form.validateFields().then((values) => console.log(values))
+                form.submit()
               }}
               type='primary'
             >
@@ -192,23 +180,13 @@ function Project() {
           </Space>
         }
       >
-        <Form form={form} name='create-project' scrollToFirstError>
+        <Form form={form} name='create-project' scrollToFirstError onFinish={() => handleSubmit(form)}>
           <Form.Item
-            name='project-name'
+            name='name'
             rules={[
               {
-                // required: true,
-                min: 6,
-                max: 10
-              },
-              (form) => ({
-                validator(_, value) {
-                  if (value.length) {
-                    return Promise.resolve()
-                  }
-                  return Promise.reject(new Error('The new password that you entered do not match!'))
-                }
-              })
+                required: true
+              }
             ]}
           >
             <div className='input-field project-name'>
@@ -218,91 +196,31 @@ function Project() {
           </Form.Item>
 
           <Form.Item
-            name='password'
-            label='Password'
+            name='description'
             rules={[
               {
-                required: true,
-                message: 'Please input your password!'
+                required: true
               }
             ]}
-            hasFeedback
           >
-            <Input.Password />
+            <div className='input-field project-description'>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Description</div>
+              <Input.TextArea showCount maxLength={100} />
+            </div>
           </Form.Item>
 
           <Form.Item
-            name='confirm'
-            label='Confirm Password'
-            dependencies={['password']}
-            hasFeedback
+            name='coreTech'
             rules={[
               {
-                required: true,
-                message: 'Please confirm your password!'
-              },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve()
-                  }
-                  return Promise.reject(new Error('The new password that you entered do not match!'))
-                }
-              })
+                required: true
+              }
             ]}
           >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item
-            name='phone'
-            label='Phone Number'
-            rules={[{ required: true, message: 'Please input your phone number!' }]}
-          >
-            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name='donation'
-            label='Donation'
-            rules={[{ required: true, message: 'Please input donation amount!' }]}
-          >
-            <InputNumber addonAfter={suffixSelector} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item name='website' label='Website' rules={[{ required: true, message: 'Please input website!' }]}>
-            <AutoComplete options={websiteOptions} onChange={onWebsiteChange} placeholder='website'>
+            <div className='input-field project-coreTech'>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Core technology</div>
               <Input />
-            </AutoComplete>
-          </Form.Item>
-
-          <Form.Item name='intro' label='Intro' rules={[{ required: true, message: 'Please input Intro' }]}>
-            <Input.TextArea showCount maxLength={100} />
-          </Form.Item>
-
-          <Form.Item name='gender' label='Gender' rules={[{ required: true, message: 'Please select gender!' }]}>
-            <Select placeholder='select your gender'>
-              <Select.Option value='male'>Male</Select.Option>
-              <Select.Option value='female'>Female</Select.Option>
-              <Select.Option value='other'>Other</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label='Captcha' extra='We must make sure that your are a human.'>
-            <Row gutter={8}>
-              <Col span={12}>
-                <Form.Item
-                  name='captcha'
-                  noStyle
-                  rules={[{ required: true, message: 'Please input the captcha you got!' }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Button>Get captcha</Button>
-              </Col>
-            </Row>
+            </div>
           </Form.Item>
         </Form>
       </Drawer>

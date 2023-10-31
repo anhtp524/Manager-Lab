@@ -1,21 +1,21 @@
 import { Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { ITeacher, dataProject } from '../ultis'
+import { TeacherInProject } from '~/api/project.api'
 
-function TableTeacherProject() {
-  const columnsTeacherProject: ColumnsType<ITeacher> = [
+export type TableTeacherProjectProps = {
+  data: TeacherInProject[] | undefined
+}
+
+function TableTeacherProject({ data }: TableTeacherProjectProps) {
+  const columnsTeacherProject: ColumnsType<TeacherInProject> = [
     {
       title: 'Name',
-      dataIndex: 'nameTeacher'
-    },
-    {
-      title: 'Major',
-      dataIndex: 'major'
+      dataIndex: 'name'
     }
   ]
   return (
     <div>
-      <Table columns={columnsTeacherProject} dataSource={dataProject.teacher} />
+      <Table columns={columnsTeacherProject} dataSource={data} />
     </div>
   )
 }
