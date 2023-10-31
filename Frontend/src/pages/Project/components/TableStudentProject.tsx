@@ -1,17 +1,22 @@
 import React from 'react'
 import { Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { IStudent, dataProject } from '../ultis'
+import { StudentInProject } from '~/api/project.api'
 
-function TableStudentProject() {
-  const columnsStudentProject: ColumnsType<IStudent> = [
+export type ITableStudentProjectProps = {
+  data: StudentInProject[] | undefined
+}
+
+function TableStudentProject(props: ITableStudentProjectProps) {
+  const { data } = props
+  const columnsStudentProject: ColumnsType<StudentInProject> = [
     {
       title: 'MSSV',
-      dataIndex: 'studentCode'
+      dataIndex: 'msv'
     },
     {
       title: 'Name',
-      dataIndex: 'nameStudent'
+      dataIndex: 'name'
     },
     {
       title: 'Class',
@@ -20,7 +25,7 @@ function TableStudentProject() {
   ]
   return (
     <div>
-      <Table columns={columnsStudentProject} dataSource={dataProject.student} />
+      <Table columns={columnsStudentProject} dataSource={data} />
     </div>
   )
 }
