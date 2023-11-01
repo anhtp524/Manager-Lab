@@ -117,4 +117,12 @@ export class ProjectController {
     const res = await this.projectService.CancelProject(projectCancel);
     return res;
   }
+
+  @Get("getmyproject")
+  async GetMyProject(@Req() req) {
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
+    const res = await this.projectService.ProjectOfUser(userProfile.id, userProfile.lab.id ,user.role)
+    return res;
+  }
 }

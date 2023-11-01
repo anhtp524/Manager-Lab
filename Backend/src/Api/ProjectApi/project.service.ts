@@ -26,6 +26,7 @@ import { Project_StudentEntity } from 'src/entity/projectStudent.entity';
 import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 import { CloseProjectDto } from './Dto/closeProject.dto';
 import { CancelProjectDto } from './Dto/cancelProject.dto';
+import { Role } from 'Core/Enum/role.enum';
 
 @Injectable()
 export class ProjectService {
@@ -202,5 +203,22 @@ export class ProjectService {
     projectModel.status = ProjectStatus.Cancel;
     await this.projectRepository.save(projectModel);
     return projectModel;
+  }
+  
+  async ProjectOfUser(userId: string, labId: string, role: Role) {
+    if(role === Role.Student) {
+      const studentProjectModel = await this.projectStudentRepo.find({
+        relations: ['project', 'project.lab'],
+        relationLoadStrategy: "join",
+        where: {
+          student: {
+            id: userId
+          }
+        }
+
+      });
+      return studentProjectModel;
+    }
+    return 1;
   }
 }
