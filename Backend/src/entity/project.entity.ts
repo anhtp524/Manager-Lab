@@ -28,6 +28,9 @@ export class ProjectEntity {
 
     @Column({nullable: true})
     score: number;
+
+    @Column({nullable: true})
+    finishDate: Date
 }
 
 

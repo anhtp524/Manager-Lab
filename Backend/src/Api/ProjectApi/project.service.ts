@@ -27,6 +27,8 @@ import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 import { CloseProjectDto } from './Dto/closeProject.dto';
 import { CancelProjectDto } from './Dto/cancelProject.dto';
 import { Role } from 'Core/Enum/role.enum';
+import { CertificateDto } from './Dto/certificate.dto';
+import { UpdateProjectDto } from './Dto/updateProject.dto';
 
 @Injectable()
 export class ProjectService {
@@ -163,7 +165,7 @@ export class ProjectService {
         true,
       );
     }
-    return 1;
+    return projectModel;
   }
 
   async GetProjectInLab(labId: string) {
@@ -189,6 +191,7 @@ export class ProjectService {
     projectModel.status = ProjectStatus.Finish;
     projectModel.feedback = closeProjectDto.feedback;
     projectModel.score = closeProjectDto.score;
+    projectModel.finishDate = new Date();
     await this.projectRepository.save(projectModel);
     return projectModel;
   }
@@ -219,6 +222,43 @@ export class ProjectService {
       });
       return studentProjectModel;
     }
-    return 1;
+    else if(role === Role.Teacher) {
+      const teacherProjectModel = await this.teacherProjectRepo.find({
+        relations: ['project'],
+        where: {
+          teacher: {
+            id: userId
+          }
+        }
+      });
+      return teacherProjectModel.map(t => t.project);
+    }
+    return [];
+  }
+
+  async GetCertificate(projectId: string) {
+    const studentProjectModel = await this.projectStudentRepo.findOne({
+      relations: ['project', 'project.lab', 'student'],
+      where: {
+        project: {
+          id: projectId
+        },
+      }
+    });
+    if(!studentProjectModel) return new CertificateDto();
+    const certificateModel = new CertificateDto();
+    certificateModel.student.studentName = studentProjectModel.student.name;
+    certificateModel.student.class = studentProjectModel.student.class;
+    certificateModel.student.studentCode = studentProjectModel.student.studentCode;
+    certificateModel.student.dateOfBirth = studentProjectModel.student.dateOfBirth;
+    certificateModel.project.projectName = studentProjectModel.project.name;
+    certificateModel.project.score = studentProjectModel.project.score;
+    certificateModel.project.finishDate = studentProjectModel.project.finishDate;
+    certificateModel.labName = studentProjectModel.project.lab.name;
+    return certificateModel;
+  }
+
+  async EditProject(projectId: string, updateProject: UpdateProjectDto) {
+    
   }
 }

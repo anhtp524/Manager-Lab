@@ -125,4 +125,10 @@ export class ProjectController {
     const res = await this.projectService.ProjectOfUser(userProfile.id, userProfile.lab.id ,user.role)
     return res;
   }
+
+  @Get("getcertificate/:projectId")
+  async GetCertificate(@Param("projectId") projectId: string) {
+    const res = await this.projectService.GetCertificate(projectId);
+    return res;
+  }
 }
