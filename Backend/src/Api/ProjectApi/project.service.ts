@@ -207,20 +207,19 @@ export class ProjectService {
     await this.projectRepository.save(projectModel);
     return projectModel;
   }
-  
+
   async ProjectOfUser(userId: string, labId: string, role: Role) {
-    if(role === Role.Student) {
+    if (role === Role.Student) {
       const studentProjectModel = await this.projectStudentRepo.find({
-        relations: ['project', 'project.lab'],
-        relationLoadStrategy: "join",
+        relations: ['project'],
+        relationLoadStrategy: 'join',
         where: {
           student: {
-            id: userId
-          }
-        }
-
+            id: userId,
+          },
+        },
       });
-      return studentProjectModel;
+      return studentProjectModel.map((x) => x.project);
     }
     else if(role === Role.Teacher) {
       const teacherProjectModel = await this.teacherProjectRepo.find({

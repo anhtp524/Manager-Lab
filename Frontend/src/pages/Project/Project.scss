@@ -25,7 +25,7 @@
 }
 
 .input-field {
-  & > div {
+  & > div:first-of-type {
     margin-bottom: 8px;
     &::after {
       display: inline-block;
@@ -36,4 +36,22 @@
       content: '*';
     }
   }
+}
+
+.info-container {
+  .detail-content {
+    margin-top: 12px;
+    .detail-content-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .detail-content-body {
+      font-size: 16px;
+    }
+  }
+}
+
+.ant-picker {
+  width: 100%;
 }

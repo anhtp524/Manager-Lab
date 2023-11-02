@@ -30,8 +30,8 @@ export type Task = {
   id: string
   title: string
   content: string
-  createDate: Date
-  dueDate: Date
+  createDate: string
+  dueDate: string
   response: string
   status: TaskStatus
   feedback: string
