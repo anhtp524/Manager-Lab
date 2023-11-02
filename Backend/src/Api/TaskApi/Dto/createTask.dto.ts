@@ -12,4 +12,7 @@ export class CreateTaskDto {
 
   @ApiProperty()
   projectId: string;
+
+  @ApiProperty()
+  listFileId?: string[]
 }

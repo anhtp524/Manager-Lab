@@ -20,6 +20,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../UserApi/users.service';
 import { ApproveStudentDto } from './Dto/approveStudent.dto';
 import { DeleteStudentDto } from './Dto/deleteStudent.dto';
+import { SearchNameDto } from '../TeacherApi/Dto/teacher.dto';
 
 @ApiTags('Student')
 @ApiBearerAuth()
@@ -120,6 +121,15 @@ export class StudentController {
   @Get('getstudentregisterinlab/:labId')
   async GetStudentRegisterInLab(@Param('labId') labId: string) {
     var res = await this.studentService.getStudentInLab(labId, false);
+    return res;
+  }
+
+  @ApiBody({type: SearchNameDto})
+  @Post('getstudentbyname')
+  async GetStudentByName(@Body() searcherNameDto: SearchNameDto, @Req() req) {
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
+    const res = await this.studentService.GetListStudentByName(searcherNameDto.searchName, userProfile.lab.id);
     return res;
   }
 }

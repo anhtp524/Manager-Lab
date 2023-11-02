@@ -4,6 +4,7 @@ import { CreateTaskDto } from './Dto/createTask.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ResponseModel } from './Dto/responseTask.dto';
 import { CloseTaskDto } from './Dto/closeTask.dto';
+import { EditTaskDto } from './Dto/editTask.dto';
 
 @ApiTags('Task')
 @Controller('task')
@@ -41,5 +42,12 @@ export class TaskController {
   async GetDetailTask(@Param('taskId') taskId: string) {
     const result = await this.taskService.GetTaskById(taskId);
     return result;
+  }
+
+  @ApiBody({type: EditTaskDto})
+  @Post("edittask")
+  async EditTask(@Body() updateTask: EditTaskDto) {
+    const res = await this.taskService.EditTask(updateTask);
+    return res;
   }
 }

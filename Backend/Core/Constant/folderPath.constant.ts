@@ -1,3 +1,4 @@
 export const FolderPath = {
-    createdProject: "create/project"
+    createdProject: "create/project",
+    createdTask: "create/task"
 }

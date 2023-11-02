@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { TeacherService } from "./teacher.service";
-import { AddTeacherLabDto, CreateTeacherDto, SearchTeacherDto } from "./Dto/teacher.dto";
+import { AddTeacherLabDto, CreateTeacherDto, SearchNameDto } from "./Dto/teacher.dto";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "../UserApi/users.service";
 
@@ -31,9 +31,9 @@ export class TeacherController {
     return this.teacherService.add(newStudent);
   }
 
-  @ApiBody({type: SearchTeacherDto})
+  @ApiBody({type: SearchNameDto})
   @Post("getteacherinlabbyname")
-  async GetTeacherInLabByName(@Body() searchNameDto: SearchTeacherDto, @Req() req){
+  async GetTeacherInLabByName(@Body() searchNameDto: SearchNameDto, @Req() req){
     const user = req.user;
     const userProfile = await this.userService.getProfileUser(user.userId, user.role);
     var res = await this.teacherService.getListTeacherByNameInLab(searchNameDto.searchName, userProfile.lab.id);

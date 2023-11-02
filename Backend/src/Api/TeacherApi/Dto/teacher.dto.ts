@@ -19,7 +19,7 @@ export class CreateTeacherDto {
     phoneNumber: string;
 }
 
-export class SearchTeacherDto {
+export class SearchNameDto {
     @ApiProperty()
     searchName: string;
 }

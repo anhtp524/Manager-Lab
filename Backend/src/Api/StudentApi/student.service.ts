@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StudentEntity } from 'src/entity/student.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Like, Repository } from 'typeorm';
 import { CreateStudentDto, UpdateStudentDto } from './Dto/student.dto';
 import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 
@@ -115,5 +115,18 @@ export class StudentService {
       },
     });
     return listStudent;
+  }
+
+  async GetListStudentByName(searchName: string, labId: string) {
+    const listStudentModel = await this.studentRepository.find({
+      where: {
+        lab: {
+          id: labId
+        },
+        name: Like(`%{searchName}%`)
+      }
+    });
+
+    return listStudentModel;
   }
 }
