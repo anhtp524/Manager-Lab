@@ -3,6 +3,7 @@ import fetchHandler from './axios'
 
 export const GET_ALL_PROJECT = 'project/getall'
 export const GET_PROJECT_IN_LAB = 'project/getprojectinlab'
+export const GET_CURRENT_USER_PROJECT = 'project/getmyproject'
 export const CREATE_PROJECT = 'project/createproject'
 export const GET_BY_ID = 'project/getdetail'
 
@@ -14,10 +15,13 @@ const projectAPI = {
     return fetchHandler.get<ProjectList>(GET_PROJECT_IN_LAB + '/' + id, { ...abortSignal })
   },
   createProject: (body: CreateProjectRequest) => {
-    return fetchHandler.post<Dennis>(CREATE_PROJECT, body)
+    return fetchHandler.post<Project>(CREATE_PROJECT, body)
   },
   getById: (id: GUID, abortSignal: IAbortSignal) => {
     return fetchHandler.get<DetailProject>(GET_BY_ID + '/' + id, { ...abortSignal })
+  },
+  getCurrentUserProject: (abortSignal: IAbortSignal) => {
+    return fetchHandler.get<ProjectList>(GET_CURRENT_USER_PROJECT, { ...abortSignal })
   }
 }
 

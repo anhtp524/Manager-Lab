@@ -1,4 +1,3 @@
-import React from 'react'
 import { Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { StudentInProject } from '~/api/project.api'
@@ -25,7 +24,7 @@ function TableStudentProject(props: ITableStudentProjectProps) {
   ]
   return (
     <div>
-      <Table columns={columnsStudentProject} dataSource={data} />
+      <Table columns={columnsStudentProject} dataSource={data} pagination={false} />
     </div>
   )
 }

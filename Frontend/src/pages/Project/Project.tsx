@@ -33,6 +33,7 @@ function Project() {
           return (
             <a
               onClick={() => {
+                showLoading()
                 navigate('/project/details/' + record?.id)
               }}
               className='column-name-project'
@@ -66,11 +67,9 @@ function Project() {
     const signal = abortController.signal
 
     const handleGetLabProject = async () => {
-      const labId = profileUserInfo?.lab?.id
-      if (labId === undefined) return
       showLoading()
       try {
-        const response = await projectAPI.getProjectInLab(labId, { signal: signal })
+        const response = await projectAPI.getCurrentUserProject({ signal: signal })
         if (response && response.data) {
           setLabProjects(response.data)
         }
@@ -134,6 +133,15 @@ function Project() {
       if (response && response.data) {
         form.resetFields()
         setShowCreate(false)
+        const newLabProjects = [...labProjects]
+        newLabProjects.push({
+          id: response.data.id,
+          name: response.data.name,
+          coreTech: response.data.coreTech,
+          description: response.data.description,
+          status: response.data.status
+        })
+        setLabProjects(newLabProjects)
       }
     } catch (error: Dennis) {
       console.error(error)

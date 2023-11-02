@@ -1,20 +1,53 @@
-import { Button, Space, Table, Tabs } from 'antd'
-import TabPane from 'antd/es/tabs/TabPane'
+import { Button, Collapse, DatePicker, Drawer, Form, Input, Space, Table, Tabs } from 'antd'
 import TableStudentProject from './TableStudentProject'
 import TableTeacherProject from './TableTeacherProject'
 import { useEffect, useMemo, useState } from 'react'
 import projectAPI, { DetailProject } from '~/api/project.api'
 import { useParams } from 'react-router-dom'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
-import { ListTask, Task } from '~/api/task.api'
+import taskAPI, { ListTask, Task, TaskStatus } from '~/api/task.api'
 import { ColumnsType } from 'antd/es/table'
 import { convertTaskStatusToValue } from '~/pages/Labs/components/Projects'
+import { FormInstance, useForm } from 'antd/es/form/Form'
+import type { CollapseProps, TabsProps } from 'antd'
 
 function ProjectChildren() {
   const { id } = useParams()
+  const [form] = useForm()
   const { showLoading, closeLoading } = useHandlingApi()
   const [detailProject, setDetailProject] = useState<DetailProject | undefined>(undefined)
   const [taskList, setTaskList] = useState<ListTask>([])
+  const [showCreate, setShowCreate] = useState<boolean>(false)
+  const [showDetailTask, setShowDetailTask] = useState<boolean>(false)
+  const [showInnerTask, setShowInnerTask] = useState<boolean>(false)
+  const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
+
+  const tabList: TabsProps['items'] = useMemo(
+    () => [
+      {
+        key: '1',
+        label: 'Students',
+        children: <TableStudentProject data={detailProject?.students} />
+      },
+      {
+        key: '2',
+        label: 'Teachers',
+        children: <TableTeacherProject data={detailProject?.teachers} />
+      }
+    ],
+    [detailProject?.students, detailProject?.teachers]
+  )
+
+  const items: CollapseProps['items'] = useMemo(
+    () => [
+      {
+        key: 1,
+        label: 'Members',
+        children: <Tabs items={tabList}></Tabs>
+      }
+    ],
+    [tabList]
+  )
 
   const columnProjectList: ColumnsType<Task> = useMemo(
     () => [
@@ -22,7 +55,15 @@ function ProjectChildren() {
         title: 'Title',
         dataIndex: 'title',
         render: (text, record) => {
-          return <a onClick={() => {}}>{text}</a>
+          return (
+            <a
+              onClick={() => {
+                handleGetDetailTask(record.id)
+              }}
+            >
+              {text}
+            </a>
+          )
         }
       },
       {
@@ -45,9 +86,18 @@ function ProjectChildren() {
       }
       showLoading()
       try {
-        const response = await projectAPI.getById(id, { signal: signal })
-        if (response && response.data) {
-          setDetailProject(response.data)
+        const response = await Promise.all([
+          projectAPI.getById(id, { signal: signal }),
+          taskAPI.getListTask(id, { signal: signal })
+        ])
+        const detailProject = response[0]
+        const listTask = response[1]
+
+        if (detailProject && detailProject.data) {
+          setDetailProject(detailProject.data)
+        }
+        if (listTask && listTask.data) {
+          setTaskList(listTask.data)
         }
       } catch (error: Dennis) {
         console.error(error)
@@ -63,7 +113,45 @@ function ProjectChildren() {
     }
   }, [])
 
-  const onCreateTask = () => {}
+  const handleSubmit = async (form: FormInstance<Dennis>) => {
+    showLoading()
+    console.log(form.getFieldsValue())
+    const requestBody = {
+      ...form.getFieldsValue(),
+      projectId: id
+    }
+    console.log(requestBody)
+    try {
+      const response = await taskAPI.createTask(requestBody)
+      if (response && response.data) {
+        form.resetFields()
+        const newListTask = [...taskList]
+        newListTask.push(response.data)
+        setTaskList(newListTask)
+        setShowCreate(false)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
+  const handleGetDetailTask = async (id: GUID) => {
+    showLoading()
+    try {
+      const response = await taskAPI.getById(id)
+      if (response && response.data) {
+        setShowDetailTask(true)
+        setDetailTask(response.data)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
@@ -72,23 +160,147 @@ function ProjectChildren() {
         </div>
       </div>
       <div className='tab-lab-details'>
-        <Tabs defaultActiveKey='1'>
-          <TabPane tab={<span>Student</span>} key='1'>
-            <TableStudentProject data={detailProject?.students} />
-          </TabPane>
-          <TabPane tab={<span>Teacher</span>} key='2'>
-            <TableTeacherProject data={detailProject?.teachers} />
-          </TabPane>
-        </Tabs>
+        <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>
+          <p>List tasks</p>
           <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
-            <Button type='primary' onClick={onCreateTask}>
+            <Button type='primary' onClick={() => setShowCreate(true)}>
               Create Task
             </Button>
           </Space>
           <Table showHeader={false} columns={columnProjectList} dataSource={taskList} bordered />
         </div>
       </div>
+      <Drawer
+        title='Create a task'
+        className='create-task-panel'
+        placement='right'
+        width={600}
+        onClose={() => {
+          form.resetFields()
+          setShowCreate(false)
+        }}
+        open={showCreate}
+        keyboard={false}
+        maskClosable={false}
+        headerStyle={{ flexDirection: 'row-reverse' }}
+        footer={
+          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+            <Button
+              onClick={() => {
+                form.resetFields()
+                setShowCreate(false)
+              }}
+              type='default'
+            >
+              Back
+            </Button>
+            <Button
+              onClick={() => {
+                form.submit()
+              }}
+              type='primary'
+            >
+              Save and create
+            </Button>
+          </Space>
+        }
+      >
+        <Form form={form} name='create-task' scrollToFirstError onFinish={() => handleSubmit(form)}>
+          <Form.Item
+            name='title'
+            rules={[
+              {
+                required: true
+              }
+            ]}
+          >
+            <div className='input-field task-title'>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Task title</div>
+              <Input />
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            name='content'
+            rules={[
+              {
+                required: true
+              }
+            ]}
+          >
+            <div className='input-field task-content'>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Content</div>
+              <Input.TextArea showCount maxLength={100} />
+            </div>
+          </Form.Item>
+
+          <Form.Item
+            name='dueDate'
+            rules={[
+              {
+                required: true
+              }
+            ]}
+          >
+            <div className='input-field task-due-date'>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Due date</div>
+              <DatePicker onChange={(_, dateString) => form.setFieldValue('dueDate', dateString)} />
+            </div>
+          </Form.Item>
+        </Form>
+      </Drawer>
+      <Drawer
+        title='View detail task'
+        className='view-detail-task'
+        placement='right'
+        width={600}
+        onClose={() => {
+          setShowDetailTask(false)
+        }}
+        open={showDetailTask}
+        keyboard={false}
+        maskClosable={false}
+        headerStyle={{ flexDirection: 'row-reverse' }}
+        footer={
+          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+            <Button
+              onClick={() => {
+                setShowDetailTask(false)
+              }}
+              type='default'
+            >
+              Back
+            </Button>
+          </Space>
+        }
+      >
+        <div className='info-container' style={{ marginTop: 0 }}>
+          <div className='detail-info'>
+            <div className='detail-left'>Task title</div>
+            <div className='detail-right'>{detailTask?.title}</div>
+          </div>
+          <div className='detail-info'>
+            <div className='detail-left'>Created date</div>
+            <div className='detail-right'>{detailTask?.createDate}</div>
+          </div>
+          <div className='detail-info'>
+            <div className='detail-left'>Due date</div>
+            <div className='detail-right'>{detailTask?.dueDate}</div>
+          </div>
+          <div className='detail-info'>
+            <div className='detail-left'>Status</div>
+            <div className='detail-right'>{convertTaskStatusToValue(detailTask?.status as TaskStatus)}</div>
+          </div>
+          <div className='detail-content'>
+            <div className='detail-content-title'>Content</div>
+            <div className='detail-content-body'>{detailTask?.content}</div>
+          </div>
+        </div>
+        <div>
+          <Button>View question</Button>
+        </div>
+      </Drawer>
     </div>
   )
 }

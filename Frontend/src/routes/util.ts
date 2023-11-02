@@ -16,7 +16,8 @@ export enum RoutePath {
   ManagementStudent = '/studentmanagement',
   ManagementProduct = '/productmanagement',
   Personalinfo = '/personalinfo',
-  ManagementAccount = '/account'
+  ManagementAccount = '/account',
+  TaskDetail = '/project/details'
 }
 
 export enum ProjectStatus {
