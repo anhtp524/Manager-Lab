@@ -20,6 +20,7 @@ import { Role } from 'Core/Enum/role.enum';
 import { UsersService } from '../UserApi/users.service';
 import { CloseProjectDto } from './Dto/closeProject.dto';
 import { CancelProjectDto } from './Dto/cancelProject.dto';
+import { UpdateProjectDto } from './Dto/updateProject.dto';
 
 @ApiTags('Project')
 @ApiBearerAuth()
@@ -127,8 +128,23 @@ export class ProjectController {
   }
 
   @Get("getcertificate/:projectId")
-  async GetCertificate(@Param("projectId") projectId: string) {
-    const res = await this.projectService.GetCertificate(projectId);
+  async GetCertificate(@Param("projectId") projectId: string, @Req() req) {
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
+    const res = await this.projectService.GetCertificate(projectId, userProfile.id);
+    return res;
+  }
+
+  @ApiBody({type: UpdateProjectDto})
+  @Post("editproject")
+  async EditProject(@Body() updateProject: UpdateProjectDto) {
+    const res = await this.projectService.EditProject(updateProject);
+    return res;
+  }
+
+  @Get("ongoingproject/:projectId")
+  async OnGoingProject(@Param('projectId') projectId: string) {
+    const res = await this.projectService.OnGoingProject(projectId);
     return res;
   }
 }

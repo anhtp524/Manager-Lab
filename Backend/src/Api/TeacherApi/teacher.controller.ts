@@ -1,15 +1,19 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiTags } from "@nestjs/swagger";
 import { TeacherService } from "./teacher.service";
 import { AddTeacherLabDto, CreateTeacherDto, SearchTeacherDto } from "./Dto/teacher.dto";
 import { AuthGuard } from "@nestjs/passport";
+import { UsersService } from "../UserApi/users.service";
 
 @ApiTags("Teacher")
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller("teacher")
 export class TeacherController {
-  constructor(private readonly teacherService: TeacherService) {}
+  constructor(
+    private readonly teacherService: TeacherService,
+    private readonly userService: UsersService
+    ) {}
 
   @Get("getall")
   GetAllTeacher(){
@@ -29,8 +33,10 @@ export class TeacherController {
 
   @ApiBody({type: SearchTeacherDto})
   @Post("getteacherinlabbyname")
-  async GetTeacherInLabByName(@Body() searchNameDto: SearchTeacherDto){
-    var res = await this.teacherService.getListTeacherByNameInLab(searchNameDto.searchName, searchNameDto.labId);
+  async GetTeacherInLabByName(@Body() searchNameDto: SearchTeacherDto, @Req() req){
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
+    var res = await this.teacherService.getListTeacherByNameInLab(searchNameDto.searchName, userProfile.lab.id);
     return res;
   }
 

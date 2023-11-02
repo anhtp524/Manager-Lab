@@ -22,9 +22,6 @@ export class CreateTeacherDto {
 export class SearchTeacherDto {
     @ApiProperty()
     searchName: string;
-
-    @ApiProperty()
-    labId: string;
 }
 
 export class AddTeacherLabDto {

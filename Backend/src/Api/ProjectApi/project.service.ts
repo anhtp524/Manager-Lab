@@ -236,13 +236,16 @@ export class ProjectService {
     return [];
   }
 
-  async GetCertificate(projectId: string) {
+  async GetCertificate(projectId: string, studentId: string) {
     const studentProjectModel = await this.projectStudentRepo.findOne({
       relations: ['project', 'project.lab', 'student'],
       where: {
         project: {
           id: projectId
         },
+        student: {
+          id: studentId
+        }
       }
     });
     if(!studentProjectModel) return new CertificateDto();
@@ -258,7 +261,33 @@ export class ProjectService {
     return certificateModel;
   }
 
-  async EditProject(projectId: string, updateProject: UpdateProjectDto) {
+  async OnGoingProject(projectId: string) {
+    const projectModel = await this.projectRepository.findOne({
+      where: {
+        id: projectId
+      }
+    });
+    if(projectModel.status === ProjectStatus.New) {
+      projectModel.status = ProjectStatus.OnGoing;
+      await this.projectRepository.save(projectModel);
+    }
+
+    return projectModel;
+  }
+
+  async EditProject(updateProject: UpdateProjectDto) {
+    const projectModel = await this.projectRepository.findOne({
+      where: {
+        id: updateProject.projectId
+      }
+    });
+    if (projectModel.status === ProjectStatus.UnConfirm || projectModel.status === ProjectStatus.New || projectModel.status === ProjectStatus.OnGoing) {
+      projectModel.coreTech = updateProject.coreTech;
+      projectModel.description = updateProject.description;
+      projectModel.name = updateProject.name;
+      await this.projectRepository.save(projectModel);
+    }
     
+    return projectModel; 
   }
 }
