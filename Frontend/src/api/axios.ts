@@ -56,10 +56,19 @@ fetchHandler.interceptors.response.use(
   }
 )
 
-const downloadHandler = axios.create(config)
+const downloadHandler = axios.create({
+  timeout: 300000,
+  baseURL: 'http://localhost:8000/v1/api/',
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  },
+  withCredentials: true
+})
 // Request interceptor
 downloadHandler.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('token')
+    request.headers.Authorization = `Bearer ${token}`
     return request
   },
   (error: AxiosError) => {

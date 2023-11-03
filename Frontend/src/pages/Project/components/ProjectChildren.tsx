@@ -1,4 +1,4 @@
-import { Button, Collapse, DatePicker, Drawer, Form, Input, Space, Table, Tabs } from 'antd'
+import { Button, Collapse, DatePicker, Drawer, Form, Input, Space, Table, Tabs, Upload } from 'antd'
 import TableStudentProject from './TableStudentProject'
 import TableTeacherProject from './TableTeacherProject'
 import { useEffect, useMemo, useState } from 'react'
@@ -9,7 +9,8 @@ import taskAPI, { ListTask, Task, TaskStatus } from '~/api/task.api'
 import { ColumnsType } from 'antd/es/table'
 import { convertTaskStatusToValue } from '~/pages/Labs/components/Projects'
 import { FormInstance, useForm } from 'antd/es/form/Form'
-import type { CollapseProps, TabsProps } from 'antd'
+import type { CollapseProps, TabsProps, UploadFile } from 'antd'
+import documentAPI from '~/api/document.api'
 
 function ProjectChildren() {
   const { id } = useParams()
@@ -21,6 +22,8 @@ function ProjectChildren() {
   const [showDetailTask, setShowDetailTask] = useState<boolean>(false)
   const [showInnerTask, setShowInnerTask] = useState<boolean>(false)
   const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
+  const [outerPanelWidth, setOuterPanelWidth] = useState<number>(600)
+  const [fileList, setFileList] = useState<UploadFile[]>([])
 
   const tabList: TabsProps['items'] = useMemo(
     () => [
@@ -152,6 +155,13 @@ function ProjectChildren() {
     }
   }
 
+  // const normFile = (e: Dennis) => {
+  //   console.log('Upload event:', e)
+  //   if (Array.isArray(e)) {
+  //     return e
+  //   }
+  //   return e?.fileList
+  // }
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
@@ -254,7 +264,7 @@ function ProjectChildren() {
         title='View detail task'
         className='view-detail-task'
         placement='right'
-        width={600}
+        width={outerPanelWidth}
         onClose={() => {
           setShowDetailTask(false)
         }}
@@ -266,11 +276,15 @@ function ProjectChildren() {
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
             <Button
               onClick={() => {
+                setOuterPanelWidth(600)
                 setShowDetailTask(false)
               }}
               type='default'
             >
               Back
+            </Button>
+            <Button type='primary' onClick={() => setShowInnerTask(true)}>
+              View content and response
             </Button>
           </Space>
         }
@@ -297,9 +311,89 @@ function ProjectChildren() {
             <div className='detail-content-body'>{detailTask?.content}</div>
           </div>
         </div>
-        <div>
-          <Button>View question</Button>
-        </div>
+        <Drawer
+          title='View detail content and response'
+          className='view-detail-content-response'
+          placement='right'
+          width={800}
+          onClose={() => {
+            form.resetFields()
+            setFileList([])
+            setShowInnerTask(false)
+          }}
+          open={showInnerTask}
+          keyboard={false}
+          maskClosable={false}
+          headerStyle={{ flexDirection: 'row-reverse' }}
+          footer={
+            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+              <Button
+                onClick={() => {
+                  form.resetFields()
+                  setFileList([])
+                  setShowInnerTask(false)
+                }}
+                type='default'
+              >
+                Back
+              </Button>
+            </Space>
+          }
+        >
+          <div className='detail-content'>
+            <div style={{ color: '#1F1F1F', fontWeight: '500', padding: '8px 0' }}>Content</div>
+            <div className='detail-content-body'>{detailTask?.content}</div>
+          </div>
+          <Form form={form}>
+            <Form.Item name='response'>
+              <div className='info-container' style={{ marginTop: 12 }}>
+                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Enter response</div>
+                <Input.TextArea showCount maxLength={250} />
+              </div>
+            </Form.Item>
+            <Form.Item name='document' valuePropName='fileList'>
+              <div className='info-container' style={{ marginTop: 12 }}>
+                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Upload document (if need)</div>
+                <Upload.Dragger
+                  name='files'
+                  maxCount={2}
+                  showUploadList={{
+                    showDownloadIcon: true,
+                    downloadIcon: 'Download',
+                    showRemoveIcon: true
+                  }}
+                  fileList={fileList}
+                  listType='text'
+                  beforeUpload={async (file) => {
+                    // const formData = new FormData()
+                    // formData.append('file', file)
+                    try {
+                      const response = await documentAPI.upload({ folderPath: 'create/project', file: file })
+                      if (response && response.data) {
+                        console.log(response.data)
+                      }
+                    } catch (error: Dennis) {
+                      console.error(error)
+                    }
+                    return false
+                  }}
+                  onRemove={(file) => {
+                    const index = fileList.indexOf(file)
+                    const newFileList = fileList.slice()
+                    newFileList.splice(index, 1)
+                    setFileList(newFileList)
+                  }}
+                  onChange={({ fileList }) => {
+                    setFileList(fileList)
+                  }}
+                >
+                  <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+                  <p className='ant-upload-hint'>Support for a single or bulk upload.</p>
+                </Upload.Dragger>
+              </div>
+            </Form.Item>
+          </Form>
+        </Drawer>
       </Drawer>
     </div>
   )
