@@ -1,13 +1,13 @@
 import './login.scss'
-import { Form, Input, Button, Checkbox } from 'antd'
+import { Form, Input, Button, Checkbox, Typography } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import Image from '~/assets/Image'
 import fetchHandler from '~/api/axios'
 import { Store } from 'antd/es/form/interface'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { useAuth } from '~/common/context/useAuth'
-import { Role } from '~/routes/util'
+import { Role, RoutePath } from '~/routes/util'
 
 function Login() {
   const navigate = useNavigate()
@@ -33,6 +33,8 @@ function Login() {
   // }
 
   const onFinish = async (values: Store) => {
+    console.log(values)
+
     const body = {
       email: values.email,
       password: values.password
@@ -60,7 +62,7 @@ function Login() {
         <img src={Image.logoUat} />
       </div>
       <div className='login-tag'>
-        <p className='login-title'>Wellcome back</p>
+        <Typography.Title>Wellcome back</Typography.Title>
         <Form
           name='normal_login'
           className='login-form'
@@ -90,6 +92,12 @@ function Login() {
               Log in
             </Button>
           </Form.Item>
+          <div className='have-account'>
+            <Form.Item>
+              <Typography.Text>Don't have an account?</Typography.Text>
+              <Link to={RoutePath.SignUp}>Sign Up</Link>
+            </Form.Item>
+          </div>
         </Form>
       </div>
     </div>

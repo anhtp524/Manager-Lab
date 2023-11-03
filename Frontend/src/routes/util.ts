@@ -7,6 +7,7 @@ export enum RoutePath {
   Chat = '/chat',
   Auth = '/auth',
   Login = '/auth/login',
+  SignUp = '/auth/signup',
   Forgotpass = '/auth/forgotpass',
   NotFoundPage = '/notfoundpage',
   ProfileLecture = '/profile/lecture',
