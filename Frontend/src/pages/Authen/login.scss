@@ -1,13 +1,13 @@
 .login-main {
   width: 70%;
-  height: 70%;
   display: flex;
-  background-color: #fff;
   justify-content: center;
-  border: 2px solid #d3d3d3;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background-color: rgba($color: #ffffff, $alpha: 0.53);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 255, 0.33);
+  backdrop-filter: blur(3px);
   outline: none;
   border-radius: 8px;
+  padding: 24px 0;
   .login-logo {
     display: flex;
     justify-content: center;
@@ -39,4 +39,12 @@
       }
     }
   }
+  .have-account {
+    text-align: center;
+}
+}
+
+.signup-main {
+  @extend .login-main;
+  // height: 100%;
 }

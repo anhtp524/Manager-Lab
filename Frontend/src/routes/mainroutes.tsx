@@ -15,6 +15,8 @@ import Chat from '~/pages/Chat/Chat'
 import Project from '~/pages/Project/Project'
 import ProjectChildren from '~/pages/Project/components/ProjectChildren'
 import LabDetail from '~/pages/Labs/LabDetail'
+import { Sign } from 'crypto'
+import SignUp from '~/pages/Authen/SignUp'
 
 const router = createBrowserRouter([
   {
@@ -116,6 +118,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Lazyloading />}>
             <ForgotPassword />
+          </Suspense>
+        )
+      },
+      {
+        path: RoutePath.SignUp,
+        element: (
+          <Suspense fallback={<Lazyloading />}>
+            <SignUp />
           </Suspense>
         )
       }

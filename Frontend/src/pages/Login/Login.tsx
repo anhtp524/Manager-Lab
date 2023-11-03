@@ -5,13 +5,13 @@ import './login.scss'
 const Login = () => {
   const navigate = useNavigate()
   // const handleLoginStudent = () => {};
-  const onFinish = (values: any) => {
+  const onFinish = (values: Dennis) => {
     console.log(values)
     localStorage.setItem('accessToken', true)
     navigate('/')
   }
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo: Dennis) => {
     console.log('Failed:', errorInfo)
   }
 
@@ -22,15 +22,7 @@ const Login = () => {
   }
 
   return (
-    <div className='login'>
-      {/* <div className="login">
-      <div className="loginstudent">
-        <button onClick={handleLoginStudent}>Login with student</button>
-      </div>
-      <div className="loginlecture">
-        <button>Login with lecture</button>
-      </div>
-    </div> */}
+    <div className='login-page'>
       <div className='logincontent'>
         <div className='header'>Đăng nhập để truy cập hệ thống</div>
         <Form
