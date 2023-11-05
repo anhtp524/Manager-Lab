@@ -6,6 +6,7 @@ export const GET_PROJECT_IN_LAB = 'project/getprojectinlab'
 export const GET_CURRENT_USER_PROJECT = 'project/getmyproject'
 export const CREATE_PROJECT = 'project/createproject'
 export const GET_BY_ID = 'project/getdetail'
+export const START_PROJECT = 'project/ongoingproject'
 
 const projectAPI = {
   getAll: (abortSignal: IAbortSignal) => {
@@ -22,12 +23,16 @@ const projectAPI = {
   },
   getCurrentUserProject: (abortSignal: IAbortSignal) => {
     return fetchHandler.get<ProjectList>(GET_CURRENT_USER_PROJECT, { ...abortSignal })
+  },
+  start: (id: GUID) => {
+    return fetchHandler.get<Project>(START_PROJECT + '/' + id)
   }
 }
 
 export default projectAPI
 
 export type Project = {
+  key: GUID
   id: GUID
   name: string
   description: string

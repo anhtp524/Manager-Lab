@@ -7,13 +7,22 @@ export const DOWNLOAD_DOCUMENT = 'document/download'
 
 const documentAPI = {
   upload: (body: UploadDocumentRequest) => {
-    return downloadHandler.post<Dennis>(UPLOAD_DOCUMENT, body)
+    return downloadHandler.post<UploadDocumentResponse>(UPLOAD_DOCUMENT, body)
   }
 }
 
 export default documentAPI
 
 export type UploadDocumentRequest = {
-  folderPath: 'create/project'
+  folderPath: 'create/project' | 'create/task'
   file: RcFile
+}
+
+export type UploadDocumentResponse = {
+  documentName: string
+  documentRuleId: GUID
+  documentType: string
+  id: GUID
+  mimeType: string
+  size: number
 }
