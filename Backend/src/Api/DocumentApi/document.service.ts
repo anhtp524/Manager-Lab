@@ -124,14 +124,14 @@ export class DocumentService {
                 documentItem.documentRule.id = keepFile !== "" ? keepFile : firstDocumentRule.id;
                 await this.documentRepo.save(documentItem);
             }
-        }
 
-        if(isCreated || keepFile === "")
-        {
-            firstDocumentRule.folderPath = folderPath;
-            firstDocumentRule.regardingId = regardingId;
-
-            await this.documentRuleRepo.save(firstDocumentRule);
+            if(isCreated || keepFile === "")
+            {
+                firstDocumentRule.folderPath = folderPath;
+                firstDocumentRule.regardingId = regardingId;
+    
+                await this.documentRuleRepo.save(firstDocumentRule);
+            }
         }
     }
 }
