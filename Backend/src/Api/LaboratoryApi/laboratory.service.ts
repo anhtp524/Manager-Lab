@@ -30,7 +30,7 @@ export class LabboratoryService {
     return newLabModel;
   }
 
-  async getDetailLab(id: string) {
+  async getDetailLab(id: string, userId: string) {
     var detailLabModel = await this.labRepository.findOne({
       relations: {
         teacher: true
@@ -39,6 +39,10 @@ export class LabboratoryService {
         id: id
       }
     });
-    return detailLabModel;
+    const checkLabHead = userId === detailLabModel.teacher.id;
+    return {
+      ...detailLabModel,
+      isLabHead: checkLabHead
+    }
   }
 }

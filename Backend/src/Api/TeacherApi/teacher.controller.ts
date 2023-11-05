@@ -20,10 +20,10 @@ export class TeacherController {
     return this.teacherService.findAll();
   }
 
-  @Get("/:id")
-  GetTeacherById(@Param('id') id: string){
-    return this.teacherService.findTeacherById(id)
-  }
+  // @Get("/:id")
+  // GetTeacherById(@Param('id') id: string){
+  //   return this.teacherService.findTeacherById(id)
+  // }
 
   @ApiBody({type: CreateTeacherDto})
   @Post("createteacher")
@@ -58,6 +58,12 @@ export class TeacherController {
   @Get("getteacherinlab/:labId")
   async GetTeacherInLab(@Param('labId') labId: string){
     var res = await this.teacherService.getTeacherInLab(labId);
+    return res;
+  }
+
+  @Get("getteachernolab")
+  async GetTeacherNoLab() {
+    const res  = await this.teacherService.getListTeacherNoLab();
     return res;
   }
 }

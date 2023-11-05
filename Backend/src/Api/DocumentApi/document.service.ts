@@ -98,9 +98,10 @@ export class DocumentService {
                         }
                     }
                 });
+                keepFile = documentRule.id;
                 if (documentItems.length > 0) {
                     for(let item of documentItems) {
-                        keepFile = item.documentRule.id;
+                        
                         if (listFile.includes(item.id)) {
                             listFile = listFile.filter(x => x !== item.id);
                         }

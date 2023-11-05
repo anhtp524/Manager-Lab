@@ -47,6 +47,8 @@ export class TaskService {
     taskModel.project = new ProjectEntity();
     taskModel.project.id = newTask.projectId;
     await this.taskRepo.save(taskModel);
+
+    await this.documentService.UpdateRegardingId(newTask.listFileId, taskModel.id, FolderPath.createdTask, true)
     return taskModel;
   }
 
@@ -55,6 +57,8 @@ export class TaskService {
     taskModel.response = responseDto.response;
     taskModel.status = TaskStatus.Resolve;
     await this.taskRepo.save(taskModel);
+
+    await this.documentService.UpdateRegardingId(responseDto.listAttachment, taskModel.id, FolderPath.responseTask, false)
     return taskModel;
   }
 
@@ -81,7 +85,7 @@ export class TaskService {
       taskModel.title = updateTask.title;
       taskModel.dueDate = updateTask.dueDate;
       await this.taskRepo.save(taskModel);
-      this.documentService.UpdateRegardingId(updateTask.listFileId, updateTask.taskId, FolderPath.createdTask, false);
+      await this.documentService.UpdateRegardingId(updateTask.listFileId, updateTask.taskId, FolderPath.createdTask, false);
     }
 
     return taskModel;

@@ -93,4 +93,10 @@ export class TeacherService {
     await this.teacherProjectRepo.save(teacherProjectModel);
     return 1;
   }
+
+  async getListTeacherNoLab() {
+    const listteacherModel = await this.teacherRepository.find();
+
+    return listteacherModel.filter(x => x.lab === null);
+  }
 }
