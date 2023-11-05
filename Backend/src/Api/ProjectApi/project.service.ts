@@ -78,11 +78,18 @@ export class ProjectService {
         },
       },
     });
-    const teacherInProject = await this.teacherProjectRepo
-      .createQueryBuilder('tp')
-      .leftJoin('tp.project', 'project', 'project.id = :id', { id: id })
-      .leftJoinAndSelect('tp.teacher', 'teacher')
-      .getMany();
+    const teacherInProject = await this.teacherProjectRepo.find({
+      relations: {
+        project: true,
+        teacher: true
+      },
+      where: {
+        project: {
+          id: id
+        }
+      }
+    })
+      
 
     detailProject.id = id;
     detailProject.name = studentInProject[0].project?.name;
@@ -90,6 +97,7 @@ export class ProjectService {
     detailProject.description = studentInProject[0].project?.description;
     detailProject.students = studentInProject.map((x) => {
       const student: StudentInProject = {
+        id: x.student.id,
         name: x.student.name,
         msv: x.student.studentCode,
         class: x.student.class,
@@ -98,7 +106,9 @@ export class ProjectService {
     });
     detailProject.teachers = teacherInProject.map((x) => {
       const teacher: TeacherInProject = {
+        id: x.teacher.id,
         name: x.teacher.name,
+        email: x.teacher.email
       };
       return teacher;
     });
@@ -288,5 +298,31 @@ export class ProjectService {
     }
     
     return projectModel; 
+  }
+
+  async ConfirmProject(projectId: string) {
+    const projectModel = await this.projectRepository.findOne({
+      where: {
+        id: projectId
+      }
+    });
+    projectModel.status = ProjectStatus.New;
+    await this.projectRepository.save(projectModel);
+    return projectModel;
+  }
+
+  async ProjectUnconfirm(userId: string) {
+    const teacherProjectModel = await this.teacherProjectRepo.find({
+      relations: ['project'],
+      where: {
+        teacher: {
+          id: userId
+        },
+        project: {
+          status: ProjectStatus.UnConfirm
+        }
+      }
+    });
+    return teacherProjectModel.map(t => t.project);
   }
 }

@@ -147,4 +147,18 @@ export class ProjectController {
     const res = await this.projectService.OnGoingProject(projectId);
     return res;
   }
+
+  @Get("confirm/:projectId")
+  async Confirm(@Param('projectId') projectId: string) {
+    const res = await this.projectService.ConfirmProject(projectId);
+    return res;
+  }
+
+  @Get("getprojectunconfirm")
+  async ListProjectUnconfirm(@Req() req) {
+    const user = req.user;
+    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
+    const res = await this.projectService.ProjectUnconfirm(userProfile.id)
+    return res;
+  }
 }
