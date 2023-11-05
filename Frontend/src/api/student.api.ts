@@ -9,6 +9,7 @@ export const WITHDRAW_FROM_LAB = 'student/withdrawfromlab'
 export const GET_REGISTER_IN_LAB = 'student/getstudentregisterinlab'
 export const APPROVE_TO_LAB = 'student/approvetolab'
 export const REMOVE_FROM_LAB = 'student/deletestudentinlab'
+export const SEARCH_BY_NAME = 'student/getstudentbyname'
 
 const studentAPI = {
   getAll: (abortSignal: IAbortSignal) => {
@@ -34,6 +35,9 @@ const studentAPI = {
   },
   removeFromLab: (body: { studentId: GUID }) => {
     return fetchHandler.post<ProfileUser>(REMOVE_FROM_LAB, body)
+  },
+  searchByName: (body: { searchName: string }) => {
+    return fetchHandler.post<ListStudent>(SEARCH_BY_NAME, body)
   }
 }
 

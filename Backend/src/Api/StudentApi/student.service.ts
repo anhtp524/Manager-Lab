@@ -121,10 +121,10 @@ export class StudentService {
     const listStudentModel = await this.studentRepository.find({
       where: {
         lab: {
-          id: labId
+          id: labId,
         },
-        name: Like(`%{searchName}%`)
-      }
+        name: Like(`%${searchName}%`),
+      },
     });
 
     return listStudentModel;

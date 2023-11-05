@@ -212,7 +212,7 @@ const LabDetail = () => {
   return (
     <div className='labdetail'>
       <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
-      {(authInfo?.roles !== Role.Student || (Boolean(profileUserInfo?.lab) && profileUserInfo?.isApproveToLab)) && (
+      {(authInfo?.roles !== Role.Student || (profileUserInfo?.lab?.id === id && profileUserInfo?.isApproveToLab)) && (
         <div className='tab-lab-details'>
           <Tabs defaultActiveKey='2' destroyInactiveTabPane items={tabs} onChange={() => showLoading()} />
         </div>

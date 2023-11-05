@@ -1,4 +1,4 @@
-import { FolderOutlined, GiftOutlined, HeatMapOutlined, HomeOutlined, WechatOutlined } from '@ant-design/icons'
+import { FolderOutlined, HeatMapOutlined, HomeOutlined, WechatOutlined } from '@ant-design/icons'
 import { Menu } from 'antd'
 import { Outlet, useNavigate } from 'react-router-dom'
 import Headertop from '../Headertop/Headertop'
@@ -10,41 +10,35 @@ import { useAuth } from '~/common/context/useAuth'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import userAPI from '~/api/user.api'
 
-let items = [
-  {
-    label: 'Home',
-    key: '/',
-    icon: <HomeOutlined />
-  },
-  {
-    label: 'Labs',
-    key: '/labs',
-    icon: <HeatMapOutlined />
-  },
-  {
-    label: 'Contests and prizes',
-    key: '/contestsprizes',
-    icon: <GiftOutlined />
-  },
-  {
-    label: 'Project',
-    key: '/project',
-    icon: <FolderOutlined />
-  },
-  {
-    label: 'Chat',
-    key: '/chat',
-    icon: <WechatOutlined />
-  },
-  {
-    label: 'Account Management',
-    key: '/account',
-    icon: <WechatOutlined />
-  }
-]
-
 function Layout() {
-  const { authInfo, setAuthInfo, setProfileUserInfo } = useAuth()
+  let items = [
+    {
+      label: 'Home',
+      key: '/',
+      icon: <HomeOutlined />
+    },
+    {
+      label: 'Labs',
+      key: '/labs',
+      icon: <HeatMapOutlined />
+    },
+    {
+      label: 'Project',
+      key: '/project',
+      icon: <FolderOutlined />
+    },
+    {
+      label: 'Chat',
+      key: '/chat',
+      icon: <WechatOutlined />
+    },
+    {
+      label: 'Account Management',
+      key: '/account',
+      icon: <WechatOutlined />
+    }
+  ]
+  const { authInfo, setAuthInfo, setProfileUserInfo, profileUserInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
   const navigate = useNavigate()
 
@@ -85,7 +79,12 @@ function Layout() {
   }, [])
 
   if (!authInfo?.isAuthenticated) return null
-
+  if (authInfo.roles === Role.Teacher && profileUserInfo?.lab === null) {
+    items = items.filter((x) => x.key !== '/project')
+  }
+  if (authInfo.roles === Role.Student && (profileUserInfo?.lab === null || !profileUserInfo?.isApproveToLab)) {
+    items = items.filter((x) => x.key !== '/project')
+  }
   if (authInfo.roles !== Role.Admin) {
     items = items.filter((x) => x.key !== '/account')
   }

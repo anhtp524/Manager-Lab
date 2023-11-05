@@ -81,15 +81,14 @@ export class ProjectService {
     const teacherInProject = await this.teacherProjectRepo.find({
       relations: {
         project: true,
-        teacher: true
+        teacher: true,
       },
       where: {
         project: {
-          id: id
-        }
-      }
-    })
-      
+          id: id,
+        },
+      },
+    });
 
     detailProject.id = id;
     detailProject.name = studentInProject[0].project?.name;
@@ -108,7 +107,7 @@ export class ProjectService {
       const teacher: TeacherInProject = {
         id: x.teacher.id,
         name: x.teacher.name,
-        email: x.teacher.email
+        email: x.teacher.email,
       };
       return teacher;
     });
@@ -230,17 +229,16 @@ export class ProjectService {
         },
       });
       return studentProjectModel.map((x) => x.project);
-    }
-    else if(role === Role.Teacher) {
+    } else if (role === Role.Teacher) {
       const teacherProjectModel = await this.teacherProjectRepo.find({
         relations: ['project'],
         where: {
           teacher: {
-            id: userId
-          }
-        }
+            id: userId,
+          },
+        },
       });
-      return teacherProjectModel.map(t => t.project);
+      return teacherProjectModel.map((t) => t.project);
     }
     return [];
   }
@@ -250,22 +248,25 @@ export class ProjectService {
       relations: ['project', 'project.lab', 'student'],
       where: {
         project: {
-          id: projectId
+          id: projectId,
         },
         student: {
-          id: studentId
-        }
-      }
+          id: studentId,
+        },
+      },
     });
-    if(!studentProjectModel) return new CertificateDto();
+    if (!studentProjectModel) return new CertificateDto();
     const certificateModel = new CertificateDto();
     certificateModel.student.studentName = studentProjectModel.student.name;
     certificateModel.student.class = studentProjectModel.student.class;
-    certificateModel.student.studentCode = studentProjectModel.student.studentCode;
-    certificateModel.student.dateOfBirth = studentProjectModel.student.dateOfBirth;
+    certificateModel.student.studentCode =
+      studentProjectModel.student.studentCode;
+    certificateModel.student.dateOfBirth =
+      studentProjectModel.student.dateOfBirth;
     certificateModel.project.projectName = studentProjectModel.project.name;
     certificateModel.project.score = studentProjectModel.project.score;
-    certificateModel.project.finishDate = studentProjectModel.project.finishDate;
+    certificateModel.project.finishDate =
+      studentProjectModel.project.finishDate;
     certificateModel.labName = studentProjectModel.project.lab.name;
     return certificateModel;
   }
@@ -273,10 +274,10 @@ export class ProjectService {
   async OnGoingProject(projectId: string) {
     const projectModel = await this.projectRepository.findOne({
       where: {
-        id: projectId
-      }
+        id: projectId,
+      },
     });
-    if(projectModel.status === ProjectStatus.New) {
+    if (projectModel.status === ProjectStatus.New) {
       projectModel.status = ProjectStatus.OnGoing;
       await this.projectRepository.save(projectModel);
     }
@@ -287,24 +288,28 @@ export class ProjectService {
   async EditProject(updateProject: UpdateProjectDto) {
     const projectModel = await this.projectRepository.findOne({
       where: {
-        id: updateProject.projectId
-      }
+        id: updateProject.projectId,
+      },
     });
-    if (projectModel.status === ProjectStatus.UnConfirm || projectModel.status === ProjectStatus.New || projectModel.status === ProjectStatus.OnGoing) {
+    if (
+      projectModel.status === ProjectStatus.UnConfirm ||
+      projectModel.status === ProjectStatus.New ||
+      projectModel.status === ProjectStatus.OnGoing
+    ) {
       projectModel.coreTech = updateProject.coreTech;
       projectModel.description = updateProject.description;
       projectModel.name = updateProject.name;
       await this.projectRepository.save(projectModel);
     }
-    
-    return projectModel; 
+
+    return projectModel;
   }
 
   async ConfirmProject(projectId: string) {
     const projectModel = await this.projectRepository.findOne({
       where: {
-        id: projectId
-      }
+        id: projectId,
+      },
     });
     projectModel.status = ProjectStatus.New;
     await this.projectRepository.save(projectModel);
@@ -316,13 +321,13 @@ export class ProjectService {
       relations: ['project'],
       where: {
         teacher: {
-          id: userId
+          id: userId,
         },
         project: {
-          status: ProjectStatus.UnConfirm
-        }
-      }
+          status: ProjectStatus.UnConfirm,
+        },
+      },
     });
-    return teacherProjectModel.map(t => t.project);
+    return teacherProjectModel.map((t) => t.project);
   }
 }

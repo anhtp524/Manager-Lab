@@ -11,10 +11,13 @@ import { convertTaskStatusToValue } from '~/pages/Labs/components/Projects'
 import { FormInstance, useForm } from 'antd/es/form/Form'
 import type { CollapseProps, TabsProps, UploadFile } from 'antd'
 import documentAPI from '~/api/document.api'
+import { useAuth } from '~/common/context/useAuth'
+import { ProjectStatus, Role } from '~/routes/util'
 
 function ProjectChildren() {
   const { id } = useParams()
   const [form] = useForm()
+  const { authInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
   const [detailProject, setDetailProject] = useState<DetailProject | undefined>(undefined)
   const [taskList, setTaskList] = useState<ListTask>([])
@@ -24,6 +27,8 @@ function ProjectChildren() {
   const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
   const [outerPanelWidth, setOuterPanelWidth] = useState<number>(600)
   const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [createTaskFileList, setCreateTaskFileList] = useState<UploadFile[]>([])
+  const [createTaskFileIds, setCreateTaskFileIds] = useState<GUID[]>([])
 
   const tabList: TabsProps['items'] = useMemo(
     () => [
@@ -121,7 +126,8 @@ function ProjectChildren() {
     console.log(form.getFieldsValue())
     const requestBody = {
       ...form.getFieldsValue(),
-      projectId: id
+      projectId: id,
+      listFileId: createTaskFileIds
     }
     console.log(requestBody)
     try {
@@ -173,12 +179,16 @@ function ProjectChildren() {
         <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>
           <p>List tasks</p>
-          <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
-            <Button type='primary' onClick={() => setShowCreate(true)}>
-              Create Task
-            </Button>
-          </Space>
+          {authInfo?.roles !== Role.Student && (
+            <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
+              <Button type='primary' onClick={() => setShowCreate(true)}>
+                Create Task
+              </Button>
+            </Space>
+          )}
+          {/* {(detailProject?.status as ProjectStatus) >= ProjectStatus.OnGoing && ( */}
           <Table showHeader={false} columns={columnProjectList} dataSource={taskList} bordered />
+          {/* )} */}
         </div>
       </div>
       <Drawer
@@ -256,6 +266,54 @@ function ProjectChildren() {
             <div className='input-field task-due-date'>
               <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Due date</div>
               <DatePicker onChange={(_, dateString) => form.setFieldValue('dueDate', dateString)} />
+            </div>
+          </Form.Item>
+
+          <Form.Item name='createTaskDocument' valuePropName='fileList'>
+            <div className='info-container' style={{ marginTop: 12 }}>
+              <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Upload document (if need)</div>
+              <Upload.Dragger
+                name='files'
+                maxCount={2}
+                showUploadList={{
+                  showDownloadIcon: true,
+                  downloadIcon: 'Download',
+                  showRemoveIcon: true
+                }}
+                fileList={createTaskFileList}
+                listType='text'
+                beforeUpload={async (file) => {
+                  // const formData = new FormData()
+                  // formData.append('file', file)
+                  showLoading()
+                  try {
+                    const response = await documentAPI.upload({ folderPath: 'create/task', file: file })
+                    if (response && response.data) {
+                      const ids = [...createTaskFileIds]
+                      ids.push(response.data.id)
+                      setCreateTaskFileIds(ids)
+                    }
+                  } catch (error: Dennis) {
+                    console.error(error)
+                  } finally {
+                    closeLoading()
+                  }
+                  return false
+                }}
+                onRemove={(file) => {
+                  console.log(file)
+                  const index = createTaskFileList.indexOf(file)
+                  const newFileList = createTaskFileList.slice()
+                  newFileList.splice(index, 1)
+                  setCreateTaskFileList(newFileList)
+                }}
+                onChange={({ fileList }) => {
+                  console.log(fileList)
+                  setCreateTaskFileList(fileList)
+                }}
+              >
+                <p className='ant-upload-text'>Click or drag file to this area to upload</p>
+              </Upload.Dragger>
             </div>
           </Form.Item>
         </Form>
