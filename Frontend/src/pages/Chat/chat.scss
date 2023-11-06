@@ -33,6 +33,7 @@
         min-height: 80px;
         padding: 8px;
         gap: 16px;
+        cursor: pointer;
         &:hover {
           background-color: #eef4ff;
         }
@@ -105,6 +106,39 @@
             text-align: right;
           }
         }
+      }
+    }
+  }
+}
+
+.search {
+  .ant-input-group-addon {
+    width: 37px !important;
+    cursor: pointer;
+    &:active {
+      background-color: rgb(219, 219, 235);
+    }
+  }
+}
+
+.project-listStudents {
+  position: relative;
+  .people-picker {
+    position: absolute;
+    background-color: white;
+    z-index: 10;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    width: 100%;
+    max-height: 300px;
+    overflow: auto;
+    .ant-list-item {
+      padding: 4px 0;
+      .people-item:hover {
+        background-color: rgb(218, 244, 255);
+        cursor: pointer;
+      }
+      .people-item.selected {
+        background-color: rgb(186, 234, 255);
       }
     }
   }

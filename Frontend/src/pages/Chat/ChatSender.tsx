@@ -3,9 +3,10 @@ import { Avatar } from 'antd'
 interface IChatSenderProps {
   isSender?: boolean
   name: string
+  message: string
 }
 
-function ChatSender({ isSender, name }: IChatSenderProps) {
+function ChatSender({ isSender, name, message }: IChatSenderProps) {
   return (
     <div className={`chat-sender ${isSender ? 'to-right' : 'to-left'}`}>
       <div>
@@ -16,9 +17,7 @@ function ChatSender({ isSender, name }: IChatSenderProps) {
       <div className='info'>
         <strong>{name}</strong>
         <p style={{ marginTop: '12px' }} className={isSender ? 'sender' : 'receiver'}>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, cupiditate! Iusto reiciendis a molestiae
-          nobis, officia doloribus. Magni, excepturi. Molestias ducimus consequatur vitae voluptas, eum odio dicta
-          ratione tenetur doloribus?
+          {message}
         </p>
       </div>
     </div>
