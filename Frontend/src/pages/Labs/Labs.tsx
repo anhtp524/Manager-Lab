@@ -36,7 +36,7 @@ const Labs = () => {
       <div className='labscontent'>
         {listLab &&
           listLab.length > 0 &&
-          listLab.map((item, _) => (
+          listLab.map((item) => (
             <div className='labscontentChild' key={item.id}>
               <LabsChildren data={item} />
             </div>

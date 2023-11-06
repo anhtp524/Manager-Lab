@@ -1,61 +1,121 @@
-import { Table } from 'antd'
+import { Button, Modal, Table } from 'antd'
 import { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import teacherAPI, { DetailTeacher, ListTeacher } from '~/api/teacher.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import DetailPanel from './common/DetailPanel'
+import { toast } from 'react-toastify'
 
-function Teachers() {
+function Teachers({ isLabHead, teacherId }: { isLabHead?: boolean; teacherId?: GUID }) {
   const columns: ColumnsType<DetailTeacher> = useMemo(
-    () => [
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        width: 200,
-        onCell: (record) => {
-          return {
-            onClick: () => onOpenPanel(record)
-          }
-        },
-        render: (value) => {
-          return (
-            <a
-              href=''
-              onClick={(e) => {
-                e.preventDefault()
-              }}
-            >
-              {value}
-            </a>
-          )
-        }
-      },
-      {
-        title: 'Date Of Birth',
-        dataIndex: 'dateOfBirth',
-        width: 150
-      },
-      {
-        title: 'Department',
-        dataIndex: 'department',
-        width: 200
-      },
-      {
-        title: 'Major',
-        dataIndex: 'major',
-        width: 150
-      },
-      {
-        title: 'Phone Number',
-        dataIndex: 'phoneNumber',
-        width: 150
-      },
-      {
-        title: 'Email',
-        dataIndex: 'email'
-      }
-    ],
+    () =>
+      !isLabHead
+        ? [
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              width: 200,
+              onCell: (record) => {
+                return {
+                  onClick: () => onOpenPanel(record)
+                }
+              },
+              render: (value) => {
+                return (
+                  <a
+                    href=''
+                    onClick={(e) => {
+                      e.preventDefault()
+                    }}
+                  >
+                    {value}
+                  </a>
+                )
+              }
+            },
+            {
+              title: 'Date Of Birth',
+              dataIndex: 'dateOfBirth',
+              width: 150
+            },
+            {
+              title: 'Department',
+              dataIndex: 'department',
+              width: 200
+            },
+            {
+              title: 'Major',
+              dataIndex: 'major',
+              width: 150
+            },
+            {
+              title: 'Phone Number',
+              dataIndex: 'phoneNumber',
+              width: 150
+            },
+            {
+              title: 'Email',
+              dataIndex: 'email'
+            }
+          ]
+        : [
+            {
+              title: 'Name',
+              dataIndex: 'name',
+              width: 200,
+              onCell: (record) => {
+                return {
+                  onClick: () => onOpenPanel(record)
+                }
+              },
+              render: (value) => {
+                return (
+                  <a
+                    href=''
+                    onClick={(e) => {
+                      e.preventDefault()
+                    }}
+                  >
+                    {value}
+                  </a>
+                )
+              }
+            },
+            {
+              title: 'Date Of Birth',
+              dataIndex: 'dateOfBirth',
+              width: 150
+            },
+            {
+              title: 'Department',
+              dataIndex: 'department',
+              width: 200
+            },
+            {
+              title: 'Major',
+              dataIndex: 'major',
+              width: 150
+            },
+            {
+              title: 'Phone Number',
+              dataIndex: 'phoneNumber',
+              width: 150
+            },
+            {
+              title: 'Email',
+              dataIndex: 'email'
+            },
+            {
+              render: (_, record) => {
+                return (
+                  <Button type='primary' onClick={() => onRemoveTeacher(record.id)}>
+                    Remove
+                  </Button>
+                )
+              }
+            }
+          ],
     []
   )
 
@@ -71,12 +131,14 @@ function Teachers() {
     const signal = abortController.signal
 
     const handleGetAllTeacherInLab = async () => {
-      if (id === undefined) return
+      if (id === undefined || teacherId === undefined) return
       try {
         showLoading()
         const response = await teacherAPI.getAllTeacherInLab(id, { signal: signal })
         if (response.data) {
-          setTeacherList(response.data)
+          let data = [...response.data]
+          data = data.filter((x) => x.id !== teacherId)
+          setTeacherList(data)
         }
       } catch (error) {
         console.error(error)
@@ -89,7 +151,25 @@ function Teachers() {
     return () => {
       abortController.abort()
     }
-  }, [])
+  }, [teacherId])
+
+  const onRemoveTeacher = (id: GUID) => {
+    Modal.confirm({
+      title: 'Remove this teacher?',
+      onOk: () => handleRemoveTeacher(id)
+    })
+  }
+
+  const handleRemoveTeacher = async (id: GUID) => {
+    try {
+      const response = await teacherAPI.deleteTeacher(id)
+      if (response && response.data) {
+        toast.success('Successfully deleted!')
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    }
+  }
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)

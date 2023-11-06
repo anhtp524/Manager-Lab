@@ -12,7 +12,7 @@ import { FormInstance, useForm } from 'antd/es/form/Form'
 import type { CollapseProps, TabsProps, UploadFile } from 'antd'
 import documentAPI from '~/api/document.api'
 import { useAuth } from '~/common/context/useAuth'
-import { ProjectStatus, Role } from '~/routes/util'
+import { Role } from '~/routes/util'
 
 function ProjectChildren() {
   const { id } = useParams()

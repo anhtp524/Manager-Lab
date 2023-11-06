@@ -3,6 +3,9 @@ import fetchHandler from './axios'
 export const GET_ALL_TEACHER = 'teacher/getteacherinlab'
 export const GET_TEACHER_BY_ID = 'teacher'
 export const SEARCH_BY_NAME = 'teacher/getteacherinlabbyname'
+export const GET_NO_LAB = 'teacher/getteachernolab'
+export const ADD_TEACHER = 'teacher/addteachertolab'
+export const DELETE_TEACHER = 'teacher/deleteteacherinlab'
 
 const teacherAPI = {
   getAllTeacherInLab: (labId: string, abortSignal: IAbortSignal) => {
@@ -13,6 +16,15 @@ const teacherAPI = {
   },
   searchByName: (body: { searchName: string }) => {
     return fetchHandler.post<ListTeacher>(SEARCH_BY_NAME, body)
+  },
+  getTeacherNoLab: () => {
+    return fetchHandler.get<ListTeacher>(GET_NO_LAB)
+  },
+  addTeacherToLab: (body: { teacherId: GUID; labId: GUID }) => {
+    return fetchHandler.post<DetailTeacher>(ADD_TEACHER, body)
+  },
+  deleteTeacher: (id: GUID) => {
+    return fetchHandler.post<Dennis>(DELETE_TEACHER, id)
   }
 }
 

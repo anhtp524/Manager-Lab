@@ -9,19 +9,30 @@ import { useAuth } from '~/common/context/useAuth'
 import studentAPI from '~/api/student.api'
 import { Role } from '~/routes/util'
 import PendingApproved from './components/PendingApproved'
+import teacherAPI from '~/api/teacher.api'
+import SelectNoLabTeacher from './components/common/SelectNoLabTeacher'
+import { toast } from 'react-toastify'
 
 const LabDetail = () => {
   const { authInfo, profileUserInfo, setProfileUserInfo } = useAuth()
   const { id } = useParams()
 
-  const [labDetail, setLabDetail] = useState<Lab | undefined>(undefined)
+  const [labDetail, setLabDetail] = useState<Lab>()
+  const [teacherId, setTeacherId] = useState<GUID>()
   const items: CollapseProps['items'] = useMemo(
     () => [
       {
         key: 1,
         label:
           authInfo?.roles !== Role.Student ? (
-            <span className='header'>{labDetail?.name}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span className='header'>{labDetail?.name}</span>
+              {labDetail?.isLabHead && (
+                <Button type='primary' onClick={handleGetTeacherNoLab}>
+                  Add teacher
+                </Button>
+              )}
+            </div>
           ) : profileUserInfo?.lab ? (
             profileUserInfo.lab.id === id ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -84,7 +95,7 @@ const LabDetail = () => {
         )
       }
     ],
-    [labDetail]
+    [labDetail, teacherId]
   )
 
   const tabList = [
@@ -96,7 +107,7 @@ const LabDetail = () => {
     {
       key: '2',
       label: 'Teachers',
-      children: <Teachers />
+      children: <Teachers isLabHead={labDetail?.isLabHead} teacherId={labDetail?.teacher.id} />
     },
     {
       key: '3',
@@ -117,7 +128,7 @@ const LabDetail = () => {
         children: <PendingApproved />
       }
     ]
-  }, [])
+  }, [labDetail])
 
   const { showLoading, closeLoading } = useHandlingApi()
 
@@ -148,6 +159,57 @@ const LabDetail = () => {
       abortController.abort()
     }
   }, [profileUserInfo?.lab])
+
+  async function handleGetTeacherNoLab() {
+    showLoading()
+    try {
+      const response = await teacherAPI.getTeacherNoLab()
+      if (response && response.data) {
+        Modal.confirm({
+          icon: null,
+          title: 'Select a teacher',
+          content: (
+            <div style={{ width: '100%' }}>
+              <SelectNoLabTeacher data={response.data} getTeacherId={getTeacherId} />
+            </div>
+          ),
+          centered: true,
+          width: '800px',
+          okText: 'Add teacher',
+          okButtonProps: {
+            disabled: response.data.length === 0
+          },
+          onOk: () => {
+            if (!teacherId) return
+            handleAddTeacher(teacherId)
+          }
+        })
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
+  const getTeacherId = (id: GUID) => {
+    setTeacherId(id)
+  }
+
+  const handleAddTeacher = async (teacherId: GUID) => {
+    if (!id) return
+    showLoading()
+    try {
+      const response = await teacherAPI.addTeacherToLab({ teacherId: teacherId, labId: id })
+      if (response && response.data) {
+        toast.success('Successfully added!')
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
 
   function onRegisterToLab() {
     Modal.confirm({
@@ -212,7 +274,9 @@ const LabDetail = () => {
   return (
     <div className='labdetail'>
       <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
-      {(authInfo?.roles !== Role.Student || (profileUserInfo?.lab?.id === id && profileUserInfo?.isApproveToLab)) && (
+      {(authInfo?.roles === Role.Admin ||
+        (authInfo?.roles === Role.Teacher && profileUserInfo?.lab?.id === id) ||
+        (profileUserInfo?.lab?.id === id && profileUserInfo?.isApproveToLab)) && (
         <div className='tab-lab-details'>
           <Tabs defaultActiveKey='2' destroyInactiveTabPane items={tabs} onChange={() => showLoading()} />
         </div>
