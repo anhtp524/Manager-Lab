@@ -4,6 +4,7 @@ import { TeacherService } from "./teacher.service";
 import { AddTeacherLabDto, CreateTeacherDto, SearchNameDto } from "./Dto/teacher.dto";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "../UserApi/users.service";
+import { DeleteTeacherDto } from "./Dto/deleteTeacher.dto";
 
 @ApiTags("Teacher")
 @ApiBearerAuth()
@@ -48,10 +49,10 @@ export class TeacherController {
     return res;
   }
 
-  @ApiBody({type : 'string'})
+  @ApiBody({type : DeleteTeacherDto})
   @Post("deleteteacherinlab")
-  async DeleteTeacherInLab(@Body() teacherId: string) {
-    var res = await this.teacherService.deleteTeacherFromLab(teacherId);
+  async DeleteTeacherInLab(@Body() deleteTeacher: DeleteTeacherDto) {
+    var res = await this.teacherService.deleteTeacherFromLab(deleteTeacher.teacherId);
     return res;
   }
 
