@@ -33,14 +33,9 @@ export class TeacherController {
     return this.teacherService.findAll();
   }
 
-  // @Get("/:id")
-  // GetTeacherById(@Param('id') id: string){
-  //   return this.teacherService.findTeacherById(id)
-  // }
-
-  @ApiBody({ type: CreateTeacherDto })
-  @Post('createteacher')
-  CreateStudent(@Body() newStudent: CreateTeacherDto) {
+  @ApiBody({type: CreateTeacherDto})
+  @Post("createteacher")
+  CreateStudent(@Body() newStudent: CreateTeacherDto){
     return this.teacherService.add(newStudent);
   }
 
@@ -92,4 +87,10 @@ export class TeacherController {
     const res = await this.teacherService.getListTeacherNoLab();
     return res;
   }
+
+  @Get("/:id")
+  GetTeacherById(@Param('id') id: string){
+    return this.teacherService.findTeacherById(id)
+  }
+
 }
