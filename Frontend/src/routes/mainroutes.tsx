@@ -15,8 +15,8 @@ import Chat from '~/pages/Chat/Chat'
 import Project from '~/pages/Project/Project'
 import ProjectChildren from '~/pages/Project/components/ProjectChildren'
 import LabDetail from '~/pages/Labs/LabDetail'
-import { Sign } from 'crypto'
 import SignUp from '~/pages/Authen/SignUp'
+import { ProjectProvider } from '~/pages/Project/project.context'
 
 const router = createBrowserRouter([
   {
@@ -52,7 +52,9 @@ const router = createBrowserRouter([
         path: RoutePath.Project,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <Project />
+            <ProjectProvider>
+              <Project />
+            </ProjectProvider>
           </Suspense>
         )
       },

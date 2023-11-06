@@ -1,12 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { TeacherEntity } from "src/entity/teacher.entity";
-import { ILike, Like, Repository } from "typeorm";
-import { CreateTeacherDto } from "./Dto/teacher.dto";
-import { LaboratoryEntity } from "src/entity/laboratory.entity";
-import { TeacherProjectDto } from "./Dto/teacherProject.dto";
-import { TeacherProjectEntity } from "src/entity/teacherProject.entity";
-import { ProjectEntity } from "src/entity/project.entity";
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TeacherEntity } from 'src/entity/teacher.entity';
+import { ILike, Like, Repository } from 'typeorm';
+import { CreateTeacherDto } from './Dto/teacher.dto';
+import { LaboratoryEntity } from 'src/entity/laboratory.entity';
+import { TeacherProjectDto } from './Dto/teacherProject.dto';
+import { TeacherProjectEntity } from 'src/entity/teacherProject.entity';
+import { ProjectEntity } from 'src/entity/project.entity';
 
 @Injectable()
 export class TeacherService {
@@ -14,7 +14,7 @@ export class TeacherService {
     @InjectRepository(TeacherEntity)
     private teacherRepository: Repository<TeacherEntity>,
     @InjectRepository(TeacherProjectEntity)
-    private teacherProjectRepo: Repository<TeacherProjectEntity>
+    private teacherProjectRepo: Repository<TeacherProjectEntity>,
   ) {}
 
   async findAll() {
@@ -30,40 +30,50 @@ export class TeacherService {
     return 1;
   }
 
-  async add(newTeacher: CreateTeacherDto){
+  async add(newTeacher: CreateTeacherDto) {
     const data = await this.teacherRepository.create(newTeacher);
     await this.teacherRepository.save(data);
     return 1;
   }
 
-  async deleteTeacherFromLab(teacherId: string){
+  async deleteTeacherFromLab(teacherId: string) {
     const teacherModel = await this.findTeacherById(teacherId);
-    if (!teacherModel) throw new HttpException("Error when delete teacher", HttpStatus.BAD_REQUEST);
-    teacherModel.lab = null
+    if (!teacherModel)
+      throw new HttpException(
+        'Error when delete teacher',
+        HttpStatus.BAD_REQUEST,
+      );
+    teacherModel.lab = null;
     const res = this.teacherRepository.update(teacherId, teacherModel);
     return res;
   }
 
-  async addTeacherToLab(teacherId: string, labId: string){
+  async addTeacherToLab(teacherId: string, labId: string) {
     const teacherModel = await this.findTeacherById(teacherId);
-    if (!teacherModel) throw new HttpException("Error when register student", HttpStatus.BAD_REQUEST);
+    if (!teacherModel)
+      throw new HttpException(
+        'Error when register student',
+        HttpStatus.BAD_REQUEST,
+      );
     teacherModel.lab = new LaboratoryEntity();
     teacherModel.lab.id = labId;
     const res = await this.teacherRepository.update(teacherId, teacherModel);
-    return res;
+    if (res) {
+      return teacherModel;
+    }
   }
 
   async getListTeacherByNameInLab(searchName: string, labId: string) {
     var listTeacherModel = await this.teacherRepository.find({
-      relations : {
-        lab : true,
+      relations: {
+        lab: true,
       },
-      where : {
-        lab : {
-          id : labId
+      where: {
+        lab: {
+          id: labId,
         },
-        name : ILike(`%${searchName}%`)
-      }
+        name: ILike(`%${searchName}%`),
+      },
     });
 
     return listTeacherModel;
@@ -71,14 +81,14 @@ export class TeacherService {
 
   async getTeacherInLab(labId: string) {
     var listTeacherInLab = await this.teacherRepository.find({
-      relations : {
-        lab : true
+      relations: {
+        lab: true,
       },
-      where : {
-        lab : {
-          id : labId
-        }
-      }
+      where: {
+        lab: {
+          id: labId,
+        },
+      },
     });
 
     return listTeacherInLab;
@@ -97,6 +107,6 @@ export class TeacherService {
   async getListTeacherNoLab() {
     const listteacherModel = await this.teacherRepository.find();
 
-    return listteacherModel.filter(x => x.lab === null);
+    return listteacherModel.filter((x) => x.lab === null);
   }
 }

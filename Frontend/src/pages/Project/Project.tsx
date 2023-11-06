@@ -1,20 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Avatar,
-  Button,
-  Divider,
-  Drawer,
-  Form,
-  FormInstance,
-  Input,
-  List,
-  Space,
-  Table,
-  Tag,
-  Upload,
-  UploadFile
-} from 'antd'
+import { Avatar, Button, Drawer, Form, FormInstance, Input, List, Space, Table, Tag, Upload, UploadFile } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { convertStatusEnumToValue } from '../Labs/components/Projects'
 import './Project.scss'
@@ -28,6 +14,7 @@ import { debounce } from 'lodash'
 import teacherAPI from '~/api/teacher.api'
 import { ProjectStatus, Role } from '~/routes/util'
 import { toast } from 'react-toastify'
+import { useGetAllProject } from './project.context'
 
 // interface DataNodeType {
 //   value: string
@@ -39,8 +26,9 @@ function Project() {
   const navigate = useNavigate()
   const { profileUserInfo, authInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
+  const { labProjects, getAllProjects } = useGetAllProject()
 
-  const [labProjects, setLabProjects] = useState<ProjectList>([])
+  // const [labProjects, setLabProjects] = useState<ProjectList>([])
   const [showCreate, setShowCreate] = useState<boolean>(false)
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [documentId, setDocumentId] = useState<GUID[]>([])
@@ -150,32 +138,32 @@ function Project() {
   )
 
   useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
+    // const abortController = new AbortController()
+    // const signal = abortController.signal
 
-    const handleGetLabProject = async () => {
-      showLoading()
-      try {
-        const response = await projectAPI.getCurrentUserProject({ signal: signal })
-        if (response && response.data) {
-          let newLabProjects = [...response.data]
-          newLabProjects = newLabProjects.map((item) => {
-            return { ...item, key: item.id }
-          })
-          setLabProjects(newLabProjects)
-        }
-      } catch (error: Dennis) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
+    // const handleGetLabProject = async () => {
+    //   showLoading()
+    //   try {
+    //     const response = await projectAPI.getCurrentUserProject({ signal: signal })
+    //     if (response && response.data) {
+    //       let newLabProjects = [...response.data]
+    //       newLabProjects = newLabProjects.map((item) => {
+    //         return { ...item, key: item.id }
+    //       })
+    //       setLabProjects(newLabProjects)
+    //     }
+    //   } catch (error: Dennis) {
+    //     console.error(error)
+    //   } finally {
+    //     closeLoading()
+    //   }
+    // }
 
-    handleGetLabProject()
+    getAllProjects()
 
-    return () => {
-      abortController.abort()
-    }
+    // return () => {
+    //   abortController.abort()
+    // }
   }, [])
 
   const handleStartProject = async (id: GUID) => {
@@ -186,8 +174,9 @@ function Project() {
         const newListProjects = [...labProjects]
         const index = newListProjects.map((x) => x.id).indexOf(id)
         if (index > -1) {
-          newListProjects[index] = response.data
-          setLabProjects(newListProjects)
+          // newListProjects[index] = response.data
+          // setLabProjects(newListProjects)
+          getAllProjects()
           toast.success('Project started', { autoClose: 2000 })
         }
       }
@@ -204,7 +193,7 @@ function Project() {
         <div className='title-header-project'>
           <span>Project</span>
         </div>
-        {profileUserInfo?.lab && profileUserInfo?.isApproveToLab && (
+        {(authInfo?.roles !== Role.Student || (profileUserInfo?.lab && profileUserInfo?.isApproveToLab)) && (
           <Space size='small'>
             <Button type='primary' onClick={onCreateProject}>
               Create project
@@ -253,7 +242,9 @@ function Project() {
           description: response.data.description,
           status: response.data.status
         })
-        setLabProjects(newLabProjects)
+        // setLabProjects(newLabProjects)
+        getAllProjects()
+        onResetForm()
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -263,7 +254,7 @@ function Project() {
   }
 
   const onSearch = (e: React.ChangeEvent<HTMLInputElement>, isStudent: boolean) => {
-    let search = e.target.value
+    const search = e.target.value
     ref.current = search
     if (isStudent) {
       setShowListStudent(true)
@@ -516,8 +507,7 @@ function Project() {
                           type='primary'
                           disabled={selectedStudent.length === 0}
                           onClick={() => {
-                            const selected = [...selectedStudent]
-                            setMembers(selected)
+                            setMembers([...members, ...selectedStudent])
                             setSelectedStudent([])
                             setShowListStudent(false)
                           }}
@@ -599,8 +589,7 @@ function Project() {
                           type='primary'
                           disabled={selectedTeacher.length === 0}
                           onClick={() => {
-                            const selected = [...selectedTeacher]
-                            setTeachers(selected)
+                            setTeachers([...teachers, ...selectedTeacher])
                             setSelectedTeacher([])
                             setShowListTeacher(false)
                           }}

@@ -1,4 +1,5 @@
 import fetchHandler from './axios'
+import { DetailTeacher } from './teacher.api'
 
 export const GET_ALL_LAB = 'lab/getall'
 export const GET_LAB_BY_ID = 'lab/getdetaillab'
@@ -22,6 +23,8 @@ export type Lab = {
   id: GUID
   name: string
   description: string
+  isLabHead: boolean
+  teacher: DetailTeacher
 }
 
 export type ListLab = Lab[]
