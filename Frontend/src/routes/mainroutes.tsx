@@ -17,6 +17,7 @@ import ProjectChildren from '~/pages/Project/components/ProjectChildren'
 import LabDetail from '~/pages/Labs/LabDetail'
 import SignUp from '~/pages/Authen/SignUp'
 import { ProjectProvider } from '~/pages/Project/project.context'
+import { ChatBoxProvider } from '~/pages/Chat/chat.context'
 
 const router = createBrowserRouter([
   {
@@ -70,7 +71,9 @@ const router = createBrowserRouter([
         path: RoutePath.Chat,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <Chat />
+            <ChatBoxProvider>
+              <Chat />
+            </ChatBoxProvider>
           </Suspense>
         )
       },

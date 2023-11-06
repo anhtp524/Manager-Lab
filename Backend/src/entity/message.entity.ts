@@ -1,23 +1,29 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { BoxChatEntity } from "./boxChat.entity";
-import { UserEntity } from "./user.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { BoxChatEntity } from './boxChat.entity';
+import { UserEntity } from './user.entity';
 
-@Entity("Message")
+@Entity('Message')
 export class MessageEntity {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    message: string;
+  @Column()
+  message: string;
 
-    @ManyToOne(() => BoxChatEntity)
-    @JoinColumn({referencedColumnName: "id"})
-    boxChat: BoxChatEntity;
+  @ManyToOne(() => BoxChatEntity)
+  @JoinColumn({ referencedColumnName: 'id' })
+  boxChat: BoxChatEntity;
 
-    @ManyToOne(() => UserEntity)
-    @JoinColumn({referencedColumnName: "id"})
-    sender: UserEntity;
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ referencedColumnName: 'id' })
+  sender: UserEntity;
 
-    @Column({type: 'date', nullable : true})
-    createdDate: Date
+  @Column({ nullable: true })
+  createdDate: Date;
 }
