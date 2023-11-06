@@ -20,10 +20,10 @@ export class TaskEntity {
   @Column()
   content: string;
 
-  @Column()
+  @Column({type: 'date'})
   createDate: Date;
 
-  @Column()
+  @Column({type: 'date'})
   dueDate: Date;
 
   @Column({ nullable: true })

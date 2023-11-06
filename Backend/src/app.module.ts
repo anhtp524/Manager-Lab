@@ -14,6 +14,7 @@ import { CommentModule } from './Api/CommentApi/comment.module';
 import { ChatModulde } from './gateway/chat.module';
 import { MessageModule } from './Api/MessageApi/message.module';
 import { TaskModule } from './Api/TaskApi/task.module';
+import { BoxChatModule } from './Api/BoxChatApi/boxChat.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { TaskModule } from './Api/TaskApi/task.module';
     CommentModule,
     MessageModule,
     ChatModulde,
-    TaskModule
+    TaskModule,
+    BoxChatModule
   ],
   controllers: [],
   providers: [],
