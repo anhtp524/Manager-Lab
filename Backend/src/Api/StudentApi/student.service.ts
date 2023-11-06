@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StudentEntity } from 'src/entity/student.entity';
-import { IsNull, Like, Repository } from 'typeorm';
+import { ILike, IsNull, Like, Repository } from 'typeorm';
 import { CreateStudentDto, UpdateStudentDto } from './Dto/student.dto';
 import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 
@@ -123,7 +123,7 @@ export class StudentService {
         lab: {
           id: labId,
         },
-        name: Like(`%${searchName}%`),
+        name: ILike(`%${searchName}%`),
       },
     });
 

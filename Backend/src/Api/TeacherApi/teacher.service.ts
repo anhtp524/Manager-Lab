@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TeacherEntity } from "src/entity/teacher.entity";
-import { Like, Repository } from "typeorm";
+import { ILike, Like, Repository } from "typeorm";
 import { CreateTeacherDto } from "./Dto/teacher.dto";
 import { LaboratoryEntity } from "src/entity/laboratory.entity";
 import { TeacherProjectDto } from "./Dto/teacherProject.dto";
@@ -62,7 +62,7 @@ export class TeacherService {
         lab : {
           id : labId
         },
-        name : Like(`%${searchName}%`)
+        name : ILike(`%${searchName}%`)
       }
     });
 

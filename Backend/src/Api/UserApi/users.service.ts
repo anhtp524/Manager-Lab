@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { UserEntity } from 'src/entity/user.entity';
 import { CreateUserDto } from './Dto/users.dto';
 import { Role } from 'Core/Enum/role.enum';
@@ -117,6 +117,40 @@ export class UsersService {
   async getLabIdByUserId(userId: string, role: Role) {
     const userProfile = await this.getProfileUser(userId, role);
     return userProfile.lab.id;
+  }
+
+  async searchUserForChat(searchName: string) {
+    const listStudentModel = await this.studentRepository.find({
+      relations: {
+        user: true
+      },
+      where: {
+        name: ILike(`%${searchName}%`)
+      }
+    });
+    const listStudentUser = listStudentModel.map(s => {
+      return {
+        userId: s.id,
+        name: s.name
+      }
+    });
+
+    const listTeacherModel = await this.teacherRepository.find({
+      relations: {
+        user: true
+      },
+      where: {
+        name: ILike(`%${searchName}%`)
+      }
+    });
+    const listTeacherUser = listTeacherModel.map(t => {
+      return {
+        userId: t.user.id,
+        name: t.name
+      }
+    });
+    const listUser = [...listStudentUser, ...listTeacherUser];
+    return listUser;
   }
 
 

@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { Payload } from 'Core/CoreModel/Payload.model';
 import { plainToInstance } from 'class-transformer';
+import { SearchNameDto } from '../TeacherApi/Dto/teacher.dto';
 
 
 @ApiTags("User")
@@ -44,6 +45,15 @@ export class UsersController {
   async GetProfileUser(@Req() req ) {
     const userPayload : Payload = req.user;
     var result = await this.userService.getProfileUser(userPayload.userId, userPayload.role);
+    return result;
+  }
+
+  @ApiBearerAuth()
+  @ApiBody({type: SearchNameDto})
+  @Post("getuserforchat")
+  @UseGuards(AuthGuard('jwt'))
+  async GetUserForChat(@Body() searchNameDto: SearchNameDto) {
+    const result = await this.userService.searchUserForChat(searchNameDto.searchName);
     return result;
   }
   
