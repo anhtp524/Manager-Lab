@@ -94,6 +94,7 @@ export class ProjectService {
     detailProject.name = studentInProject[0].project?.name;
     detailProject.coreTech = studentInProject[0].project?.coreTech;
     detailProject.description = studentInProject[0].project?.description;
+    detailProject.status = studentInProject[0].project?.status;
     detailProject.students = studentInProject.map((x) => {
       const student: StudentInProject = {
         id: x.student.id,
@@ -277,7 +278,10 @@ export class ProjectService {
         id: projectId,
       },
     });
-    if (projectModel.status === ProjectStatus.New || projectModel.status === ProjectStatus.UnConfirm) {
+    if (
+      projectModel.status === ProjectStatus.New ||
+      projectModel.status === ProjectStatus.UnConfirm
+    ) {
       projectModel.status = ProjectStatus.OnGoing;
       await this.projectRepository.save(projectModel);
     }

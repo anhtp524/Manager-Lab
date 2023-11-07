@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeacherEntity } from 'src/entity/teacher.entity';
-import { ILike, Like, Repository } from 'typeorm';
+import { ILike, Like, Not, Repository } from 'typeorm';
 import { CreateTeacherDto } from './Dto/teacher.dto';
 import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 import { TeacherProjectDto } from './Dto/teacherProject.dto';
@@ -63,12 +63,17 @@ export class TeacherService {
     }
   }
 
-  async getListTeacherByNameInLab(searchName: string, labId: string) {
+  async getListTeacherByNameInLab(
+    searchName: string,
+    labId: string,
+    teacherId: string,
+  ) {
     var listTeacherModel = await this.teacherRepository.find({
       relations: {
         lab: true,
       },
       where: {
+        id: Not(teacherId),
         lab: {
           id: labId,
         },

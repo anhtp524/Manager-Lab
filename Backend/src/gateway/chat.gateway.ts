@@ -23,7 +23,7 @@ export class ChatGateway {
   async handleSendMessage(@MessageBody() message: CreateMessageDto) {
     var response = await this.messageService.createMessage(message);
     console.log(response);
-    this.server.emit('receiveMessage', message);
+    this.server.emit(`receiveMessage_${message.boxChatId}`, message);
     return response;
   }
 }

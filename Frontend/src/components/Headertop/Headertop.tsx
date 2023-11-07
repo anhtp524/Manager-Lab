@@ -5,8 +5,10 @@ import './headertop.scss'
 import Image from '~/assets/Image'
 import fetchHandler from '~/api/axios'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
+import { useAuth } from '~/common/context/useAuth'
 const Headertop = () => {
   const navigate = useNavigate()
+  const { profileUserInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
   const handleClickgotoInfoPage = () => {
     // navigate('/personalinfo');
@@ -41,9 +43,14 @@ const Headertop = () => {
           <p className='img-title'>Quản lí sinh viên trong phòng thí nghiệm</p>
         </div>
       </div>
-      <Dropdown menu={{ items }} placement='bottomRight' arrow>
-        <div onClick={handleClickgotoInfoPage} className='hdright'>
-          Thông tin <UserOutlined />
+      <Dropdown menu={{ items }} placement='bottomRight' arrow trigger={['click']}>
+        <div onClick={handleClickgotoInfoPage} className='hdright' style={{ display: 'flex', gap: 12 }}>
+          <div>
+            Xin chào <strong>{profileUserInfo?.name}</strong>
+          </div>
+          <div>
+            Thông tin <UserOutlined />
+          </div>
         </div>
       </Dropdown>
     </div>
