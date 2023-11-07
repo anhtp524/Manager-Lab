@@ -23,8 +23,8 @@ const teacherAPI = {
   addTeacherToLab: (body: { teacherId: GUID; labId: GUID }) => {
     return fetchHandler.post<DetailTeacher>(ADD_TEACHER, body)
   },
-  deleteTeacher: (id: GUID) => {
-    return fetchHandler.post<Dennis>(DELETE_TEACHER, id)
+  deleteTeacher: (body: { teacherId: GUID }) => {
+    return fetchHandler.post<Dennis>(DELETE_TEACHER, body)
   }
 }
 
@@ -38,6 +38,7 @@ export type DetailTeacher = {
   phoneNumber: string
   email: string
   major: boolean
+  key: GUID
 }
 
 export type ListTeacher = DetailTeacher[]

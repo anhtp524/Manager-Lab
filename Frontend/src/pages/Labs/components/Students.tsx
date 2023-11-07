@@ -1,22 +1,25 @@
 import { Button, Modal, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import DetailPanel from './common/DetailPanel'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '~/common/context/useAuth'
 import { Role } from '~/routes/util'
+import { useLabContext } from '../LabContext'
+import { toast } from 'react-toastify'
 
-function Students() {
+function Students({ data }: { data?: ListStudent }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const [studentList, setStudentList] = useState<ListStudent>([])
+  // const [studentList, setStudentList] = useState<ListStudent>([])
   const [open, setOpen] = useState<boolean>(false)
   const [studentDetail, setStudentDetail] = useState<DetailStudent | undefined>(undefined)
   const { showLoading, closeLoading } = useHandlingApi()
-  const { authInfo, profileUserInfo, setProfileUserInfo } = useAuth()
+  const { authInfo } = useAuth()
   const { id } = useParams()
+  const { getById } = useLabContext()
   const columns: ColumnsType<DetailStudent> = useMemo(
     () =>
       authInfo?.roles !== Role.Student
@@ -125,36 +128,12 @@ function Students() {
               dataIndex: 'email'
             }
           ],
-    []
+    [authInfo]
   )
 
   if (authInfo?.roles !== Role.Student) {
     columns.push()
   }
-  useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
-
-    const handleGetAllStudent = async () => {
-      if (id === undefined || id === null) return
-      try {
-        showLoading()
-        const response = await studentAPI.getStudentInLab(id, { signal: signal })
-        if (response.data) {
-          setStudentList(response.data)
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
-
-    handleGetAllStudent()
-    return () => {
-      abortController.abort()
-    }
-  }, [profileUserInfo?.lab])
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)
@@ -206,16 +185,15 @@ function Students() {
     })
   }
 
-  const handleDelete = async (id: GUID) => {
+  const handleDelete = async (studentId: GUID) => {
+    if (!id) return
     showLoading()
     try {
-      const response = await studentAPI.removeFromLab({ studentId: id })
+      const response = await studentAPI.removeFromLab({ studentId: studentId })
       if (response && response.data) {
         closeLoading()
-        Modal.success({
-          title: 'Successfully removed!',
-          onOk: () => setProfileUserInfo(response.data)
-        })
+        getById(id)
+        toast.success('Successfully removed!', { autoClose: 2000 })
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -243,7 +221,7 @@ function Students() {
   }
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={studentList} bordered />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered />
       <DetailPanel open={open} onClose={onClose} data={studentDetail} type='student' />
     </div>
   )

@@ -6,21 +6,15 @@ import { convertStatusEnumToValue } from '../Labs/components/Projects'
 import './Project.scss'
 import { useAuth } from '~/common/context/useAuth'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
-import projectAPI, { Project, ProjectList } from '~/api/project.api'
+import projectAPI, { Project } from '~/api/project.api'
 import documentAPI from '~/api/document.api'
 import Search from 'antd/es/input/Search'
-import studentAPI, { DetailStudent, ListStudent } from '~/api/student.api'
+import studentAPI from '~/api/student.api'
 import { debounce } from 'lodash'
 import teacherAPI from '~/api/teacher.api'
 import { ProjectStatus, Role } from '~/routes/util'
 import { toast } from 'react-toastify'
 import { useGetAllProject } from './project.context'
-
-// interface DataNodeType {
-//   value: string
-//   label: string
-//   children?: DataNodeType[]
-// }
 
 function Project() {
   const navigate = useNavigate()
@@ -138,32 +132,7 @@ function Project() {
   )
 
   useEffect(() => {
-    // const abortController = new AbortController()
-    // const signal = abortController.signal
-
-    // const handleGetLabProject = async () => {
-    //   showLoading()
-    //   try {
-    //     const response = await projectAPI.getCurrentUserProject({ signal: signal })
-    //     if (response && response.data) {
-    //       let newLabProjects = [...response.data]
-    //       newLabProjects = newLabProjects.map((item) => {
-    //         return { ...item, key: item.id }
-    //       })
-    //       setLabProjects(newLabProjects)
-    //     }
-    //   } catch (error: Dennis) {
-    //     console.error(error)
-    //   } finally {
-    //     closeLoading()
-    //   }
-    // }
-
     getAllProjects()
-
-    // return () => {
-    //   abortController.abort()
-    // }
   }, [])
 
   const handleStartProject = async (id: GUID) => {

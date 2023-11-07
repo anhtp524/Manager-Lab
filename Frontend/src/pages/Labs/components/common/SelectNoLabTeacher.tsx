@@ -12,19 +12,16 @@ function SelectNoLabTeacher({ data, getTeacherId }: ISelectNoLabTeacherProps) {
   const columns: ColumnsType<DetailTeacher> = useMemo(
     () => [
       {
-        key: '1',
         title: 'Name',
         dataIndex: 'name',
         width: 200
       },
       {
-        key: '2',
         title: 'Department',
         dataIndex: 'department',
         width: 200
       },
       {
-        key: '3',
         title: 'Major',
         dataIndex: 'major'
       }
@@ -34,9 +31,8 @@ function SelectNoLabTeacher({ data, getTeacherId }: ISelectNoLabTeacherProps) {
 
   const rowSelection: TableRowSelection<DetailTeacher> = {
     type: 'radio',
-    onChange: (selectedRowKeys: React.Key[], selectedRows: ListTeacher) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-      getTeacherId(selectedRows[0]?.id)
+    onChange: (selectedRowKeys: React.Key[]) => {
+      getTeacherId(selectedRowKeys[0] as GUID)
     }
   }
   return <Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered />
