@@ -15,7 +15,7 @@ export class BoxChatService {
         private boxChat_userRepo: Repository<BoxChat_UserEntity>
     ){}
 
-    async GetListBoxChat(userId: string) {
+    async GetListBoxChat(userId: string, userName: string) {
         var listBoxChat_UserModel = await this.boxChat_userRepo.find({
             relations: {
                 boxChat: true
@@ -26,7 +26,11 @@ export class BoxChatService {
                 }
             }
         })
-        var listBoxChat = listBoxChat_UserModel.map(x => x.boxChat)
+        var listBoxChat = listBoxChat_UserModel.map(x => {
+            const nameChat = x.boxChat.name.split(", ").filter(name => name != userName);
+            x.boxChat.name = nameChat.join(', ')
+            return x.boxChat;
+        });
         return listBoxChat;
     }
 

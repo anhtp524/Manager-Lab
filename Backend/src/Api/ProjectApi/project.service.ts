@@ -277,7 +277,7 @@ export class ProjectService {
         id: projectId,
       },
     });
-    if (projectModel.status === ProjectStatus.New) {
+    if (projectModel.status === ProjectStatus.New || projectModel.status === ProjectStatus.UnConfirm) {
       projectModel.status = ProjectStatus.OnGoing;
       await this.projectRepository.save(projectModel);
     }
