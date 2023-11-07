@@ -124,12 +124,19 @@ export class StudentController {
     return res;
   }
 
-  @ApiBody({type: SearchNameDto})
+  @ApiBody({ type: SearchNameDto })
   @Post('getstudentbyname')
   async GetStudentByName(@Body() searcherNameDto: SearchNameDto, @Req() req) {
     const user = req.user;
-    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
-    const res = await this.studentService.GetListStudentByName(searcherNameDto.searchName, userProfile.lab.id);
+    const userProfile = await this.userService.getProfileUser(
+      user.userId,
+      user.role,
+    );
+    const res = await this.studentService.GetListStudentByName(
+      searcherNameDto.searchName,
+      userProfile.lab.id,
+      userProfile.id,
+    );
     return res;
   }
 }

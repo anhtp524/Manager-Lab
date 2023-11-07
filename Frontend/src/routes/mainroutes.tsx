@@ -19,6 +19,7 @@ import SignUp from '~/pages/Authen/SignUp'
 import { ProjectProvider } from '~/pages/Project/project.context'
 import { ChatBoxProvider } from '~/pages/Chat/chat.context'
 import { LabProvider } from '~/pages/Labs/LabContext'
+import { ProjectChildrenProvider } from '~/pages/Project/components/ProjectChildrenContext'
 
 const router = createBrowserRouter([
   {
@@ -64,7 +65,9 @@ const router = createBrowserRouter([
         path: RoutePath.ProjectDetails,
         element: (
           <Suspense fallback={<Lazyloading />}>
-            <ProjectChildren />
+            <ProjectChildrenProvider>
+              <ProjectChildren />
+            </ProjectChildrenProvider>
           </Suspense>
         )
       },

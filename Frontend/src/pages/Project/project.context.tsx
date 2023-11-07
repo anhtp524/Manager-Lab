@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useState } from 'react'
 import projectAPI, { ProjectList } from '~/api/project.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 
-export interface IProjectContext {
+export interface IProjectContext extends GlobalContext {
   labProjects: ProjectList
   getAllProjects: VoidFunction
 }
@@ -40,7 +40,7 @@ export const ProjectProvider = (props: IProps) => {
   }, [abortController])
 
   return (
-    <ProjectContext.Provider value={{ labProjects: labProjects, getAllProjects: handleGetLabProject }}>
+    <ProjectContext.Provider value={{ labProjects: labProjects, getAllProjects: handleGetLabProject, abortController }}>
       {props.children}
     </ProjectContext.Provider>
   )

@@ -35,8 +35,9 @@ function Chat() {
   const [chatList, setChatList] = useState<ListMessages>([])
 
   const ref = useRef<string>()
+  const chatContentRef = useRef<HTMLDivElement | null>(null)
 
-  const chatListRef = useRef<ListMessages>([])
+  // const chatListRef = useRef<ListMessages>([])
 
   useEffect(() => {
     getAllChatBoxes()
@@ -46,37 +47,27 @@ function Chat() {
   }, [])
 
   useEffect(() => {
-    socket.on('receiveMessage', (args: Dennis) => {
-      const newChatList = [...chatListRef.current]
-      newChatList.push({
-        message: args.message,
-        isSender: args.sender === profileUserInfo?.userId,
-        createdDate: new Date(),
-        user: {
-          userId: args.sender,
-          name: 'zzzzz'
-        }
-      })
-      setChatList(newChatList)
+    socket.on(`receiveMessage_${boxChatInfo?.id}`, (args: Dennis) => {
+      args.sender !== profileUserInfo?.userId &&
+        setChatList((chatList) => [
+          ...chatList,
+          {
+            message: args.message,
+            isSender: false,
+            createdDate: new Date(),
+            user: {
+              userId: args.sender,
+              name: args.userName
+            }
+          }
+        ])
     })
-  }, [])
+  }, [boxChatInfo])
 
   const handlePutChat = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.keyCode === 13) {
       let chatMsg = inputChat.current?.input.value
-      chatListRef.current = [
-        ...chatList,
-        {
-          isSender: true,
-          user: {
-            userId: profileUserInfo?.userId as GUID,
-            name: profileUserInfo?.name as string
-          },
-          message: chatMsg,
-          createdDate: new Date()
-        }
-      ]
-      setChatList([
+      setChatList((chatList) => [
         ...chatList,
         {
           isSender: true,
@@ -92,7 +83,8 @@ function Chat() {
       sendMessage({
         sender: profileUserInfo?.userId as GUID,
         message: chatMsg,
-        boxChatId: boxChatInfo?.id as GUID
+        boxChatId: boxChatInfo?.id as GUID,
+        userName: profileUserInfo?.name as string
       })
     }
   }
@@ -101,7 +93,7 @@ function Chat() {
     setChatMsgValue(e.target.value)
   }
 
-  const sendMessage = (body: { sender: GUID; message: string; boxChatId: GUID }) => {
+  const sendMessage = (body: { sender: GUID; message: string; boxChatId: GUID; userName: string }) => {
     socket.emit('sendMessage', body)
   }
 
@@ -117,6 +109,7 @@ function Chat() {
   const handleRemovePeople = (id: GUID) => {
     let usersCopy = [...users]
     usersCopy = usersCopy.filter((x) => x.userId !== id)
+    setChatBoxName(usersCopy.map((x) => x.name).join(', '))
     setUsers(usersCopy)
   }
 
@@ -169,7 +162,7 @@ function Chat() {
     showLoading()
     try {
       const response = await chatAPI.create({
-        name: chatBoxName,
+        name: chatBoxName.concat(`, ${profileUserInfo?.name}`),
         userId: users.filter((x) => x.userId !== profileUserInfo?.userId).map((x) => x.userId)
       })
       if (response) {
@@ -206,7 +199,6 @@ function Chat() {
         })
         setBoxChatInfo(item)
         setChatList(data)
-        chatListRef.current = [...data]
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -214,6 +206,12 @@ function Chat() {
       closeLoading()
     }
   }
+
+  useEffect(() => {
+    const el = chatContentRef.current
+    if (el === null) return
+    el.scrollTo(0, el.scrollHeight)
+  }, [chatList])
 
   return (
     <div className='chat-container'>
@@ -233,11 +231,6 @@ function Chat() {
           />
         </div>
         <div className='message-list'>
-          {/* {Array(50)
-            .fill('Hello')
-            .map((_, index) => (
-              <Conversation key={index} />
-            ))} */}
           {chatBoxes && chatBoxes.length > 0 ? (
             chatBoxes.map((item, _) => (
               <Conversation key={item.id} name={item.name} onClick={() => handleGetListMsg(item)} />
@@ -251,7 +244,7 @@ function Chat() {
         <div className='person-info-bar'>
           <strong>{boxChatInfo?.name}</strong>
         </div>
-        <div className='chat-content'>
+        <div className='chat-content' ref={chatContentRef}>
           {chatList.map((chatItem, index) => {
             return (
               <ChatSender
@@ -341,11 +334,7 @@ function Chat() {
                     disabled={selectedUser.length === 0}
                     onClick={() => {
                       setUsers([...users, ...selectedUser])
-                      setChatBoxName(
-                        [...users, ...selectedUser].length === 1
-                          ? [...users, ...selectedUser][0]?.name
-                          : [...users, ...selectedUser].map((x) => x.name).join(', ')
-                      )
+                      setChatBoxName([...users, ...selectedUser].map((x) => x.name).join(', '))
                       setSelectedUser([])
                       setShowListUser(false)
                     }}
@@ -376,7 +365,7 @@ function Chat() {
           </div>
           <div style={{ marginTop: 8 }}>
             <div style={{ fontWeight: 500, marginBottom: 4 }}>Name</div>
-            <Input disabled={users && users.length <= 1} value={chatBoxName} />
+            <Input disabled={true} value={chatBoxName} />
           </div>
         </div>
       </Modal>

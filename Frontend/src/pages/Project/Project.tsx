@@ -20,7 +20,7 @@ function Project() {
   const navigate = useNavigate()
   const { profileUserInfo, authInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
-  const { labProjects, getAllProjects } = useGetAllProject()
+  const { labProjects, getAllProjects, abortController } = useGetAllProject()
 
   // const [labProjects, setLabProjects] = useState<ProjectList>([])
   const [showCreate, setShowCreate] = useState<boolean>(false)
@@ -113,18 +113,18 @@ function Project() {
             },
             {
               render: (_, record) => {
-                if (record.status === ProjectStatus.UnConfirm) {
+                if (record.status === ProjectStatus.UnConfirm || record.status === ProjectStatus.New) {
                   return (
-                    <Button type='primary' onClick={() => handleStartProject(record.id)}>
-                      Start project
-                    </Button>
+                    <Space>
+                      <Button type='primary' onClick={() => handleStartProject(record.id)}>
+                        Start project
+                      </Button>
+                      <Button type='dashed' onClick={() => handleCancelProject({ projectId: record.id })}>
+                        Cancel
+                      </Button>
+                    </Space>
                   )
                 }
-                return (
-                  <Button type='primary' onClick={() => handleStartProject(record.id)}>
-                    Cancel
-                  </Button>
-                )
               }
             }
           ],
@@ -133,6 +133,9 @@ function Project() {
 
   useEffect(() => {
     getAllProjects()
+    return () => {
+      abortController?.abort()
+    }
   }, [])
 
   const handleStartProject = async (id: GUID) => {
@@ -140,14 +143,22 @@ function Project() {
     try {
       const response = await projectAPI.start(id)
       if (response && response.data) {
-        const newListProjects = [...labProjects]
-        const index = newListProjects.map((x) => x.id).indexOf(id)
-        if (index > -1) {
-          // newListProjects[index] = response.data
-          // setLabProjects(newListProjects)
-          getAllProjects()
-          toast.success('Project started', { autoClose: 2000 })
-        }
+        getAllProjects()
+        toast.success('Project started', { autoClose: 2000 })
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+  const handleCancelProject = async (body: { projectId: GUID }) => {
+    showLoading()
+    try {
+      const response = await projectAPI.cancel(body)
+      if (response && response.data) {
+        getAllProjects()
+        toast.success('Project cancelled', { autoClose: 2000 })
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -202,16 +213,6 @@ function Project() {
       if (response && response.data) {
         form.resetFields()
         setShowCreate(false)
-        const newLabProjects = [...labProjects]
-        newLabProjects.push({
-          key: response.data.id,
-          id: response.data.id,
-          name: response.data.name,
-          coreTech: response.data.coreTech,
-          description: response.data.description,
-          status: response.data.status
-        })
-        // setLabProjects(newLabProjects)
         getAllProjects()
         onResetForm()
       }

@@ -16,9 +16,9 @@ function Conversation({ name, onClick }: IConversationProps) {
       <div className='profile-info'>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
           <strong>{name}</strong>
-          <div style={{ color: 'gray', fontSize: '14px' }}>12:30</div>
+          {/* <div style={{ color: 'gray', fontSize: '14px' }}>12:30</div> */}
         </div>
-        <p style={{ color: 'gray' }}>This is the latest message</p>
+        {/* <p style={{ color: 'gray' }}>This is the latest message</p> */}
       </div>
     </div>
   )

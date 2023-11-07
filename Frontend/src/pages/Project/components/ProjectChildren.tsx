@@ -1,32 +1,36 @@
-import { Button, Collapse, DatePicker, Drawer, Form, Input, Space, Table, Tabs, Upload } from 'antd'
+import { Button, Collapse, DatePicker, Divider, Drawer, Form, Input, Space, Table, Tabs, Upload } from 'antd'
 import TableStudentProject from './TableStudentProject'
 import TableTeacherProject from './TableTeacherProject'
 import { useEffect, useMemo, useState } from 'react'
-import projectAPI, { DetailProject } from '~/api/project.api'
 import { useParams } from 'react-router-dom'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
-import taskAPI, { ListTask, Task, TaskStatus } from '~/api/task.api'
+import taskAPI, { Task, TaskStatus } from '~/api/task.api'
 import { ColumnsType } from 'antd/es/table'
 import { convertTaskStatusToValue } from '~/pages/Labs/components/Projects'
 import { FormInstance, useForm } from 'antd/es/form/Form'
 import type { CollapseProps, TabsProps, UploadFile } from 'antd'
-import documentAPI from '~/api/document.api'
+import documentAPI, { UploadDocumentResponse } from '~/api/document.api'
 import { useAuth } from '~/common/context/useAuth'
-import { Role } from '~/routes/util'
+import { ProjectStatus, Role } from '~/routes/util'
+import { useProjectChildrenContext } from './ProjectChildrenContext'
 
 function ProjectChildren() {
   const { id } = useParams()
   const [form] = useForm()
   const { authInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
-  const [detailProject, setDetailProject] = useState<DetailProject | undefined>(undefined)
-  const [taskList, setTaskList] = useState<ListTask>([])
+  const { detailProject, taskList, getDetailProjectAndTasks, abortController } = useProjectChildrenContext()
+  // const [detailProject, setDetailProject] = useState<DetailProject | undefined>(undefined)
+  // const [taskList, setTaskList] = useState<ListTask>([])
   const [showCreate, setShowCreate] = useState<boolean>(false)
   const [showDetailTask, setShowDetailTask] = useState<boolean>(false)
   const [showInnerTask, setShowInnerTask] = useState<boolean>(false)
   const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
+  const [detailTaskDoc, setDetailTaskDoc] = useState<UploadDocumentResponse[]>([])
+  const [responseTaskDoc, setResponseTaskDoc] = useState<UploadDocumentResponse[]>([])
   const [outerPanelWidth, setOuterPanelWidth] = useState<number>(600)
-  const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [responseFileList, setResponseFileList] = useState<UploadFile[]>([])
+  const [responseFileDic, setResponseFileDic] = useState<{ id: GUID; documentName: string }[]>([])
   const [createTaskFileList, setCreateTaskFileList] = useState<UploadFile[]>([])
   const [createTaskFileIds, setCreateTaskFileIds] = useState<GUID[]>([])
 
@@ -43,7 +47,7 @@ function ProjectChildren() {
         children: <TableTeacherProject data={detailProject?.teachers} />
       }
     ],
-    [detailProject?.students, detailProject?.teachers]
+    [detailProject]
   )
 
   const items: CollapseProps['items'] = useMemo(
@@ -86,57 +90,28 @@ function ProjectChildren() {
   )
 
   useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
-    const handleGetDetailProject = async () => {
-      if (id === undefined || id === null) {
-        return
-      }
-      showLoading()
-      try {
-        const response = await Promise.all([
-          projectAPI.getById(id, { signal: signal }),
-          taskAPI.getListTask(id, { signal: signal })
-        ])
-        const detailProject = response[0]
-        const listTask = response[1]
+    if (!id) return
 
-        if (detailProject && detailProject.data) {
-          setDetailProject(detailProject.data)
-        }
-        if (listTask && listTask.data) {
-          setTaskList(listTask.data)
-        }
-      } catch (error: Dennis) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
-
-    handleGetDetailProject()
+    getDetailProjectAndTasks(id)
 
     return () => {
-      abortController.abort()
+      abortController?.abort()
     }
   }, [])
 
   const handleSubmit = async (form: FormInstance<Dennis>) => {
+    if (!id) return
     showLoading()
-    console.log(form.getFieldsValue())
     const requestBody = {
       ...form.getFieldsValue(),
       projectId: id,
       listFileId: createTaskFileIds
     }
-    console.log(requestBody)
     try {
       const response = await taskAPI.createTask(requestBody)
       if (response && response.data) {
         form.resetFields()
-        const newListTask = [...taskList]
-        newListTask.push(response.data)
-        setTaskList(newListTask)
+        getDetailProjectAndTasks(id)
         setShowCreate(false)
       }
     } catch (error: Dennis) {
@@ -149,10 +124,16 @@ function ProjectChildren() {
   const handleGetDetailTask = async (id: GUID) => {
     showLoading()
     try {
-      const response = await taskAPI.getById(id)
-      if (response && response.data) {
+      const response = await Promise.all([
+        taskAPI.getById(id),
+        documentAPI.byRegarding({ regarding: id, folderPath: 'create/task' }),
+        documentAPI.byRegarding({ regarding: id, folderPath: 'response/task' })
+      ])
+      if (response && response.length > 0) {
         setShowDetailTask(true)
-        setDetailTask(response.data)
+        setDetailTask(response[0].data)
+        setDetailTaskDoc(response[1].data)
+        setResponseTaskDoc(response[2].data)
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -161,13 +142,30 @@ function ProjectChildren() {
     }
   }
 
-  // const normFile = (e: Dennis) => {
-  //   console.log('Upload event:', e)
-  //   if (Array.isArray(e)) {
-  //     return e
-  //   }
-  //   return e?.fileList
-  // }
+  const handleResponse = async (form: FormInstance<Dennis>) => {
+    if (!id) return
+    showLoading()
+    const requestBody = {
+      taskId: detailTask?.id as GUID,
+      response: form.getFieldValue('response'),
+      listAttachment: responseFileDic.map((x) => x.id)
+    }
+    console.log('Response task: ', requestBody)
+    try {
+      const response = await taskAPI.responseTask(requestBody)
+      if (response && response.data) {
+        form.resetFields()
+        getDetailProjectAndTasks(id)
+        setShowDetailTask(false)
+        setShowInnerTask(false)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
@@ -179,13 +177,14 @@ function ProjectChildren() {
         <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>
           <p>List tasks</p>
-          {authInfo?.roles !== Role.Student && (
-            <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
-              <Button type='primary' onClick={() => setShowCreate(true)}>
-                Create Task
-              </Button>
-            </Space>
-          )}
+          {authInfo?.roles !== Role.Student &&
+            (detailProject?.status === ProjectStatus.New || detailProject?.status === ProjectStatus.OnGoing) && (
+              <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
+                <Button type='primary' onClick={() => setShowCreate(true)}>
+                  Create Task
+                </Button>
+              </Space>
+            )}
           {/* {(detailProject?.status as ProjectStatus) >= ProjectStatus.OnGoing && ( */}
           <Table showHeader={false} columns={columnProjectList} dataSource={taskList} bordered />
           {/* )} */}
@@ -364,10 +363,38 @@ function ProjectChildren() {
             <div className='detail-left'>Status</div>
             <div className='detail-right'>{convertTaskStatusToValue(detailTask?.status as TaskStatus)}</div>
           </div>
+          <Divider />
+
           <div className='detail-content'>
             <div className='detail-content-title'>Content</div>
             <div className='detail-content-body'>{detailTask?.content}</div>
           </div>
+          {detailTaskDoc &&
+            detailTaskDoc.length > 0 &&
+            detailTaskDoc.map((item) => (
+              <div className='detail-content' key={item.id}>
+                <div className='detail-content-title'>Task attachments</div>
+                <div className='detail-content-body'>{item?.documentName}</div>
+              </div>
+            ))}
+
+          <Divider />
+          {detailTask?.response && (
+            <div className='detail-content'>
+              <div className='detail-content-title'>Student response</div>
+              <div className='detail-content-body' style={{ wordWrap: 'break-word', fontSize: 14 }}>
+                {detailTask?.response}
+              </div>
+            </div>
+          )}
+          {responseTaskDoc &&
+            responseTaskDoc.length > 0 &&
+            responseTaskDoc.map((item) => (
+              <div className='detail-content' key={item.id}>
+                <div className='detail-content-title'>Response attachments</div>
+                <div className='detail-content-body'>{item?.documentName}</div>
+              </div>
+            ))}
         </div>
         <Drawer
           title='View detail content and response'
@@ -376,7 +403,8 @@ function ProjectChildren() {
           width={800}
           onClose={() => {
             form.resetFields()
-            setFileList([])
+            setResponseFileDic([])
+            setResponseFileList([])
             setShowInnerTask(false)
           }}
           open={showInnerTask}
@@ -388,12 +416,21 @@ function ProjectChildren() {
               <Button
                 onClick={() => {
                   form.resetFields()
-                  setFileList([])
+                  setResponseFileList([])
+                  setResponseFileDic([])
                   setShowInnerTask(false)
                 }}
                 type='default'
               >
                 Back
+              </Button>
+              <Button
+                onClick={() => {
+                  form.submit()
+                }}
+                type='primary'
+              >
+                Submit response
               </Button>
             </Space>
           }
@@ -402,9 +439,16 @@ function ProjectChildren() {
             <div style={{ color: '#1F1F1F', fontWeight: '500', padding: '8px 0' }}>Content</div>
             <div className='detail-content-body'>{detailTask?.content}</div>
           </div>
-          <Form form={form}>
-            <Form.Item name='response'>
-              <div className='info-container' style={{ marginTop: 12 }}>
+          <Form form={form} name='response-task' scrollToFirstError onFinish={() => handleResponse(form)}>
+            <Form.Item
+              name='response'
+              rules={[
+                {
+                  required: true
+                }
+              ]}
+            >
+              <div className='input-field info-container' style={{ marginTop: 12 }}>
                 <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Enter response</div>
                 <Input.TextArea showCount maxLength={250} />
               </div>
@@ -417,18 +461,24 @@ function ProjectChildren() {
                   maxCount={2}
                   showUploadList={{
                     showDownloadIcon: true,
-                    downloadIcon: 'Download',
+                    // downloadIcon: 'Download',
                     showRemoveIcon: true
                   }}
-                  fileList={fileList}
+                  fileList={responseFileList}
                   listType='text'
                   beforeUpload={async (file) => {
                     // const formData = new FormData()
                     // formData.append('file', file)
                     try {
-                      const response = await documentAPI.upload({ folderPath: 'create/project', file: file })
+                      const response = await documentAPI.upload({ folderPath: 'response/task', file: file })
                       if (response && response.data) {
-                        console.log(response.data)
+                        setResponseFileDic((item) => [
+                          ...item,
+                          {
+                            id: response.data.id,
+                            documentName: response.data.documentName
+                          }
+                        ])
                       }
                     } catch (error: Dennis) {
                       console.error(error)
@@ -436,17 +486,20 @@ function ProjectChildren() {
                     return false
                   }}
                   onRemove={(file) => {
-                    const index = fileList.indexOf(file)
-                    const newFileList = fileList.slice()
+                    console.log(file)
+                    const index = responseFileList.indexOf(file)
+                    const newFileList = responseFileList.slice()
                     newFileList.splice(index, 1)
-                    setFileList(newFileList)
+                    let newResponseFileDic = [...responseFileDic]
+                    newResponseFileDic = newResponseFileDic.filter((x) => x.documentName !== file.name)
+                    setResponseFileList(newFileList)
+                    setResponseFileDic(newResponseFileDic)
                   }}
                   onChange={({ fileList }) => {
-                    setFileList(fileList)
+                    setResponseFileList(fileList)
                   }}
                 >
                   <p className='ant-upload-text'>Click or drag file to this area to upload</p>
-                  <p className='ant-upload-hint'>Support for a single or bulk upload.</p>
                 </Upload.Dragger>
               </div>
             </Form.Item>
