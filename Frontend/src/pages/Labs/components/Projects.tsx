@@ -1,10 +1,8 @@
 import { Table, Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table/interface'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import projectAPI, { Project, ProjectList } from '~/api/project.api'
+import { useMemo } from 'react'
+import { Project, ProjectList } from '~/api/project.api'
 import { TaskStatus } from '~/api/task.api'
-import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { ProjectStatus } from '~/routes/util'
 
 export const convertStatusEnumToValue = (status: ProjectStatus) => {
@@ -38,12 +36,7 @@ export const convertTaskStatusToValue = (status: TaskStatus) => {
   }
 }
 
-function Projects() {
-  const { showLoading, closeLoading } = useHandlingApi()
-  const { id } = useParams()
-
-  const [projectList, setProjectList] = useState<ProjectList>([])
-
+function Projects({ data }: { data?: ProjectList }) {
   const columns: ColumnsType<Project> = useMemo(
     () => [
       {
@@ -72,33 +65,10 @@ function Projects() {
     ],
     []
   )
-  useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
 
-    const handleGetProjectInLab = async () => {
-      if (id === undefined) return
-      try {
-        showLoading()
-        const response = await projectAPI.getProjectInLab(id, { signal: signal })
-        if (response.data) {
-          setProjectList(response.data)
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
-
-    handleGetProjectInLab()
-    return () => {
-      abortController.abort()
-    }
-  }, [])
   return (
     <div>
-      <Table columns={columns} dataSource={projectList} bordered />
+      <Table columns={columns} dataSource={data} bordered />
     </div>
   )
 }

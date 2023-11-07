@@ -4,6 +4,9 @@ declare global {
   }
   type Dennis = any
   type GUID = string
+  type GlobalContext = {
+    abortController?: AbortController
+  }
 }
 
 export {}

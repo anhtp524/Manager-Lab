@@ -1,16 +1,62 @@
 import { Button, Modal, Table } from 'antd'
 import { ColumnsType, TableRowSelection } from 'antd/es/table/interface'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import teacherAPI, { DetailTeacher, ListTeacher } from '~/api/teacher.api'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import DetailPanel from './common/DetailPanel'
 import { toast } from 'react-toastify'
+import { Lab } from '~/api/lab.api'
+import { useLabContext } from '../LabContext'
+import { useAuth } from '~/common/context/useAuth'
 
-function Teachers({ isLabHead, teacherId }: { isLabHead?: boolean; teacherId?: GUID }) {
+function Teachers({ labDetail, data }: { labDetail?: Lab; data?: ListTeacher }) {
+  const staticColumns = [
+    {
+      title: 'Date Of Birth',
+      dataIndex: 'dateOfBirth',
+      width: 150
+    },
+    {
+      title: 'Department',
+      dataIndex: 'department',
+      width: 200
+    },
+    {
+      title: 'Major',
+      dataIndex: 'major',
+      width: 150
+    },
+    {
+      title: 'Phone Number',
+      dataIndex: 'phoneNumber',
+      width: 150
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email'
+    }
+  ]
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [open, setOpen] = useState<boolean>(false)
+  const [teacherDetail, setTeacherDetail] = useState<DetailTeacher | undefined>(undefined)
+  // const [teacherList, setTeacherList] = useState<ListTeacher>([])
+  const { id } = useParams()
+  const { getById } = useLabContext()
+  const { showLoading, closeLoading } = useHandlingApi()
+  const { profileUserInfo } = useAuth()
+
+  // useEffect(() => {
+  //   if (id === undefined) return
+  //   getAll(id)
+  //   return () => {
+  //     abortController?.abort()
+  //   }
+  // }, [labDetail])
+
   const columns: ColumnsType<DetailTeacher> = useMemo(
     () =>
-      !isLabHead
+      !labDetail?.isLabHead
         ? [
             {
               title: 'Name',
@@ -34,30 +80,7 @@ function Teachers({ isLabHead, teacherId }: { isLabHead?: boolean; teacherId?: G
                 )
               }
             },
-            {
-              title: 'Date Of Birth',
-              dataIndex: 'dateOfBirth',
-              width: 150
-            },
-            {
-              title: 'Department',
-              dataIndex: 'department',
-              width: 200
-            },
-            {
-              title: 'Major',
-              dataIndex: 'major',
-              width: 150
-            },
-            {
-              title: 'Phone Number',
-              dataIndex: 'phoneNumber',
-              width: 150
-            },
-            {
-              title: 'Email',
-              dataIndex: 'email'
-            }
+            ...staticColumns
           ]
         : [
             {
@@ -82,89 +105,35 @@ function Teachers({ isLabHead, teacherId }: { isLabHead?: boolean; teacherId?: G
                 )
               }
             },
-            {
-              title: 'Date Of Birth',
-              dataIndex: 'dateOfBirth',
-              width: 150
-            },
-            {
-              title: 'Department',
-              dataIndex: 'department',
-              width: 200
-            },
-            {
-              title: 'Major',
-              dataIndex: 'major',
-              width: 150
-            },
-            {
-              title: 'Phone Number',
-              dataIndex: 'phoneNumber',
-              width: 150
-            },
-            {
-              title: 'Email',
-              dataIndex: 'email'
-            },
+            ...staticColumns,
             {
               render: (_, record) => {
+                if (record.id === profileUserInfo?.id) return null
                 return (
-                  <Button type='primary' onClick={() => onRemoveTeacher(record.id)}>
+                  <Button type='primary' onClick={() => onRemoveTeacher({ teacherId: record.id })}>
                     Remove
                   </Button>
                 )
               }
             }
           ],
-    []
+    [labDetail, data]
   )
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const [open, setOpen] = useState<boolean>(false)
-  const [teacherDetail, setTeacherDetail] = useState<DetailTeacher | undefined>(undefined)
-  const [teacherList, setTeacherList] = useState<ListTeacher>([])
-  const { id } = useParams()
-  const { showLoading, closeLoading } = useHandlingApi()
-
-  useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
-
-    const handleGetAllTeacherInLab = async () => {
-      if (id === undefined || teacherId === undefined) return
-      try {
-        showLoading()
-        const response = await teacherAPI.getAllTeacherInLab(id, { signal: signal })
-        if (response.data) {
-          let data = [...response.data]
-          data = data.filter((x) => x.id !== teacherId)
-          setTeacherList(data)
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
-
-    handleGetAllTeacherInLab()
-    return () => {
-      abortController.abort()
-    }
-  }, [teacherId])
-
-  const onRemoveTeacher = (id: GUID) => {
+  const onRemoveTeacher = (body: { teacherId: GUID }) => {
     Modal.confirm({
       title: 'Remove this teacher?',
-      onOk: () => handleRemoveTeacher(id)
+      onOk: () => handleRemoveTeacher(body)
     })
   }
 
-  const handleRemoveTeacher = async (id: GUID) => {
+  const handleRemoveTeacher = async (body: { teacherId: GUID }) => {
+    if (id === undefined) return
     try {
-      const response = await teacherAPI.deleteTeacher(id)
+      const response = await teacherAPI.deleteTeacher(body)
       if (response && response.data) {
         toast.success('Successfully deleted!')
+        getById(id)
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -232,9 +201,10 @@ function Teachers({ isLabHead, teacherId }: { isLabHead?: boolean; teacherId?: G
   const onClose = () => {
     setOpen(false)
   }
+
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={teacherList} bordered />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered />
       <DetailPanel open={open} onClose={onClose} data={teacherDetail} type='teacher' />
     </div>
   )

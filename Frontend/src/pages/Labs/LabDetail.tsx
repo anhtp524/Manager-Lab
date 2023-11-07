@@ -4,21 +4,25 @@ import { Projects, Students, Teachers } from './components'
 import { useEffect, useMemo, useState } from 'react'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { useParams } from 'react-router-dom'
-import labAPI, { Lab } from '~/api/lab.api'
 import { useAuth } from '~/common/context/useAuth'
 import studentAPI from '~/api/student.api'
 import { Role } from '~/routes/util'
 import PendingApproved from './components/PendingApproved'
-import teacherAPI from '~/api/teacher.api'
+import teacherAPI, { ListTeacher } from '~/api/teacher.api'
 import SelectNoLabTeacher from './components/common/SelectNoLabTeacher'
 import { toast } from 'react-toastify'
+import { useLabContext } from './LabContext'
+import { Lab } from '~/api/lab.api'
 
 const LabDetail = () => {
   const { authInfo, profileUserInfo, setProfileUserInfo } = useAuth()
+  const { labDetail, getById, teacherList, studentList, abortController, projectList, pendingApproveList } =
+    useLabContext()
   const { id } = useParams()
 
-  const [labDetail, setLabDetail] = useState<Lab>()
-  const [teacherId, setTeacherId] = useState<GUID>()
+  const [teacherId, setTeacherId] = useState<GUID>('')
+  const [showSelectTeacher, setShowSelectTeacher] = useState<boolean>(false)
+  const [teacherNoLab, setTeacherNoLab] = useState<ListTeacher>([])
   const items: CollapseProps['items'] = useMemo(
     () => [
       {
@@ -62,7 +66,7 @@ const LabDetail = () => {
             <div className='profile'>
               <div className='profileuser'>
                 <img src='https://sep.hust.edu.vn/wp-content/uploads/002.065.00001.jpg' alt='' />
-                <p>Trưởng phòng</p>
+                <p>{labDetail?.teacher.name}</p>
               </div>
               <div className='profilefuntion'>
                 <div>
@@ -95,26 +99,41 @@ const LabDetail = () => {
         )
       }
     ],
-    [labDetail, teacherId]
+    [authInfo, id, labDetail, profileUserInfo]
   )
 
-  const tabList = [
-    {
-      key: '1',
-      label: 'Students',
-      children: <Students />
-    },
-    {
-      key: '2',
-      label: 'Teachers',
-      children: <Teachers isLabHead={labDetail?.isLabHead} teacherId={labDetail?.teacher.id} />
-    },
-    {
-      key: '3',
-      label: 'Projects',
-      children: <Projects />
+  const { showLoading, closeLoading } = useHandlingApi()
+
+  useEffect(() => {
+    if (id === undefined) return
+
+    getById(id)
+
+    return () => {
+      abortController?.abort()
     }
-  ]
+  }, [])
+
+  const tabList = useMemo(
+    () => [
+      {
+        key: '1',
+        label: 'Students',
+        children: <Students data={studentList} />
+      },
+      {
+        key: '2',
+        label: 'Teachers',
+        children: <Teachers labDetail={labDetail as Lab} data={teacherList} />
+      },
+      {
+        key: '3',
+        label: 'Projects',
+        children: <Projects data={projectList} />
+      }
+    ],
+    [labDetail]
+  )
 
   const tabs: TabsProps['items'] = useMemo(() => {
     if (authInfo?.roles === Role.Student) {
@@ -125,65 +144,22 @@ const LabDetail = () => {
       {
         key: '4',
         label: 'Pending approved',
-        children: <PendingApproved />
+        children: <PendingApproved data={pendingApproveList} />
       }
     ]
-  }, [labDetail])
-
-  const { showLoading, closeLoading } = useHandlingApi()
-
-  useEffect(() => {
-    const abortController = new AbortController()
-    const signal = abortController.signal
-
-    const handleGetLabById = async () => {
-      if (id === undefined || id === null) {
-        return
-      }
-      showLoading()
-      try {
-        const response = await labAPI.getLabById(id, { signal: signal })
-        if (response && response.data) {
-          setLabDetail(response.data)
-        }
-      } catch (error: Dennis) {
-        console.error(error)
-      } finally {
-        closeLoading()
-      }
-    }
-
-    handleGetLabById()
-
-    return () => {
-      abortController.abort()
-    }
-  }, [profileUserInfo?.lab])
+  }, [authInfo, tabList])
 
   async function handleGetTeacherNoLab() {
     showLoading()
     try {
       const response = await teacherAPI.getTeacherNoLab()
       if (response && response.data) {
-        Modal.confirm({
-          icon: null,
-          title: 'Select a teacher',
-          content: (
-            <div style={{ width: '100%' }}>
-              <SelectNoLabTeacher data={response.data} getTeacherId={getTeacherId} />
-            </div>
-          ),
-          centered: true,
-          width: '800px',
-          okText: 'Add teacher',
-          okButtonProps: {
-            disabled: response.data.length === 0
-          },
-          onOk: () => {
-            if (!teacherId) return
-            handleAddTeacher(teacherId)
-          }
-        })
+        setShowSelectTeacher(true)
+        setTeacherNoLab(
+          response.data.map((x) => {
+            return { ...x, key: x.id }
+          })
+        )
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -203,6 +179,8 @@ const LabDetail = () => {
       const response = await teacherAPI.addTeacherToLab({ teacherId: teacherId, labId: id })
       if (response && response.data) {
         toast.success('Successfully added!')
+        getById(id)
+        setShowSelectTeacher(false)
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -233,7 +211,10 @@ const LabDetail = () => {
 
         Modal.success({
           title: 'Successfully registered, please wait for result!',
-          onOk: () => setProfileUserInfo(response.data)
+          onOk: () => {
+            setProfileUserInfo(response.data)
+            getById(id)
+          }
         })
       }
     } catch (error: Dennis) {
@@ -278,9 +259,33 @@ const LabDetail = () => {
         (authInfo?.roles === Role.Teacher && profileUserInfo?.lab?.id === id) ||
         (profileUserInfo?.lab?.id === id && profileUserInfo?.isApproveToLab)) && (
         <div className='tab-lab-details'>
-          <Tabs defaultActiveKey='2' destroyInactiveTabPane items={tabs} onChange={() => showLoading()} />
+          <Tabs defaultActiveKey='2' destroyInactiveTabPane items={tabs} />
         </div>
       )}
+      <Modal
+        open={showSelectTeacher}
+        title='Select a teacher'
+        centered={true}
+        width='800px'
+        okText='Add teacher'
+        okButtonProps={{
+          disabled: teacherNoLab.length === 0
+        }}
+        onOk={() => {
+          if (!teacherId) return
+          handleAddTeacher(teacherId)
+        }}
+        maskClosable={false}
+        onCancel={() => {
+          setShowSelectTeacher(false)
+          setTeacherId('')
+        }}
+        destroyOnClose
+      >
+        <div style={{ width: '100%' }}>
+          <SelectNoLabTeacher data={teacherNoLab} getTeacherId={getTeacherId} />
+        </div>
+      </Modal>
     </div>
   )
 }

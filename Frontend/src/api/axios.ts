@@ -22,6 +22,9 @@ fetchHandler.interceptors.response.use(
     return response
   },
   (error: AxiosError) => {
+    if (error.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
     switch (error.response?.status) {
       case HttpStatusCode.NotFound:
         Modal.error({
