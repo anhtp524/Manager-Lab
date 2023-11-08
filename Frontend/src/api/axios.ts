@@ -70,8 +70,8 @@ const downloadHandler = axios.create({
 // Request interceptor
 downloadHandler.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token')
-    request.headers.Authorization = `Bearer ${token}`
+    // const token = localStorage.getItem('token')
+    // request.headers.Authorization = `Bearer ${token}`
     return request
   },
   (error: AxiosError) => {

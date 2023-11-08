@@ -13,6 +13,8 @@ import documentAPI, { UploadDocumentResponse } from '~/api/document.api'
 import { useAuth } from '~/common/context/useAuth'
 import { ProjectStatus, Role } from '~/routes/util'
 import { useProjectChildrenContext } from './ProjectChildrenContext'
+import { DownloadOutlined } from '@ant-design/icons'
+import projectAPI from '~/api/project.api'
 
 function ProjectChildren() {
   const { id } = useParams()
@@ -25,6 +27,7 @@ function ProjectChildren() {
   const [showCreate, setShowCreate] = useState<boolean>(false)
   const [showDetailTask, setShowDetailTask] = useState<boolean>(false)
   const [showInnerTask, setShowInnerTask] = useState<boolean>(false)
+  const [showFeedbackTask, setShowFeedbackTask] = useState<boolean>(false)
   const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
   const [detailTaskDoc, setDetailTaskDoc] = useState<UploadDocumentResponse[]>([])
   const [responseTaskDoc, setResponseTaskDoc] = useState<UploadDocumentResponse[]>([])
@@ -33,6 +36,7 @@ function ProjectChildren() {
   const [responseFileDic, setResponseFileDic] = useState<{ id: GUID; documentName: string }[]>([])
   const [createTaskFileList, setCreateTaskFileList] = useState<UploadFile[]>([])
   const [createTaskFileIds, setCreateTaskFileIds] = useState<GUID[]>([])
+  const [isPass, setIsPass] = useState<boolean>(false)
 
   const tabList: TabsProps['items'] = useMemo(
     () => [
@@ -111,6 +115,8 @@ function ProjectChildren() {
       const response = await taskAPI.createTask(requestBody)
       if (response && response.data) {
         form.resetFields()
+        setCreateTaskFileIds([])
+        setCreateTaskFileList([])
         getDetailProjectAndTasks(id)
         setShowCreate(false)
       }
@@ -165,6 +171,62 @@ function ProjectChildren() {
       closeLoading()
     }
   }
+  const handleFeedback = async (form: FormInstance<Dennis>) => {
+    if (!id) return
+    showLoading()
+    const requestBody = {
+      taskId: detailTask?.id as GUID,
+      feedback: form.getFieldValue('feedback'),
+      isPass: isPass
+    }
+    console.log('Response task: ', requestBody)
+    try {
+      const response = await taskAPI.closeTask(requestBody)
+      if (response && response.data) {
+        form.resetFields()
+        getDetailProjectAndTasks(id)
+        setShowDetailTask(false)
+        setShowFeedbackTask(false)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+  const handleCloseProject = async () => {
+    if (!id) return
+    showLoading()
+    const requestBody = {
+      projectId: id,
+      feedback: 'OK',
+      score: 10
+    }
+    try {
+      const response = await projectAPI.close(requestBody)
+      if (response && response.data) {
+        console.log(response)
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
+  const handleDownloadFile = async (fileId: GUID) => {
+    showLoading()
+    try {
+      const response = await documentAPI.download(fileId)
+      if (response) {
+        window.open(response.config.baseURL + response.config.url)
+      }
+    } catch (error: Dennis) {
+      console.error
+    } finally {
+      closeLoading()
+    }
+  }
 
   return (
     <div className='project-children'>
@@ -172,7 +234,26 @@ function ProjectChildren() {
         <div className='title'>
           Project: <strong>{detailProject?.name}</strong>
         </div>
+        {authInfo?.roles !== Role.Student &&
+          detailProject?.status !== ProjectStatus.Finish &&
+          taskList &&
+          taskList.length > 0 &&
+          taskList.every((item) => item.status === TaskStatus.Pass) && (
+            <Button type='primary' danger onClick={handleCloseProject}>
+              Close project
+            </Button>
+          )}
       </div>
+      {detailProject?.status === ProjectStatus.Finish && (
+        <>
+          <div className='project-score'>
+            Score: <strong>{10}</strong>
+          </div>
+          <div className='project-feedback'>
+            Feedback: <strong>OK</strong>
+          </div>
+        </>
+      )}
       <div className='tab-lab-details'>
         <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>
@@ -340,9 +421,16 @@ function ProjectChildren() {
             >
               Back
             </Button>
-            <Button type='primary' onClick={() => setShowInnerTask(true)}>
-              View content and response
-            </Button>
+            {authInfo?.roles === Role.Student && detailTask?.status !== TaskStatus.Pass && (
+              <Button type='primary' onClick={() => setShowInnerTask(true)}>
+                View content and response
+              </Button>
+            )}
+            {authInfo?.roles !== Role.Student && detailTask?.status === TaskStatus.Resolve && (
+              <Button type='primary' onClick={() => setShowFeedbackTask(true)}>
+                Mark
+              </Button>
+            )}
           </Space>
         }
       >
@@ -374,7 +462,10 @@ function ProjectChildren() {
             detailTaskDoc.map((item) => (
               <div className='detail-content' key={item.id}>
                 <div className='detail-content-title'>Task attachments</div>
-                <div className='detail-content-body'>{item?.documentName}</div>
+                <div className='detail-content-body has-file'>
+                  <div className='filename'>{item?.documentName}</div>
+                  <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>
+                </div>
               </div>
             ))}
 
@@ -392,9 +483,18 @@ function ProjectChildren() {
             responseTaskDoc.map((item) => (
               <div className='detail-content' key={item.id}>
                 <div className='detail-content-title'>Response attachments</div>
-                <div className='detail-content-body'>{item?.documentName}</div>
+                <div className='detail-content-body has-file'>
+                  {item?.documentName}
+                  <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>
+                </div>
               </div>
             ))}
+          {detailTask?.feedback && (
+            <div className='detail-content'>
+              <div className='detail-content-title'>Feedback</div>
+              <div className='detail-content-body'>{detailTask?.feedback}</div>
+            </div>
+          )}
         </div>
         <Drawer
           title='View detail content and response'
@@ -501,6 +601,68 @@ function ProjectChildren() {
                 >
                   <p className='ant-upload-text'>Click or drag file to this area to upload</p>
                 </Upload.Dragger>
+              </div>
+            </Form.Item>
+          </Form>
+        </Drawer>
+
+        <Drawer
+          title='View response and feedback'
+          className='view-response-feedback'
+          placement='right'
+          width={800}
+          onClose={() => {
+            form.resetFields()
+            setShowFeedbackTask(false)
+          }}
+          open={showFeedbackTask}
+          keyboard={false}
+          maskClosable={false}
+          headerStyle={{ flexDirection: 'row-reverse' }}
+          footer={
+            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+              <Button
+                onClick={() => {
+                  form.resetFields()
+                  setShowFeedbackTask(false)
+                }}
+                type='default'
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsPass(false)
+                  form.submit()
+                }}
+                danger
+              >
+                Reopen
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsPass(true)
+                  form.submit()
+                }}
+                type='primary'
+              >
+                Mark as passed
+              </Button>
+            </Space>
+          }
+        >
+          <Form form={form} name='feedback-task' scrollToFirstError onFinish={() => handleFeedback(form)}>
+            <Form.Item
+              name='feeback'
+              rules={[
+                {
+                  required: true
+                }
+              ]}
+            >
+              <div className='input-field info-container' style={{ marginTop: 12 }}>
+                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Enter feedback</div>
+                <Input.TextArea showCount maxLength={250} />
               </div>
             </Form.Item>
           </Form>

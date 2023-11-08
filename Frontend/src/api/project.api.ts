@@ -8,6 +8,7 @@ export const CREATE_PROJECT = 'project/createproject'
 export const GET_BY_ID = 'project/getdetail'
 export const START_PROJECT = 'project/ongoingproject'
 export const CANCEL_PROJECT = 'project/cancelproject'
+export const CLOSE_PROJECT = 'project/closeproject'
 
 const projectAPI = {
   getAll: (abortSignal: IAbortSignal) => {
@@ -30,6 +31,9 @@ const projectAPI = {
   },
   cancel: (body: { projectId: GUID }) => {
     return fetchHandler.post<Project>(CANCEL_PROJECT, body)
+  },
+  close: (body: {}) => {
+    return fetchHandler.post<Dennis>(CLOSE_PROJECT, body)
   }
 }
 
