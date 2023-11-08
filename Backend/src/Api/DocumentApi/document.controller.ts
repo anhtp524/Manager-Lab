@@ -29,7 +29,7 @@ import { Readable } from 'stream';
 
 @Controller('document')
 @ApiTags('Document')
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
