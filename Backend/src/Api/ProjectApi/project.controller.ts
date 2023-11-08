@@ -29,7 +29,7 @@ import { UpdateProjectDto } from './Dto/updateProject.dto';
 export class ProjectController {
   constructor(
     private readonly projectService: ProjectService,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
   ) {}
 
   @Get('getall')
@@ -87,15 +87,21 @@ export class ProjectController {
   @Post('createproject')
   async CreateProject(@Body() projectAddDto: ProjectAddDto, @Req() req) {
     const user = req.user;
-    const userProfile = await this.userService.getProfileUser(user.userId, user.role)
+    const userProfile = await this.userService.getProfileUser(
+      user.userId,
+      user.role,
+    );
     var isStudent: boolean = false;
-    if (user.role === Role.Student){
+    if (user.role === Role.Student) {
       projectAddDto.listStudent.push(userProfile.id);
       isStudent = true;
-    }
-    else if (user.role === Role.Teacher)
+    } else if (user.role === Role.Teacher)
       projectAddDto.listTeacher.push(userProfile.id);
-    const result = await this.projectService.createProject(projectAddDto, isStudent, userProfile.lab.id);
+    const result = await this.projectService.createProject(
+      projectAddDto,
+      isStudent,
+      userProfile.lab.id,
+    );
     return result;
   }
 
@@ -105,60 +111,76 @@ export class ProjectController {
     return res;
   }
 
-  @ApiBody({type: CloseProjectDto})
-  @Post("closeproject")
-  async CloseProject(@Body() closeProject: CloseProjectDto){
+  @ApiBody({ type: CloseProjectDto })
+  @Post('closeproject')
+  async CloseProject(@Body() closeProject: CloseProjectDto) {
     const res = await this.projectService.CloseProject(closeProject);
     return res;
   }
 
-  @ApiBody({type: CancelProjectDto})
-  @Post("cancelproject")
-  async CancelProject(@Body() projectCancel: CancelProjectDto){
+  @ApiBody({ type: CancelProjectDto })
+  @Post('cancelproject')
+  async CancelProject(@Body() projectCancel: CancelProjectDto) {
     const res = await this.projectService.CancelProject(projectCancel);
     return res;
   }
 
-  @Get("getmyproject")
+  @Get('getmyproject')
   async GetMyProject(@Req() req) {
     const user = req.user;
-    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
-    const res = await this.projectService.ProjectOfUser(userProfile.id, userProfile.lab.id ,user.role)
+    const userProfile = await this.userService.getProfileUser(
+      user.userId,
+      user.role,
+    );
+    const res = await this.projectService.ProjectOfUser(
+      userProfile.id,
+      userProfile.lab.id,
+      user.role,
+    );
     return res;
   }
 
-  @Get("getcertificate/:projectId")
-  async GetCertificate(@Param("projectId") projectId: string, @Req() req) {
+  @Get('getcertificate/:projectId')
+  async GetCertificate(@Param('projectId') projectId: string, @Req() req) {
     const user = req.user;
-    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
-    const res = await this.projectService.GetCertificate(projectId, userProfile.id);
+    const userProfile = await this.userService.getProfileUser(
+      user.userId,
+      user.role,
+    );
+    const res = await this.projectService.GetCertificate(
+      projectId,
+      userProfile.id,
+    );
     return res;
   }
 
-  @ApiBody({type: UpdateProjectDto})
-  @Post("editproject")
+  @ApiBody({ type: UpdateProjectDto })
+  @Post('editproject')
   async EditProject(@Body() updateProject: UpdateProjectDto) {
     const res = await this.projectService.EditProject(updateProject);
     return res;
   }
 
-  @Get("ongoingproject/:projectId")
+  @Get('ongoingproject/:projectId')
   async OnGoingProject(@Param('projectId') projectId: string) {
     const res = await this.projectService.OnGoingProject(projectId);
     return res;
   }
 
-  @Get("confirm/:projectId")
+  @Get('confirm/:projectId')
   async Confirm(@Param('projectId') projectId: string) {
     const res = await this.projectService.ConfirmProject(projectId);
     return res;
   }
 
-  @Get("getprojectunconfirm")
+  @Get('getprojectunconfirm')
   async ListProjectUnconfirm(@Req() req) {
     const user = req.user;
-    const userProfile = await this.userService.getProfileUser(user.userId, user.role);
-    const res = await this.projectService.ProjectUnconfirm(userProfile.id)
+    const userProfile = await this.userService.getProfileUser(
+      user.userId,
+      user.role,
+    );
+    const res = await this.projectService.ProjectUnconfirm(userProfile.id);
     return res;
   }
 }
