@@ -10,6 +10,9 @@ const documentAPI = {
   upload: (body: UploadDocumentRequest) => {
     return downloadHandler.post<UploadDocumentResponse>(UPLOAD_DOCUMENT, body)
   },
+  download: (id: GUID) => {
+    return downloadHandler.get<Dennis>(DOWNLOAD_DOCUMENT + '/' + id)
+  },
   byRegarding: (body: { regarding: GUID; folderPath: 'create/project' | 'create/task' | 'response/task' }) => {
     return fetchHandler.post<UploadDocumentResponse[]>(BY_REGARDING, body)
   }

@@ -71,6 +71,15 @@
     }
     .detail-content-body {
       font-size: 16px;
+      &.has-file {
+        padding: 8px;
+        border: 1px solid rgb(197, 197, 197);
+        border-radius: 4px;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
     }
   }
 }
