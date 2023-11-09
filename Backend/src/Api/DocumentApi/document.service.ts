@@ -65,7 +65,9 @@ export class DocumentService {
     }
 
     async getDocumentByRegarding(regardingId: string, folderPath: string){
+        var documents = [];
         var documentRuleModel = await this.getDocumentRuleByRegardingId(regardingId, folderPath);
+        if(!documentRuleModel) return documents; 
         const listdocument = await this.documentRepo.find({
             where : {
                 documentRule: {
@@ -73,10 +75,14 @@ export class DocumentService {
                 }
             }
         });
-        var documents = listdocument.map(document => {
-            document.documentContent = null;
-            return document;
-        } );
+        
+        if(listdocument.length !== 0) {
+            documents = listdocument.map(document => {
+                document.documentContent = null;
+                return document;
+            } );
+        }
+
         return documents;
     }
 

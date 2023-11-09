@@ -29,12 +29,13 @@ import { Readable } from 'stream';
 
 @Controller('document')
 @ApiTags('Document')
-@UseGuards(AuthGuard('jwt'))
+//@UseGuards(AuthGuard('jwt'))
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
   @Post('adddocument')
   @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UploadFileDto,
@@ -61,6 +62,7 @@ export class DocumentController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get('getdocumentbyid/:id')
   async GetDocumentById(@Param('id') id: string) {
     var res = await this.documentService.getDocumentById(id);
@@ -69,6 +71,7 @@ export class DocumentController {
 
   @ApiBody({ type: ByRegardingDto })
   @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('byregarding')
   async GetDocumentByRegarding(@Body() byRegardingDto: ByRegardingDto) {
     var res = await this.documentService.getDocumentByRegarding(
@@ -79,7 +82,6 @@ export class DocumentController {
   }
 
   @Get('download/:id')
-  @ApiBearerAuth()
   @ApiResponse({
     schema: {
       type: 'string',
