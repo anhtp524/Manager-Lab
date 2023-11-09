@@ -9,12 +9,18 @@ import { Request } from 'express';
 import { Payload } from 'Core/CoreModel/Payload.model';
 import { plainToInstance } from 'class-transformer';
 import { SearchNameDto } from '../TeacherApi/Dto/teacher.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { SendMailDto } from './Dto/sendMail.dto';
 
 
 @ApiTags("User")
 @Controller("user")
 export class UsersController {
-  constructor(private readonly userService: UsersService, private cloudService: CloudinaryService) {}
+  constructor(
+    private readonly userService: UsersService, 
+    private cloudService: CloudinaryService,
+    private mailSerivce: MailerService
+    ) {}
 
   @ApiBody({type: CreateUserDto})
   @Post("adduser")
@@ -55,6 +61,16 @@ export class UsersController {
   async GetUserForChat(@Body() searchNameDto: SearchNameDto) {
     const result = await this.userService.searchUserForChat(searchNameDto.searchName);
     return result;
+  }
+
+  @ApiBody({type: SendMailDto})
+  @Post("testSendMail")
+  async SendMail(@Body() body: SendMailDto) {
+    await this.mailSerivce.sendMail({
+      to: "anhtp524@gmail.com",
+      subject: "Test 123",
+      text: "Mật khẩu mới của bạn là 1123123"
+    })
   }
   
 }

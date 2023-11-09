@@ -8,9 +8,13 @@ import { TeacherEntity } from 'src/entity/teacher.entity';
 import { CloudinaryModule } from 'Core/Cloudinary/cloudinary.module';
 import { Project_StudentEntity } from 'src/entity/projectStudent.entity';
 import { TeacherProjectEntity } from 'src/entity/teacherProject.entity';
+import { MailModule } from 'Core/Mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, StudentEntity, TeacherEntity, Project_StudentEntity, TeacherProjectEntity]), CloudinaryModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, StudentEntity, TeacherEntity, Project_StudentEntity, TeacherProjectEntity]), 
+    CloudinaryModule,
+    MailModule
+  ],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService]
