@@ -20,6 +20,7 @@ import { ProjectProvider } from '~/pages/Project/project.context'
 import { ChatBoxProvider } from '~/pages/Chat/chat.context'
 import { LabProvider } from '~/pages/Labs/LabContext'
 import { ProjectChildrenProvider } from '~/pages/Project/components/ProjectChildrenContext'
+import Certificate from '~/pages/Project/components/Certificate'
 
 const router = createBrowserRouter([
   {
@@ -106,6 +107,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Lazyloading />}>
             <div>Hello</div>
+          </Suspense>
+        )
+      },
+      {
+        path: RoutePath.Certificate,
+        element: (
+          <Suspense fallback={<Lazyloading />}>
+            <Certificate />
           </Suspense>
         )
       }

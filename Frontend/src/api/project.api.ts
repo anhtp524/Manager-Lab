@@ -46,6 +46,8 @@ export type Project = {
   description: string
   coreTech: string
   status: ProjectStatus
+  score: number
+  feedback: string
 }
 
 export type DetailProject = Project & {

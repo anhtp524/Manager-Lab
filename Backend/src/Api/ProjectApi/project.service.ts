@@ -27,7 +27,11 @@ import { LaboratoryEntity } from 'src/entity/laboratory.entity';
 import { CloseProjectDto } from './Dto/closeProject.dto';
 import { CancelProjectDto } from './Dto/cancelProject.dto';
 import { Role } from 'Core/Enum/role.enum';
-import { CertificateDto } from './Dto/certificate.dto';
+import {
+  CertificateDto,
+  InfoProject,
+  InfoStudent,
+} from './Dto/certificate.dto';
 import { UpdateProjectDto } from './Dto/updateProject.dto';
 
 @Injectable()
@@ -95,6 +99,8 @@ export class ProjectService {
     detailProject.coreTech = studentInProject[0].project?.coreTech;
     detailProject.description = studentInProject[0].project?.description;
     detailProject.status = studentInProject[0].project?.status;
+    detailProject.score = studentInProject[0].project?.score;
+    detailProject.feedback = studentInProject[0].project.feedback;
     detailProject.students = studentInProject.map((x) => {
       const student: StudentInProject = {
         id: x.student.id,
@@ -258,12 +264,15 @@ export class ProjectService {
     });
     if (!studentProjectModel) return new CertificateDto();
     const certificateModel = new CertificateDto();
+    certificateModel.student = new InfoStudent();
+
     certificateModel.student.studentName = studentProjectModel.student.name;
     certificateModel.student.class = studentProjectModel.student.class;
     certificateModel.student.studentCode =
       studentProjectModel.student.studentCode;
     certificateModel.student.dateOfBirth =
       studentProjectModel.student.dateOfBirth;
+    certificateModel.project = new InfoProject();
     certificateModel.project.projectName = studentProjectModel.project.name;
     certificateModel.project.score = studentProjectModel.project.score;
     certificateModel.project.finishDate =

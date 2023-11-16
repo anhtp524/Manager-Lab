@@ -19,6 +19,8 @@ export class DetailProjectModel {
   coreTech: string;
   status: ProjectStatus;
   description: string;
+  score: number;
+  feedback: string;
   students: StudentInProject[];
   teachers: TeacherInProject[];
 }
