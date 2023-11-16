@@ -1,4 +1,4 @@
-import { Button, Collapse, DatePicker, Divider, Drawer, Form, Input, Space, Table, Tabs, Upload } from 'antd'
+import { Button, Collapse, DatePicker, Drawer, Form, Input, InputNumber, Modal, Space, Table, Tabs, Upload } from 'antd'
 import TableStudentProject from './TableStudentProject'
 import TableTeacherProject from './TableTeacherProject'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,8 +13,9 @@ import documentAPI, { UploadDocumentResponse } from '~/api/document.api'
 import { useAuth } from '~/common/context/useAuth'
 import { ProjectStatus, Role } from '~/routes/util'
 import { useProjectChildrenContext } from './ProjectChildrenContext'
-import { DownloadOutlined } from '@ant-design/icons'
 import projectAPI from '~/api/project.api'
+import ViewDetailTask from './task/ViewDetailTask'
+import * as PDF from '@react-pdf/renderer'
 
 function ProjectChildren() {
   const { id } = useParams()
@@ -27,16 +28,15 @@ function ProjectChildren() {
   const [showCreate, setShowCreate] = useState<boolean>(false)
   const [showDetailTask, setShowDetailTask] = useState<boolean>(false)
   const [showInnerTask, setShowInnerTask] = useState<boolean>(false)
+  const [showCloseProjectDialog, setShowCloseProjectDialog] = useState<boolean>(false)
   const [showFeedbackTask, setShowFeedbackTask] = useState<boolean>(false)
   const [detailTask, setDetailTask] = useState<Task | undefined>(undefined)
   const [detailTaskDoc, setDetailTaskDoc] = useState<UploadDocumentResponse[]>([])
   const [responseTaskDoc, setResponseTaskDoc] = useState<UploadDocumentResponse[]>([])
-  const [outerPanelWidth, setOuterPanelWidth] = useState<number>(600)
-  const [responseFileList, setResponseFileList] = useState<UploadFile[]>([])
-  const [responseFileDic, setResponseFileDic] = useState<{ id: GUID; documentName: string }[]>([])
+
   const [createTaskFileList, setCreateTaskFileList] = useState<UploadFile[]>([])
   const [createTaskFileIds, setCreateTaskFileIds] = useState<GUID[]>([])
-  const [isPass, setIsPass] = useState<boolean>(false)
+  const [score, setScore] = useState<number>(0)
 
   const tabList: TabsProps['items'] = useMemo(
     () => [
@@ -148,7 +148,7 @@ function ProjectChildren() {
     }
   }
 
-  const handleResponse = async (form: FormInstance<Dennis>) => {
+  const handleResponse = async (form: FormInstance<Dennis>, responseFileDic: { id: GUID; documentName: string }[]) => {
     if (!id) return
     showLoading()
     const requestBody = {
@@ -171,7 +171,7 @@ function ProjectChildren() {
       closeLoading()
     }
   }
-  const handleFeedback = async (form: FormInstance<Dennis>) => {
+  const handleFeedback = async (form: FormInstance<Dennis>, isPass: boolean) => {
     if (!id) return
     showLoading()
     const requestBody = {
@@ -194,18 +194,20 @@ function ProjectChildren() {
       closeLoading()
     }
   }
-  const handleCloseProject = async () => {
+  const handleCloseProject = async (form: FormInstance<Dennis>) => {
     if (!id) return
     showLoading()
     const requestBody = {
       projectId: id,
-      feedback: 'OK',
-      score: 10
+      feedback: form.getFieldValue('project-feedback'),
+      score: form.getFieldValue('score')
     }
     try {
       const response = await projectAPI.close(requestBody)
       if (response && response.data) {
-        console.log(response)
+        form.resetFields()
+        setShowCloseProjectDialog(false)
+        getDetailProjectAndTasks(id)
       }
     } catch (error: Dennis) {
       console.error(error)
@@ -228,29 +230,32 @@ function ProjectChildren() {
     }
   }
 
+  const toggleFeedbackTask = (show: boolean) => {
+    setShowFeedbackTask(show)
+  }
+  const toggleInnerTask = (show: boolean) => {
+    setShowInnerTask(show)
+  }
+
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
         <div className='title'>
           Project: <strong>{detailProject?.name}</strong>
         </div>
-        {authInfo?.roles !== Role.Student &&
-          detailProject?.status !== ProjectStatus.Finish &&
-          taskList &&
-          taskList.length > 0 &&
-          taskList.every((item) => item.status === TaskStatus.Pass) && (
-            <Button type='primary' danger onClick={handleCloseProject}>
-              Close project
-            </Button>
-          )}
+        {authInfo?.roles !== Role.Student && detailProject?.status !== ProjectStatus.Finish && (
+          <Button type='primary' danger onClick={() => setShowCloseProjectDialog(true)}>
+            Close project
+          </Button>
+        )}
       </div>
       {detailProject?.status === ProjectStatus.Finish && (
         <>
           <div className='project-score'>
-            Score: <strong>{10}</strong>
+            Score: <strong>{detailProject?.score}</strong>
           </div>
           <div className='project-feedback'>
-            Feedback: <strong>OK</strong>
+            Feedback: <strong>{detailProject?.feedback}</strong>
           </div>
         </>
       )}
@@ -398,276 +403,78 @@ function ProjectChildren() {
           </Form.Item>
         </Form>
       </Drawer>
-      <Drawer
-        title='View detail task'
-        className='view-detail-task'
-        placement='right'
-        width={outerPanelWidth}
-        onClose={() => {
-          setShowDetailTask(false)
-        }}
-        open={showDetailTask}
-        keyboard={false}
-        maskClosable={false}
-        headerStyle={{ flexDirection: 'row-reverse' }}
-        footer={
-          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Button
-              onClick={() => {
-                setOuterPanelWidth(600)
-                setShowDetailTask(false)
-              }}
-              type='default'
-            >
-              Back
-            </Button>
-            {authInfo?.roles === Role.Student && detailTask?.status !== TaskStatus.Pass && (
-              <Button type='primary' onClick={() => setShowInnerTask(true)}>
-                View content and response
-              </Button>
-            )}
-            {authInfo?.roles !== Role.Student && detailTask?.status === TaskStatus.Resolve && (
-              <Button type='primary' onClick={() => setShowFeedbackTask(true)}>
-                Mark
-              </Button>
-            )}
-          </Space>
-        }
-      >
-        <div className='info-container' style={{ marginTop: 0 }}>
-          <div className='detail-info'>
-            <div className='detail-left'>Task title</div>
-            <div className='detail-right'>{detailTask?.title}</div>
-          </div>
-          <div className='detail-info'>
-            <div className='detail-left'>Created date</div>
-            <div className='detail-right'>{detailTask?.createDate}</div>
-          </div>
-          <div className='detail-info'>
-            <div className='detail-left'>Due date</div>
-            <div className='detail-right'>{detailTask?.dueDate}</div>
-          </div>
-          <div className='detail-info'>
-            <div className='detail-left'>Status</div>
-            <div className='detail-right'>{convertTaskStatusToValue(detailTask?.status as TaskStatus)}</div>
-          </div>
-          <Divider />
-
-          <div className='detail-content'>
-            <div className='detail-content-title'>Content</div>
-            <div className='detail-content-body'>{detailTask?.content}</div>
-          </div>
-          {detailTaskDoc &&
-            detailTaskDoc.length > 0 &&
-            detailTaskDoc.map((item) => (
-              <div className='detail-content' key={item.id}>
-                <div className='detail-content-title'>Task attachments</div>
-                <div className='detail-content-body has-file'>
-                  <div className='filename'>{item?.documentName}</div>
-                  <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>
-                </div>
-              </div>
-            ))}
-
-          <Divider />
-          {detailTask?.response && (
-            <div className='detail-content'>
-              <div className='detail-content-title'>Student response</div>
-              <div className='detail-content-body' style={{ wordWrap: 'break-word', fontSize: 14 }}>
-                {detailTask?.response}
-              </div>
-            </div>
-          )}
-          {responseTaskDoc &&
-            responseTaskDoc.length > 0 &&
-            responseTaskDoc.map((item) => (
-              <div className='detail-content' key={item.id}>
-                <div className='detail-content-title'>Response attachments</div>
-                <div className='detail-content-body has-file'>
-                  {item?.documentName}
-                  <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>
-                </div>
-              </div>
-            ))}
-          {detailTask?.feedback && (
-            <div className='detail-content'>
-              <div className='detail-content-title'>Feedback</div>
-              <div className='detail-content-body'>{detailTask?.feedback}</div>
-            </div>
-          )}
-        </div>
-        <Drawer
-          title='View detail content and response'
-          className='view-detail-content-response'
-          placement='right'
-          width={800}
-          onClose={() => {
+      <ViewDetailTask
+        detailTask={detailTask}
+        showDetailTask={showDetailTask}
+        showInnerTask={showInnerTask}
+        showFeedbackTask={showFeedbackTask}
+        detailTaskDoc={detailTaskDoc}
+        onHideDetailTask={() => setShowDetailTask(false)}
+        onToggleFeedbackTask={toggleFeedbackTask}
+        onToggleInnerTask={toggleInnerTask}
+        onDownloadFile={handleDownloadFile}
+        responseTaskDoc={responseTaskDoc}
+        onFeedback={handleFeedback}
+        onResponse={handleResponse}
+      />
+      {showCloseProjectDialog && (
+        <Modal
+          open={showCloseProjectDialog}
+          title='Evaluate and close project'
+          centered={true}
+          width='500px'
+          okText='Evaluate'
+          onOk={() => handleCloseProject(form)}
+          onCancel={() => {
             form.resetFields()
-            setResponseFileDic([])
-            setResponseFileList([])
-            setShowInnerTask(false)
+            setShowCloseProjectDialog(false)
           }}
-          open={showInnerTask}
-          keyboard={false}
           maskClosable={false}
-          headerStyle={{ flexDirection: 'row-reverse' }}
-          footer={
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button
-                onClick={() => {
-                  form.resetFields()
-                  setResponseFileList([])
-                  setResponseFileDic([])
-                  setShowInnerTask(false)
-                }}
-                type='default'
-              >
-                Back
-              </Button>
-              <Button
-                onClick={() => {
-                  form.submit()
-                }}
-                type='primary'
-              >
-                Submit response
-              </Button>
-            </Space>
-          }
+          destroyOnClose
         >
-          <div className='detail-content'>
-            <div style={{ color: '#1F1F1F', fontWeight: '500', padding: '8px 0' }}>Content</div>
-            <div className='detail-content-body'>{detailTask?.content}</div>
-          </div>
-          <Form form={form} name='response-task' scrollToFirstError onFinish={() => handleResponse(form)}>
+          <Form form={form} name='evaluate-project' scrollToFirstError onFinish={() => handleSubmit(form)}>
             <Form.Item
-              name='response'
+              name='project-feedback'
               rules={[
                 {
                   required: true
                 }
               ]}
             >
-              <div className='input-field info-container' style={{ marginTop: 12 }}>
-                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Enter response</div>
-                <Input.TextArea showCount maxLength={250} />
+              <div className='input-field project-feedback'>
+                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Project feedback</div>
+                <Input.TextArea showCount maxLength={100} size='large' />
               </div>
             </Form.Item>
-            <Form.Item name='document' valuePropName='fileList'>
-              <div className='info-container' style={{ marginTop: 12 }}>
-                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Upload document (if need)</div>
-                <Upload.Dragger
-                  name='files'
-                  maxCount={2}
-                  showUploadList={{
-                    showDownloadIcon: true,
-                    // downloadIcon: 'Download',
-                    showRemoveIcon: true
-                  }}
-                  fileList={responseFileList}
-                  listType='text'
-                  beforeUpload={async (file) => {
-                    // const formData = new FormData()
-                    // formData.append('file', file)
-                    try {
-                      const response = await documentAPI.upload({ folderPath: 'response/task', file: file })
-                      if (response && response.data) {
-                        setResponseFileDic((item) => [
-                          ...item,
-                          {
-                            id: response.data.id,
-                            documentName: response.data.documentName
-                          }
-                        ])
-                      }
-                    } catch (error: Dennis) {
-                      console.error(error)
+
+            <Form.Item
+              name='score'
+              rules={[
+                {
+                  required: true
+                }
+              ]}
+            >
+              <div className='input-field project-score' style={{ width: 100 }}>
+                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Score</div>
+                <InputNumber
+                  size='large'
+                  min={0}
+                  max={10}
+                  controls={false}
+                  onKeyPress={(event) => {
+                    if (!/[0-9]/.test(event.key)) {
+                      event.preventDefault()
                     }
-                    return false
                   }}
-                  onRemove={(file) => {
-                    console.log(file)
-                    const index = responseFileList.indexOf(file)
-                    const newFileList = responseFileList.slice()
-                    newFileList.splice(index, 1)
-                    let newResponseFileDic = [...responseFileDic]
-                    newResponseFileDic = newResponseFileDic.filter((x) => x.documentName !== file.name)
-                    setResponseFileList(newFileList)
-                    setResponseFileDic(newResponseFileDic)
-                  }}
-                  onChange={({ fileList }) => {
-                    setResponseFileList(fileList)
-                  }}
-                >
-                  <p className='ant-upload-text'>Click or drag file to this area to upload</p>
-                </Upload.Dragger>
+                  value={score}
+                  onChange={(value) => setScore(value as number)}
+                />
               </div>
             </Form.Item>
           </Form>
-        </Drawer>
-
-        <Drawer
-          title='View response and feedback'
-          className='view-response-feedback'
-          placement='right'
-          width={800}
-          onClose={() => {
-            form.resetFields()
-            setShowFeedbackTask(false)
-          }}
-          open={showFeedbackTask}
-          keyboard={false}
-          maskClosable={false}
-          headerStyle={{ flexDirection: 'row-reverse' }}
-          footer={
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button
-                onClick={() => {
-                  form.resetFields()
-                  setShowFeedbackTask(false)
-                }}
-                type='default'
-              >
-                Back
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsPass(false)
-                  form.submit()
-                }}
-                danger
-              >
-                Reopen
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsPass(true)
-                  form.submit()
-                }}
-                type='primary'
-              >
-                Mark as passed
-              </Button>
-            </Space>
-          }
-        >
-          <Form form={form} name='feedback-task' scrollToFirstError onFinish={() => handleFeedback(form)}>
-            <Form.Item
-              name='feeback'
-              rules={[
-                {
-                  required: true
-                }
-              ]}
-            >
-              <div className='input-field info-container' style={{ marginTop: 12 }}>
-                <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Enter feedback</div>
-                <Input.TextArea showCount maxLength={250} />
-              </div>
-            </Form.Item>
-          </Form>
-        </Drawer>
-      </Drawer>
+        </Modal>
+      )}
     </div>
   )
 }
