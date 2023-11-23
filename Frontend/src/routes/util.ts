@@ -19,7 +19,7 @@ export enum RoutePath {
   Personalinfo = '/personalinfo',
   ManagementAccount = '/account',
   TaskDetail = '/project/details',
-  Certificate = 'certificate'
+  Certificate = '/certificate/:id'
 }
 
 export enum ProjectStatus {

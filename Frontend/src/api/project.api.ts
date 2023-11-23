@@ -9,6 +9,7 @@ export const GET_BY_ID = 'project/getdetail'
 export const START_PROJECT = 'project/ongoingproject'
 export const CANCEL_PROJECT = 'project/cancelproject'
 export const CLOSE_PROJECT = 'project/closeproject'
+export const CERTIFICATE = 'project/getcertificate'
 
 const projectAPI = {
   getAll: (abortSignal: IAbortSignal) => {
@@ -34,6 +35,9 @@ const projectAPI = {
   },
   close: (body: {}) => {
     return fetchHandler.post<Dennis>(CLOSE_PROJECT, body)
+  },
+  getCertificate: (id: GUID, abortSignal: IAbortSignal) => {
+    return fetchHandler.get<Dennis>(CERTIFICATE + '/' + id, { ...abortSignal })
   }
 }
 

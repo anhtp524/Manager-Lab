@@ -103,14 +103,6 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: RoutePath.TaskDetail + '/:id',
-        element: (
-          <Suspense fallback={<Lazyloading />}>
-            <div>Hello</div>
-          </Suspense>
-        )
-      },
-      {
         path: RoutePath.Certificate,
         element: (
           <Suspense fallback={<Lazyloading />}>
