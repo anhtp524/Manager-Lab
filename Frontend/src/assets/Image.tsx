@@ -1,6 +1,7 @@
 import logoUat from './logoUet.png'
 import logoBk from './logo-dai-hoc-bach-khoa.png'
 import logoBk2 from './Logo_Đại_học_Bách_Khoa_Hà_Nội.svg.png'
+import cert from './Fancy.png'
 
-const Image = { logoUat, logoBk, logoBk2 }
+const Image = { logoUat, logoBk, logoBk2, cert }
 export default Image

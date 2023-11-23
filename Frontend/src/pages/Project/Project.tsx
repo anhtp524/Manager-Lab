@@ -36,6 +36,12 @@ function Project() {
   const [showListTeacher, setShowListTeacher] = useState<boolean>(false)
   const [selectedTeacher, setSelectedTeacher] = useState<{ name: string; id: GUID; index: number }[]>([])
   const [teachers, setTeachers] = useState<{ name: string; id: GUID; index: number }[]>([])
+  // const [certInfo, setCertInfo] = useState<{
+  //   studentName?: string
+  //   labName?: string
+  //   score?: number
+  //   finishDate?: string
+  // }>()
 
   const ref = useRef<string>()
 
@@ -75,6 +81,17 @@ function Project() {
               dataIndex: 'status',
               render: (status) => {
                 return convertStatusEnumToValue(status)
+              }
+            },
+            {
+              render: (_, record) => {
+                if (record.status === ProjectStatus.Finish) {
+                  return (
+                    <Button type='primary' danger onClick={() => window.open(`/certificate/${record.id}`)}>
+                      Generate Certificate
+                    </Button>
+                  )
+                }
               }
             }
           ]
@@ -166,6 +183,28 @@ function Project() {
       closeLoading()
     }
   }
+
+  // const handleGetCertificate = async (id: GUID) => {
+  //   showLoading()
+  //   try {
+  //     const response = await projectAPI.getCertificate(id)
+  //     if (response && response.data) {
+  //       setCertInfo((prev) => {
+  //         return {
+  //           ...prev,
+  //           studentName: response.data.student.studentName,
+  //           labName: response.data.labName,
+  //           score: response.data.project.score,
+  //           finishDate: response.data.project.finishDate
+  //         }
+  //       })
+  //     }
+  //   } catch (error: Dennis) {
+  //     console.error(error)
+  //   } finally {
+  //     closeLoading()
+  //   }
+  // }
 
   const onRenderContent = useCallback(() => {
     return (

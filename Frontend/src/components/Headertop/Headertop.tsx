@@ -49,7 +49,7 @@ const Headertop = () => {
             Xin chào <strong>{profileUserInfo?.name}</strong>
           </div>
           <div>
-            Thông tin <UserOutlined />
+            <UserOutlined />
           </div>
         </div>
       </Dropdown>
