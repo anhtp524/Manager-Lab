@@ -275,8 +275,8 @@ export class ProjectService {
     certificateModel.project = new InfoProject();
     certificateModel.project.projectName = studentProjectModel.project.name;
     certificateModel.project.score = studentProjectModel.project.score;
-    certificateModel.project.finishDate =
-      studentProjectModel.project.finishDate;
+    certificateModel.project.finishDate = studentProjectModel.project.finishDate;
+    certificateModel.project.feedback = studentProjectModel.project.feedback;
     certificateModel.labName = studentProjectModel.project.lab.name;
     return certificateModel;
   }

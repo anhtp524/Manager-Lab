@@ -8,7 +8,8 @@ export class InfoStudent {
 export class InfoProject {
     projectName: string;
     score: number;
-    finishDate: Date
+    finishDate: Date;
+    feedback: string;
 }
 
 export class CertificateDto {

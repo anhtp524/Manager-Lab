@@ -66,6 +66,7 @@ export class TaskService {
     var taskModel = await this.GetTaskById(closeDto.taskId);
     if (!closeDto.isPass) {
       taskModel.status = TaskStatus.New;
+      taskModel.feedback = closeDto.feedback;
     } else {
       taskModel.status = TaskStatus.Pass;
       taskModel.feedback = closeDto.feedback;
