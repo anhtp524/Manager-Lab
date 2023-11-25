@@ -13,6 +13,9 @@ import { TeacherEntity } from 'src/entity/teacher.entity';
 import { emptyUUID } from 'Core/Constant/uuid.constant';
 import * as bcrypt from 'bcrypt';
 import { Project_StudentEntity } from 'src/entity/projectStudent.entity';
+import { MailerService } from '@nestjs-modules/mailer';
+import randomPassword from 'Core/Helper/UtilityHelper';
+import { ChangePasswordDto } from './Dto/changePass.dto';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +28,7 @@ export class UsersService {
     private teacherRepository: Repository<TeacherEntity>,
     @InjectRepository(Project_StudentEntity)
     private projectStudentRepo: Repository<Project_StudentEntity>,
+    private mailSerivce: MailerService
   ) {}
 
   async findAll() {
@@ -148,5 +152,35 @@ export class UsersService {
     });
     const listUser = [...listStudentUser, ...listTeacherUser];
     return listUser;
+  }
+
+  async forgetPassword(userId: string) {
+    var userModel = await this.findOne(userId);
+    var newPass = randomPassword(6);
+    console.log(newPass);
+    try {
+      await this.mailSerivce.sendMail({
+        to: "anhtp524@gmail.com",
+        subject: "Quên mật khẩu",
+        text: `Mật khẩu mới của bạn là ${newPass}.
+              Mời bạn đăng nhập lại hệ thống.`
+      })
+    }
+    catch {
+      throw new BadRequestException("Error when sent email")
+    }
+    userModel.password = await bcrypt.hash(newPass, 10);
+    await this.usersRepository.save(userModel);
+    return 1; 
+  }
+
+  async changePassword(userId: string, passwordDto: ChangePasswordDto) {
+    var userModel = await this.findOne(userId);
+    if(!userModel) throw new BadRequestException("Error when get user by id");
+    var checkPassword = await bcrypt.compare(passwordDto.oldPassword, userModel.password);
+    if (checkPassword == false) throw new BadRequestException("Old password is wrong");
+    userModel.password = await bcrypt.hash(passwordDto.newPassword, 10);
+    await this.usersRepository.save(userModel);
+    return 1;
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './Dto/users.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -11,6 +11,8 @@ import { plainToInstance } from 'class-transformer';
 import { SearchNameDto } from '../TeacherApi/Dto/teacher.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SendMailDto } from './Dto/sendMail.dto';
+import randomPassword from 'Core/Helper/UtilityHelper';
+import { ChangePasswordDto } from './Dto/changePass.dto';
 
 
 @ApiTags("User")
@@ -36,15 +38,6 @@ export class UsersController {
     return await this.userService.findAll();
   }
 
-  // @Post("TestuploadFile")
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({type : UploadFileDto})
-  // @UseInterceptors(FileInterceptor('file'))
-  // async uploadFile(@UploadedFile() file: Express.Multer.File) {
-  //   const result = await this.cloudService.uploadImageToCloudinary(file);
-  //   return result.url;
-  // }
-
   @ApiBearerAuth()
   @Get("getprofileuser")
   @UseGuards(AuthGuard('jwt'))
@@ -63,14 +56,24 @@ export class UsersController {
     return result;
   }
 
-  @ApiBody({type: SendMailDto})
-  @Post("testSendMail")
-  async SendMail(@Body() body: SendMailDto) {
-    await this.mailSerivce.sendMail({
-      to: "anhtp524@gmail.com",
-      subject: "Test 123",
-      text: "Mật khẩu mới của bạn là 1123123"
-    })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post("forgetpassword")
+  async forgetPassword(@Req() req) {
+    const {userId, role} = req.user;
+
+    const res = await this.userService.forgetPassword(userId);
+    return res;
+  }
+
+  @ApiBody({type: ChangePasswordDto})
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post("changepassword")
+  async changePassword(@Body() passwordDto: ChangePasswordDto, @Req() req) {
+    const userId = req.user.userId;
+    const res = await this.userService.changePassword(userId, passwordDto);
+    return res;
   }
   
 }
