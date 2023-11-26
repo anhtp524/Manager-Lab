@@ -76,6 +76,9 @@ const Certificate = () => {
     <PDF.PDFViewer
       width='100%'
       height='100%'
+      style={{
+        height: 'calc(100vh - 100px)'
+      }}
       children={
         <PDF.Document style={{ fontFamily: 'Ubuntu' }}>
           <PDF.Page orientation='landscape' style={styles.page}>
