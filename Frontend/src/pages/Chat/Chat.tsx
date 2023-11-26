@@ -2,7 +2,7 @@ import Search from 'antd/es/input/Search'
 import './chat.scss'
 import Conversation from './Conversation'
 import ChatSender from './ChatSender'
-import { Avatar, Button, Input, List, Modal, Space, Tag } from 'antd'
+import { Button, Input, List, Modal, Space, Tag } from 'antd'
 import { PlusOutlined, SendOutlined } from '@ant-design/icons'
 import { useRef, useState, useEffect } from 'react'
 import io from 'socket.io-client'
@@ -14,6 +14,7 @@ import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { useGetAllChatBoxes } from './chat.context'
 import { useAuth } from '~/common/context/useAuth'
 import messageAPI, { ListMessages } from '~/api/message.api'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 const socket = io('http://localhost:8000')
 
@@ -311,7 +312,7 @@ function Chat() {
               renderItem={(item, index) => (
                 <List.Item onClick={() => handleSelectPeople({ name: item.name, userId: item.userId, index: index })}>
                   <List.Item.Meta
-                    avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                    avatar={<UserAvatar name={item.name} />}
                     title={<strong style={{ fontSize: 16 }}>{item.name}</strong>}
                     style={{ alignItems: 'center', padding: '8px' }}
                     className={`people-item`}

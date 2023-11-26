@@ -1,4 +1,5 @@
 import { Avatar } from 'antd'
+import UserAvatar from '../../components/UserAvatar/UserAvatar'
 
 interface IChatSenderProps {
   isSender?: boolean
@@ -10,9 +11,7 @@ function ChatSender({ isSender, name, message }: IChatSenderProps) {
   return (
     <div className={`chat-sender ${isSender ? 'to-right' : 'to-left'}`}>
       <div>
-        <Avatar style={{ backgroundColor: 'orange', verticalAlign: 'middle' }} size='large'>
-          {name}
-        </Avatar>
+        <UserAvatar name={name} size='large' />
       </div>
       <div className='info'>
         <strong>{name}</strong>

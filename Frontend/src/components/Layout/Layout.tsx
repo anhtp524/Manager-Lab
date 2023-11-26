@@ -13,27 +13,27 @@ import userAPI from '~/api/user.api'
 function Layout() {
   let items = [
     {
-      label: 'Home',
+      label: <span>Home</span>,
       key: '/',
       icon: <HomeOutlined />
     },
     {
-      label: 'Labs',
+      label: <span>Laboratories</span>,
       key: '/labs',
       icon: <HeatMapOutlined />
     },
     {
-      label: 'Project',
+      label: <span>Project</span>,
       key: '/project',
       icon: <FolderOutlined />
     },
     {
-      label: 'Chat',
+      label: <span>Chat</span>,
       key: '/chat',
       icon: <WechatOutlined />
     },
     {
-      label: 'Account Management',
+      label: <span>Account management</span>,
       key: '/account',
       icon: <WechatOutlined />
     }

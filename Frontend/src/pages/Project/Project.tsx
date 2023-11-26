@@ -15,6 +15,7 @@ import teacherAPI from '~/api/teacher.api'
 import { ProjectStatus, Role } from '~/routes/util'
 import { toast } from 'react-toastify'
 import { useGetAllProject } from './project.context'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 function Project() {
   const navigate = useNavigate()
@@ -494,7 +495,8 @@ function Project() {
                         onClick={() => handleSelectPeople({ name: item.name, id: item.id, index: index }, true)}
                       >
                         <List.Item.Meta
-                          avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                          // avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                          avatar={<UserAvatar name={item.name} />}
                           title={<strong style={{ fontSize: 16 }}>{item.name}</strong>}
                           style={{ alignItems: 'center', padding: '8px' }}
                           className={`people-item`}
@@ -576,7 +578,8 @@ function Project() {
                         onClick={() => handleSelectPeople({ name: item.name, id: item.id, index: index }, false)}
                       >
                         <List.Item.Meta
-                          avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                          // avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
+                          avatar={<UserAvatar name={item.name} />}
                           title={<strong style={{ fontSize: 16 }}>{item.name}</strong>}
                           style={{ alignItems: 'center', padding: '8px' }}
                           className={`people-item`}
