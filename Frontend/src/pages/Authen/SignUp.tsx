@@ -132,7 +132,7 @@ function SignUp() {
         <img src={Image.logoUat} />
       </div>
       <div className='login-tag'>
-        <Typography.Title>Wellcome back</Typography.Title>
+        <Typography.Title>Welcome back</Typography.Title>
         <Form
           name='normal_login'
           className='login-form'
@@ -194,7 +194,7 @@ function SignUp() {
           </Form.Item>
           <div className='have-account'>
             <Form.Item>
-              <Typography.Text>Don't have an account?</Typography.Text>
+              <Typography.Text style={{marginRight: "5px"}}>Have already an account?</Typography.Text>
               <Link to={RoutePath.Login}>Log In</Link>
             </Form.Item>
           </div>
