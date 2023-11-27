@@ -1,4 +1,4 @@
-import { Avatar } from 'antd'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 export interface IConversationProps {
   name: string
@@ -9,16 +9,12 @@ function Conversation({ name, onClick }: IConversationProps) {
   return (
     <div className='conversation' onClick={onClick}>
       <div className='profile-avatar'>
-        <Avatar style={{ backgroundColor: 'orange', verticalAlign: 'middle' }} size='large' gap={10}>
-          H
-        </Avatar>
+        <UserAvatar name={name} size='large' />
       </div>
       <div className='profile-info'>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
           <strong>{name}</strong>
-          {/* <div style={{ color: 'gray', fontSize: '14px' }}>12:30</div> */}
         </div>
-        {/* <p style={{ color: 'gray' }}>This is the latest message</p> */}
       </div>
     </div>
   )

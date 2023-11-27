@@ -2,19 +2,23 @@ import { UserOutlined } from '@ant-design/icons'
 import { Drawer, Space, Button, Avatar } from 'antd'
 import { DetailStudent } from '~/api/student.api'
 import { DetailTeacher } from '~/api/teacher.api'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 
 export interface IDetailPanelProps {
   open: boolean
   onClose: VoidFunction
   data?: DetailStudent | DetailTeacher
   type: 'student' | 'teacher'
+  isUserProfile: boolean
 }
 
-function DetailPanel({ open, onClose, data, type }: IDetailPanelProps) {
+function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelProps) {
   return (
     <Drawer
       title={
-        type === 'student'
+        isUserProfile
+          ? 'User information'
+          : type === 'student'
           ? 'View student information'
           : type === 'teacher'
           ? 'View teacher information'
@@ -38,7 +42,8 @@ function DetailPanel({ open, onClose, data, type }: IDetailPanelProps) {
     >
       <div style={{ padding: 12 }}>
         <div className='student-avatar'>
-          <Avatar size={120} icon={<UserOutlined />} />
+          {/* <Avatar size={120} icon={<UserOutlined />} /> */}
+          <UserAvatar name={data?.name} size={120} />
           <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', gap: 12 }}>
             <span>{data?.name}</span>
             {type === 'student' && <span>Student Code: {(data as DetailStudent)?.studentCode}</span>}
@@ -63,7 +68,7 @@ function DetailPanel({ open, onClose, data, type }: IDetailPanelProps) {
             <div className='detail-left'>Phone Number</div>
             <div className='detail-right'>{data?.phoneNumber}</div>
           </div>
-          {type === 'teacher' && (
+          {(isUserProfile || type === 'teacher') && (
             <>
               <div className='detail-info'>
                 <div className='detail-left'>Department</div>
