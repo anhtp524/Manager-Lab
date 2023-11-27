@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Button, Drawer, Form, FormInstance, Input, List, Space, Table, Tag, Upload, UploadFile } from 'antd'
+import { Button, Drawer, Form, FormInstance, Input, List, Space, Table, Tag, Upload, UploadFile } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { convertStatusEnumToValue } from '../Labs/components/Projects'
 import './Project.scss'
@@ -218,12 +218,12 @@ function Project() {
             <Button type='primary' onClick={onCreateProject}>
               Create project
             </Button>
-            <Button type='default' disabled>
+            {/* <Button type='default' disabled>
               Edit
             </Button>
             <Button type='default' disabled>
               Delete
-            </Button>
+            </Button> */}
           </Space>
         )}
         <div className='table-project'>

@@ -13,7 +13,7 @@ export enum RoutePath {
   ProfileLecture = '/profile/lecture',
   ProfileStudent = '/profile/student',
   Labs = '/labs',
-  LabDetail = '/labsdetail/:id',
+  LabDetail = '/labs/:id',
   ManagementStudent = '/studentmanagement',
   ManagementProduct = '/productmanagement',
   Personalinfo = '/personalinfo',

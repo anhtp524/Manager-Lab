@@ -17,7 +17,7 @@ const LabsChildren = (props: ILabchildren) => {
   const navigate = useNavigate()
   const handleNavigate = (id: string) => {
     showLoading()
-    navigate(`/labsdetail/${id}`)
+    navigate(`/labs/${id}`)
   }
 
   return (

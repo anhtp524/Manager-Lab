@@ -1,4 +1,3 @@
-import { UserOutlined } from '@ant-design/icons'
 import { Dropdown, MenuProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import './headertop.scss'
@@ -7,10 +6,14 @@ import fetchHandler from '~/api/axios'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import { useAuth } from '~/common/context/useAuth'
 import UserAvatar, { addAlpha, stringToColour } from '../UserAvatar/UserAvatar'
+import { useState } from 'react'
+import DetailPanel from '~/pages/Labs/components/common/DetailPanel'
+import { ProfileUser } from '~/api/user.api'
 const Headertop = () => {
   const navigate = useNavigate()
   const { profileUserInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
+  const [open, setOpen] = useState<boolean>(false)
   const handleClickgotoInfoPage = () => {
     // navigate('/personalinfo');
   }
@@ -29,10 +32,23 @@ const Headertop = () => {
     }
   }
 
+  const onClose = () => {
+    setOpen(false)
+  }
+
+  const handleOpenProfileUser = () => {
+    setOpen(true)
+  }
+
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: 'Đăng xuất',
+      label: 'User profile',
+      onClick: () => handleOpenProfileUser()
+    },
+    {
+      key: '2',
+      label: 'Sign out',
       onClick: () => hanleLogout()
     }
   ]
@@ -41,7 +57,7 @@ const Headertop = () => {
       <div className='hdleft'>
         <div className='img'>
           <img src={Image.logoUat} alt='' />
-          <p className='img-title'>Laboratory Management System</p>
+          <div className='img-title'>Laboratory Management System</div>
         </div>
       </div>
       <Dropdown menu={{ items }} placement='bottomRight' arrow trigger={['click']}>
@@ -50,7 +66,7 @@ const Headertop = () => {
             <span>Welcome,</span>
             <div
               style={{
-                padding: '2px 8px 2px 4px',
+                padding: '4px 8px 4px 4px',
                 background: addAlpha(stringToColour(profileUserInfo?.name)),
                 borderRadius: 18,
                 marginLeft: 8
@@ -62,6 +78,7 @@ const Headertop = () => {
           </div>
         </div>
       </Dropdown>
+      {open && <DetailPanel open={open} onClose={onClose} isUserProfile data={profileUserInfo as ProfileUser} />}
     </div>
   )
 }
