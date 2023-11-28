@@ -59,11 +59,13 @@ function ViewDetailTask(props: IViewDetailTaskProps) {
           <Button onClick={onHideDetailTask} type='default'>
             Back
           </Button>
-          {authInfo?.roles === Role.Student && detailTask?.status !== TaskStatus.Pass && (
-            <Button type='primary' onClick={() => onToggleInnerTask(true)}>
-              View content and response
-            </Button>
-          )}
+          {authInfo?.roles === Role.Student &&
+            detailTask?.status !== TaskStatus.Pass &&
+            new Date(detailTask?.dueDate as string) >= new Date() && (
+              <Button type='primary' onClick={() => onToggleInnerTask(true)}>
+                View content and response
+              </Button>
+            )}
           {authInfo?.roles !== Role.Student && detailTask?.status === TaskStatus.Resolve && (
             <Button type='primary' onClick={() => onToggleFeedbackTask(true)}>
               Mark

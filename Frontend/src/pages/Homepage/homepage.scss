@@ -1,0 +1,45 @@
+.homepage {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+  column-gap: 24px;
+  .left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-left: 20px;
+    .welcome {
+      font-size: 48px;
+      font-weight: 700;
+      .system-name {
+        color: #c72a16;
+      }
+    }
+    .description {
+      font-weight: 600;
+    }
+    .go-to-lab {
+      & > div {
+        padding: 12px;
+        border-radius: 20px;
+        width: 150px;
+        text-align: center;
+        background-color: #2566f1;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    }
+  }
+  .right {
+  }
+}
+
+@media only screen and (min-width: 1280px) {
+  .homepage {
+    display: grid;
+  }
+}

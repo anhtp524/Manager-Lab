@@ -26,7 +26,6 @@ function Project() {
   // const [labProjects, setLabProjects] = useState<ProjectList>([])
   const [showCreate, setShowCreate] = useState<boolean>(false)
   const [fileList, setFileList] = useState<UploadFile[]>([])
-  const [documentId, setDocumentId] = useState<GUID[]>([])
   const [searchStudentLoading, setSearchStudentLoading] = useState<boolean>(false)
   const [studentList, setStudentList] = useState<{ id: GUID; name: string }[]>([])
   const [showListStudent, setShowListStudent] = useState<boolean>(false)
@@ -37,6 +36,7 @@ function Project() {
   const [showListTeacher, setShowListTeacher] = useState<boolean>(false)
   const [selectedTeacher, setSelectedTeacher] = useState<{ name: string; id: GUID; index: number }[]>([])
   const [teachers, setTeachers] = useState<{ name: string; id: GUID; index: number }[]>([])
+  const [responseFileDic, setResponseFileDic] = useState<{ id: GUID; documentName: string }[]>([])
   // const [certInfo, setCertInfo] = useState<{
   //   studentName?: string
   //   labName?: string
@@ -69,10 +69,10 @@ function Project() {
                 )
               }
             },
-            {
-              title: 'Description',
-              dataIndex: 'description'
-            },
+            // {
+            //   title: 'Description',
+            //   dataIndex: 'description'
+            // },
             {
               title: 'Core technology',
               dataIndex: 'coreTech'
@@ -114,10 +114,10 @@ function Project() {
                 )
               }
             },
-            {
-              title: 'Description',
-              dataIndex: 'description'
-            },
+            // {
+            //   title: 'Description',
+            //   dataIndex: 'description'
+            // },
             {
               title: 'Core technology',
               dataIndex: 'coreTech'
@@ -131,12 +131,14 @@ function Project() {
             },
             {
               render: (_, record) => {
-                if (record.status === ProjectStatus.UnConfirm || record.status === ProjectStatus.New) {
+                if (record.status !== ProjectStatus.Finish && record.status !== ProjectStatus.Cancel) {
                   return (
                     <Space>
-                      <Button type='primary' onClick={() => handleStartProject(record.id)}>
-                        Start project
-                      </Button>
+                      {(record.status === ProjectStatus.New || record.status === ProjectStatus.UnConfirm) && (
+                        <Button type='primary' onClick={() => handleStartProject(record.id)}>
+                          Start project
+                        </Button>
+                      )}
                       <Button type='dashed' onClick={() => handleCancelProject({ projectId: record.id })}>
                         Cancel
                       </Button>
@@ -146,7 +148,7 @@ function Project() {
               }
             }
           ],
-    [navigate]
+    [labProjects, getAllProjects]
   )
 
   useEffect(() => {
@@ -239,14 +241,23 @@ function Project() {
 
   const handleSubmit = async (form: FormInstance<Dennis>) => {
     showLoading()
-
+    if (authInfo?.roles !== Role.Student && members && members.length === 0) {
+      toast.error('Project must have at least 1 student')
+      closeLoading()
+      return
+    }
+    if (authInfo?.roles === Role.Student && teachers && teachers.length === 0) {
+      toast.error('Project must have at least 1 teacher')
+      closeLoading()
+      return
+    }
     const requestBody = {
       projectAdd: {
         ...form.getFieldsValue(['name', 'description', 'coreTech'])
       },
       listStudent: members.map((x) => x.id).filter((x) => x !== profileUserInfo?.id),
       listTeacher: teachers.map((x) => x.id),
-      listAttachment: documentId
+      listAttachment: responseFileDic.map((x) => x.id)
     }
     try {
       const response = await projectAPI.createProject(requestBody)
@@ -351,7 +362,6 @@ function Project() {
   const onResetForm = () => {
     form.resetFields()
     setFileList([])
-    setDocumentId([])
     setShowListStudent(false)
     setShowListTeacher(false)
     setSelectedStudent([])
@@ -617,7 +627,7 @@ function Project() {
                     teachers.map((item) => (
                       <div key={item.id} style={{ marginTop: 8 }}>
                         <Tag
-                          color='purple'
+                          color='orange'
                           style={{ fontSize: 14 }}
                           closeIcon
                           onClose={() => handleRemovePeople(item.id, false)}
@@ -652,7 +662,14 @@ function Project() {
                       showLoading()
                       const response = await documentAPI.upload({ folderPath: 'create/project', file: file })
                       if (response && response.data) {
-                        setDocumentId([...documentId, response.data.id])
+                        // setDocumentId([...documentId, response.data.id])
+                        setResponseFileDic((item) => [
+                          ...item,
+                          {
+                            id: response.data.id,
+                            documentName: response.data.documentName
+                          }
+                        ])
                       }
                     } catch (error: Dennis) {
                       console.error(error)
@@ -665,7 +682,11 @@ function Project() {
                     const index = fileList.indexOf(file)
                     const newFileList = fileList.slice()
                     newFileList.splice(index, 1)
+                    // setFileList(newFileList)
+                    let newResponseFileDic = [...responseFileDic]
+                    newResponseFileDic = newResponseFileDic.filter((x) => x.documentName !== file.name)
                     setFileList(newFileList)
+                    setResponseFileDic(newResponseFileDic)
                   }}
                   onChange={({ fileList }) => {
                     setFileList(fileList)
