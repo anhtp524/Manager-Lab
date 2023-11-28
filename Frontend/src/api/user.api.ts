@@ -23,6 +23,6 @@ export type ProfileUser = {
   phoneNumber: string
   email: string
   isApproveToLab: boolean | null
-  lab: { id: GUID } | null
+  lab: { id: GUID; name?: string; description?: string } | null
   userId: GUID
 }

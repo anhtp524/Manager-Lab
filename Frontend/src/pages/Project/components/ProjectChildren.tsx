@@ -4,7 +4,7 @@ import TableTeacherProject from './TableTeacherProject'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
-import taskAPI, { Task, TaskStatus } from '~/api/task.api'
+import taskAPI, { Task } from '~/api/task.api'
 import { ColumnsType } from 'antd/es/table'
 import { convertTaskStatusToValue } from '~/pages/Labs/components/Projects'
 import { FormInstance, useForm } from 'antd/es/form/Form'
@@ -15,7 +15,6 @@ import { ProjectStatus, Role } from '~/routes/util'
 import { useProjectChildrenContext } from './ProjectChildrenContext'
 import projectAPI from '~/api/project.api'
 import ViewDetailTask from './task/ViewDetailTask'
-import * as PDF from '@react-pdf/renderer'
 
 function ProjectChildren() {
   const { id } = useParams()
@@ -240,8 +239,23 @@ function ProjectChildren() {
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
-        <div className='title'>
-          Project: <strong>{detailProject?.name}</strong>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '100%', gap: 12 }}>
+          <div className='title project-info-card'>
+            <div>{detailProject?.name}</div>
+            <div>{detailProject?.description}</div>
+          </div>
+          {detailProject?.status === ProjectStatus.Finish && (
+            <>
+              <div className='project-info-card'>
+                <div>Score</div>
+                <div style={{ fontSize: 40 }}>{detailProject?.score}</div>
+              </div>
+              <div className='project-info-card' style={{ minWidth: 300 }}>
+                <div>Feedback</div>
+                <div>{detailProject?.feedback}</div>
+              </div>
+            </>
+          )}
         </div>
         {authInfo?.roles !== Role.Student && detailProject?.status !== ProjectStatus.Finish && (
           <Button type='primary' danger onClick={() => setShowCloseProjectDialog(true)}>
@@ -249,16 +263,7 @@ function ProjectChildren() {
           </Button>
         )}
       </div>
-      {detailProject?.status === ProjectStatus.Finish && (
-        <>
-          <div className='project-score'>
-            Score: <strong>{detailProject?.score}</strong>
-          </div>
-          <div className='project-feedback'>
-            Feedback: <strong>{detailProject?.feedback}</strong>
-          </div>
-        </>
-      )}
+
       <div className='tab-lab-details'>
         <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>

@@ -1,18 +1,58 @@
-import { UserOutlined } from '@ant-design/icons'
-import { Drawer, Space, Button, Avatar } from 'antd'
+import { Drawer, Space, Button, Modal, Form, Input } from 'antd'
+import { FormInstance, useForm } from 'antd/es/form/Form'
 import { DetailStudent } from '~/api/student.api'
 import { DetailTeacher } from '~/api/teacher.api'
+import { ProfileUser } from '~/api/user.api'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import './style.scss'
+import { useState } from 'react'
+import { useHandlingApi } from '~/common/context/useHandlingApi'
+import fetchHandler from '~/api/axios'
 
 export interface IDetailPanelProps {
   open: boolean
   onClose: VoidFunction
-  data?: DetailStudent | DetailTeacher
-  type: 'student' | 'teacher'
-  isUserProfile: boolean
+  data?: DetailStudent | DetailTeacher | ProfileUser
+  type?: 'student' | 'teacher'
+  isUserProfile?: boolean
 }
 
 function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelProps) {
+  const [form] = useForm()
+  const { showLoading, closeLoading } = useHandlingApi()
+  const [openModal, setOpenModal] = useState<boolean>(false)
+
+  const onChangePassword = () => {
+    setOpenModal(true)
+  }
+
+  const onSubmit = () => {
+    form.submit()
+  }
+
+  const handleSubmit = async (form: FormInstance<Dennis>) => {
+    showLoading()
+    const body = {
+      oldPassword: form.getFieldValue('oldPassword'),
+      newPassword: form.getFieldValue('newPassword')
+    }
+    try {
+      const response = await fetchHandler.post<Dennis>('user/changepassword', body)
+      if (response) {
+        localStorage.clear()
+      }
+    } catch (error: Dennis) {
+      console.error(error)
+    } finally {
+      closeLoading()
+    }
+  }
+
+  const onReset = () => {
+    form.resetFields()
+    setOpenModal(false)
+  }
+
   return (
     <Drawer
       title={
@@ -34,9 +74,14 @@ function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelP
       headerStyle={{ flexDirection: 'row-reverse' }}
       footer={
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-          <Button onClick={onClose} type='primary'>
+          <Button onClick={onClose} type={isUserProfile ? 'default' : 'primary'}>
             Back
           </Button>
+          {isUserProfile && (
+            <Button type='primary' onClick={onChangePassword}>
+              Change password
+            </Button>
+          )}
         </Space>
       }
     >
@@ -68,7 +113,7 @@ function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelP
             <div className='detail-left'>Phone Number</div>
             <div className='detail-right'>{data?.phoneNumber}</div>
           </div>
-          {(isUserProfile || type === 'teacher') && (
+          {isUserProfile && type === 'teacher' && (
             <>
               <div className='detail-info'>
                 <div className='detail-left'>Department</div>
@@ -80,8 +125,69 @@ function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelP
               </div>
             </>
           )}
+          {isUserProfile && (
+            <div className='detail-info'>
+              <div className='detail-left'>Laboratory</div>
+              <div className='detail-right'>{(data as ProfileUser)?.lab?.name}</div>
+            </div>
+          )}
         </div>
       </div>
+      {isUserProfile && (
+        <Modal
+          open={openModal}
+          title='Change password'
+          centered={true}
+          width='500px'
+          onOk={onSubmit}
+          onCancel={onReset}
+          maskClosable={false}
+          destroyOnClose
+        >
+          <div style={{ marginTop: 12 }}>
+            <Form form={form} name='create-task' scrollToFirstError onFinish={() => handleSubmit(form)}>
+              <Form.Item
+                name='oldPassword'
+                rules={[
+                  {
+                    required: true
+                  }
+                ]}
+              >
+                <div className='input-field task-title'>
+                  <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Old password</div>
+                  <Input.Password size='large' />
+                </div>
+              </Form.Item>
+
+              <Form.Item
+                name='newPassword'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter new password'
+                  },
+                  {
+                    validator(_, value, callback) {
+                      console.log(value, callback)
+                      if (!value || value.length >= 6) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject('Password length must be greater than 6.')
+                    }
+                  }
+                ]}
+                validateTrigger='onBlur'
+              >
+                <div className='input-field task-content'>
+                  <div style={{ color: '#1F1F1F', fontWeight: '500' }}>New password</div>
+                  <Input.Password size='large' />
+                </div>
+              </Form.Item>
+            </Form>
+          </div>
+        </Modal>
+      )}
     </Drawer>
   )
 }

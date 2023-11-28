@@ -5,7 +5,6 @@ import ErrorPage from '~/components/ErrorPage/ErrorPage'
 import Layout from '~/components/Layout/Layout'
 import Homepage from '~/pages/Homepage/Homepage'
 import Labs from '~/pages/Labs/Labs'
-import ProfileStudent from '~/pages/ProfileStudent/ProfileStudent'
 import { Role, RoutePath } from './util'
 import AuthenLayout from '~/components/Layout/AuthenLayout'
 import Login from '~/pages/Authen/Login'
@@ -41,14 +40,6 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Lazyloading />}>
             <Labs />
-          </Suspense>
-        )
-      },
-      {
-        path: RoutePath.ContestSprizes,
-        element: (
-          <Suspense fallback={<Lazyloading />}>
-            <ProfileStudent />
           </Suspense>
         )
       },
