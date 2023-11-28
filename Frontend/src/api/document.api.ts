@@ -13,8 +13,11 @@ const documentAPI = {
   download: (id: GUID) => {
     return downloadHandler.get<Dennis>(DOWNLOAD_DOCUMENT + '/' + id)
   },
-  byRegarding: (body: { regarding: GUID; folderPath: 'create/project' | 'create/task' | 'response/task' }) => {
-    return fetchHandler.post<UploadDocumentResponse[]>(BY_REGARDING, body)
+  byRegarding: (
+    body: { regarding: GUID; folderPath: 'create/project' | 'create/task' | 'response/task' },
+    abortSignal?: IAbortSignal
+  ) => {
+    return fetchHandler.post<UploadDocumentResponse[]>(BY_REGARDING, body, { ...abortSignal })
   }
 }
 

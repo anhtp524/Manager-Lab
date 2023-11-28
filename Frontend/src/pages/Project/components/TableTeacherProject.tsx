@@ -15,7 +15,7 @@ function TableTeacherProject({ data }: TableTeacherProjectProps) {
   ]
   return (
     <div>
-      <Table columns={columnsTeacherProject} dataSource={data} />
+      <Table columns={columnsTeacherProject} dataSource={data} pagination={false} />
     </div>
   )
 }

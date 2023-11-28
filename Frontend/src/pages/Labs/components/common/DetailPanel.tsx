@@ -8,6 +8,7 @@ import './style.scss'
 import { useState } from 'react'
 import { useHandlingApi } from '~/common/context/useHandlingApi'
 import fetchHandler from '~/api/axios'
+import { useNavigate } from 'react-router-dom'
 
 export interface IDetailPanelProps {
   open: boolean
@@ -21,6 +22,7 @@ function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelP
   const [form] = useForm()
   const { showLoading, closeLoading } = useHandlingApi()
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const navigate = useNavigate()
 
   const onChangePassword = () => {
     setOpenModal(true)
@@ -40,6 +42,12 @@ function DetailPanel({ open, onClose, data, type, isUserProfile }: IDetailPanelP
       const response = await fetchHandler.post<Dennis>('user/changepassword', body)
       if (response) {
         localStorage.clear()
+        setOpenModal(false)
+        Modal.success({
+          title: 'Successful!',
+          content: 'You need to sign in again.',
+          onOk: () => navigate('/auth/login', { replace: true })
+        })
       }
     } catch (error: Dennis) {
       console.error(error)

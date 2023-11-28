@@ -15,13 +15,17 @@ import { ProjectStatus, Role } from '~/routes/util'
 import { useProjectChildrenContext } from './ProjectChildrenContext'
 import projectAPI from '~/api/project.api'
 import ViewDetailTask from './task/ViewDetailTask'
+import { convertStatusEnumToValue } from '~/pages/Labs/components/PendingApproved'
+import { DownloadOutlined } from '@ant-design/icons'
+import moment from 'moment'
 
 function ProjectChildren() {
   const { id } = useParams()
   const [form] = useForm()
   const { authInfo } = useAuth()
   const { showLoading, closeLoading } = useHandlingApi()
-  const { detailProject, taskList, getDetailProjectAndTasks, abortController } = useProjectChildrenContext()
+  const { detailProject, taskList, getDetailProjectAndTasks, abortController, projectDocs } =
+    useProjectChildrenContext()
   // const [detailProject, setDetailProject] = useState<DetailProject | undefined>(undefined)
   // const [taskList, setTaskList] = useState<ListTask>([])
   const [showCreate, setShowCreate] = useState<boolean>(false)
@@ -87,6 +91,15 @@ function ProjectChildren() {
         render: (status) => {
           return convertTaskStatusToValue(status)
         }
+      },
+      {
+        title: 'Due date',
+        dataIndex: 'dueDate',
+        render: (dueDate) => (
+          <div>
+            Due date: <span style={{ color: 'red' }}>{dueDate}</span>
+          </div>
+        )
       }
     ],
     []
@@ -239,35 +252,53 @@ function ProjectChildren() {
   return (
     <div className='project-children'>
       <div className='project-children-content-top'>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', width: '100%', gap: 12 }}>
-          <div className='title project-info-card'>
-            <div>{detailProject?.name}</div>
-            <div>{detailProject?.description}</div>
+        <div
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', gap: 12 }}
+        >
+          <div className='title'>
+            <div style={{ fontSize: 40 }}>
+              {detailProject?.name} <div>{convertStatusEnumToValue(detailProject?.status as ProjectStatus)}</div>
+            </div>
+            <div></div>
+            <div style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>Description</div>
+            <div style={{ fontSize: 14, marginTop: 12, color: '#172b4d' }}>{detailProject?.description}</div>
           </div>
           {detailProject?.status === ProjectStatus.Finish && (
-            <>
-              <div className='project-info-card'>
-                <div>Score</div>
-                <div style={{ fontSize: 40 }}>{detailProject?.score}</div>
-              </div>
-              <div className='project-info-card' style={{ minWidth: 300 }}>
-                <div>Feedback</div>
-                <div>{detailProject?.feedback}</div>
-              </div>
-            </>
+            <div className='project-info-card'>
+              <div>Score</div>
+              <div style={{ fontSize: 40, fontWeight: 600, color: '#ed2525' }}>{detailProject?.score}</div>
+            </div>
           )}
         </div>
-        {authInfo?.roles !== Role.Student && detailProject?.status !== ProjectStatus.Finish && (
+        {authInfo?.roles !== Role.Student && detailProject?.status === ProjectStatus.OnGoing && (
           <Button type='primary' danger onClick={() => setShowCloseProjectDialog(true)}>
             Close project
           </Button>
         )}
       </div>
+      {detailProject?.status === ProjectStatus.Finish && (
+        <div className='project-info-card' style={{ minWidth: 300 }}>
+          <div style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>Feedback</div>
+          <div style={{ fontSize: 14, marginTop: 12 }}>{detailProject?.feedback}</div>
+        </div>
+      )}
+
+      {projectDocs &&
+        projectDocs.length > 0 &&
+        projectDocs.map((item) => (
+          <div className='detail-content' key={item.id}>
+            <div style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>Attachments</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: 14, marginTop: 12 }}>{item?.documentName}</div>
+              <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>
+            </div>
+          </div>
+        ))}
 
       <div className='tab-lab-details'>
         <Collapse items={items} defaultActiveKey={['1']} bordered={true} collapsible='icon' />
         <div style={{ marginTop: 24 }}>
-          <p>List tasks</p>
+          <p style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>List tasks</p>
           {authInfo?.roles !== Role.Student &&
             (detailProject?.status === ProjectStatus.New || detailProject?.status === ProjectStatus.OnGoing) && (
               <Space size='small' direction='vertical' style={{ marginBottom: 12 }}>
@@ -355,7 +386,12 @@ function ProjectChildren() {
           >
             <div className='input-field task-due-date'>
               <div style={{ color: '#1F1F1F', fontWeight: '500' }}>Due date</div>
-              <DatePicker onChange={(_, dateString) => form.setFieldValue('dueDate', dateString)} />
+              <DatePicker
+                onChange={(_, dateString) => form.setFieldValue('dueDate', dateString)}
+                disabledDate={(current) => {
+                  return moment() > current
+                }}
+              />
             </div>
           </Form.Item>
 

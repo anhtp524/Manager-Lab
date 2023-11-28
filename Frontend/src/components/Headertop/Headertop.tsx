@@ -53,7 +53,7 @@ const Headertop = () => {
     }
   ]
   return (
-    <div className='headertop'>
+    <div className='headertop' style={{ marginBottom: '5px' }}>
       <div className='hdleft'>
         <div className='img'>
           <img src={Image.logoUat} alt='' />

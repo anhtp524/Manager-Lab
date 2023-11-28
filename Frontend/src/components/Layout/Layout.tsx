@@ -98,7 +98,8 @@ function Layout() {
         <div className='ctleft'>
           <Menu
             style={{
-              backgroundColor: '#0E2554',
+              backgroundColor: '#0e2554',
+              // backgroundImage: 'linear-gradient(to top, #deeafd, #e8effe, #f2f4fe, #f9f9fe, #ffffff)',
               height: '100%',
               color: 'white'
               // marginTop: '51px'
