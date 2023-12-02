@@ -63,37 +63,94 @@ const LabDetail = () => {
           ),
         children: (
           <div>
+            <p>{labDetail?.description}</p>
             <div className='profile'>
-              <div className='profileuser'>
-                <img src='https://sep.hust.edu.vn/wp-content/uploads/002.065.00001.jpg' alt='' />
+              {/* <div className='profileuser'>
                 <p>{labDetail?.teacher.name}</p>
               </div>
               <div className='profilefuntion'>
                 <div>
-                  <span>CHỨC NĂNG/NHIỆM VỤ:</span>
-                  <ul>
-                    <li>Nghiên cứu các hệ vật liệu cấu trúc nano ứng dụng trong y-sinh-nông-môi trường</li>
-                    <li>Phát triển và tối ưu các quy trình công nghệ trong lĩnh vực nghiên cứu</li>
-                  </ul>
+                  <span>Description: </span>
+                  <div>{labDetail?.description}</div>
                 </div>
-                <div>
-                  <span>HƯỚNG NGHIÊN CỨU CHÍNH:</span>
-                  <ul>
-                    <li>Nghiên cứu các hệ vật liệu cấu trúc nano ứng dụng trong y-sinh-nông-môi trường</li>
-                    <li>Phát triển và tối ưu các quy trình công nghệ trong lĩnh vực nghiên cứu</li>
-                  </ul>
-                </div>
-                <div className='contact'>
-                  <div>
-                    <GoogleOutlined />
-                    o0othanh2k1@gmail.com
-                  </div>
-                  <div>
-                    <PhoneOutlined />
-                    0335138003
-                  </div>
-                </div>
-              </div>
+              </div> */}
+              <table style={{ width: '100%' }}>
+                <tbody>
+                  <tr>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Lab leader</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.name}</span>
+                      </div>
+                    </td>
+                    <td></td>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Date of birth</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.dateOfBirth}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody>
+                  <tr>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Phonenumber</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.phoneNumber}</span>
+                      </div>
+                    </td>
+                    <td></td>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Department</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.department}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody>
+                  <tr>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Email</span>
+                      </div>
+                    </td>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.email}</span>
+                      </div>
+                    </td>
+                    <td style={{ width: '4%' }}></td>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-title'>
+                        <span className='basic-info-span'>Major</span>
+                      </div>
+                    </td>
+                    <td style={{ width: '23%' }}>
+                      <div className='basic-info-content'>
+                        <span className='basic-info-span'>{labDetail?.teacher.department}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         )

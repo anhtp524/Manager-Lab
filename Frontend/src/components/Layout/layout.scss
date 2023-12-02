@@ -40,9 +40,9 @@
         .profile {
           margin-top: 10px;
           display: flex;
-          background-color: rgb(238, 244, 255);
-          justify-content: space-between;
-          padding: 20px 30px;
+          // background-color: rgb(238, 244, 255);
+          // justify-content: space-between;
+          // padding: 20px 30px;
           .profileuser {
             height: 100px;
             width: 100px;
@@ -64,4 +64,14 @@
       }
     }
   }
+}
+
+.basic-info-title {
+  font-weight: 600;
+  background-color: #f7f7f7;
+  padding: 8px 12px;
+  margin-right: 12px;
+}
+
+.basic-info-content {
 }
