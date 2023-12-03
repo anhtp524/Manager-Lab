@@ -22,7 +22,7 @@ function ForgotPassword() {
     const email = form.getFieldValue('email')
     try {
       showLoading()
-      const res = await fetchHandler.post<Dennis>('/user/forgetpassword', email)
+      const res = await fetchHandler.post<Dennis>('/user/forgetpassword', {email: email})
 
       if (res && res.data) {
         toast.info('Please check your email inbox!')

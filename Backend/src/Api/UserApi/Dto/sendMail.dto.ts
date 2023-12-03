@@ -2,9 +2,6 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class SendMailDto {
     @ApiProperty()
-    to: string;
-    @ApiProperty()
-    subject: string;
-    @ApiProperty()
-    text: string;
+    email: string;
+
 }

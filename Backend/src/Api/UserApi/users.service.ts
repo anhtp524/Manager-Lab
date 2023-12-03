@@ -81,7 +81,7 @@ export class UsersService {
 
   async findUserByEmail(email: string) {
     const userModel = await this.usersRepository.findOneBy({ email: email });
-    if (!userModel) throw new UnauthorizedException('Error when find user');
+    if (!userModel) throw new BadRequestException('Error when find user');
     return userModel;
   }
 
@@ -154,8 +154,8 @@ export class UsersService {
     return listUser;
   }
 
-  async forgetPassword(userId: string) {
-    var userModel = await this.findOne(userId);
+  async forgetPassword(email: string) {
+    var userModel = await this.findUserByEmail(email);
     var newPass = randomPassword(6);
     console.log(newPass);
     try {

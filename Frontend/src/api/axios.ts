@@ -47,7 +47,7 @@ fetchHandler.interceptors.response.use(
         break
       case HttpStatusCode.BadRequest:
         Modal.error({
-          title: '400 Bad Request'
+          title: error.response?.data?.message ?? "404 Bad Request",
         })
         break
       default:

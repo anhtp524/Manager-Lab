@@ -71,13 +71,10 @@ export class UsersController {
     return result;
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @ApiBody({type: SendMailDto})
   @Post('forgetpassword')
-  async forgetPassword(@Req() req) {
-    const { userId, role } = req.user;
-
-    const res = await this.userService.forgetPassword(userId);
+  async forgetPassword(@Body() email: SendMailDto) {
+    const res = await this.userService.forgetPassword(email.email);
     return res;
   }
 
