@@ -30,12 +30,11 @@ const LabsChildren = (props: ILabchildren) => {
             src='https://cms.luatvietnam.vn/uploaded/Images/Original/2019/06/13/nghien-cuu-khoa-hoc_1306163907.jpg'
           />
         }
-        actions={[<FundViewOutlined onClick={() => handleNavigate(data.id)} />, <EllipsisOutlined key='ellipsis' />]}
+        actions={[<div onClick={() => handleNavigate(data.id)} style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8}}><FundViewOutlined  /> View</div>]}
       >
         <Meta
-          avatar={<Avatar src='https://dongphucgiadinh.com/wp-content/uploads/2022/09/logo-dai-hoc-bach-khoa.png' />}
+          avatar={<Avatar src='https://th.bing.com/th/id/R.96bc0fa883a40155afe8a468c6b5eb9e?rik=F7YmHfEQIx0osg&pid=ImgRaw&r=0' />}
           title={data.name}
-          description={data.description}
         />
       </Card>
       {authInfo?.roles === Role.Student &&

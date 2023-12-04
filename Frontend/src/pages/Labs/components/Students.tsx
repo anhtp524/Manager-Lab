@@ -221,7 +221,7 @@ function Students({ data }: { data?: ListStudent }) {
   }
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered />
+      <Table columns={columns} dataSource={data} bordered />
       <DetailPanel open={open} onClose={onClose} data={studentDetail} type='student' />
     </div>
   )

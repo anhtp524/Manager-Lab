@@ -311,7 +311,7 @@ function Project() {
           } else {
             setStudentList(
               response.data.map((x) => {
-                return { id: x.id, name: x.name }
+                return { id: x.id, name: x.name + `(${x.email})` }
               })
             )
           }
@@ -329,7 +329,7 @@ function Project() {
           } else {
             setTeacherList(
               response.data.map((x) => {
-                return { id: x.id, name: x.name }
+                return { id: x.id, name: x.name + `(${x.email})` }
               })
             )
           }

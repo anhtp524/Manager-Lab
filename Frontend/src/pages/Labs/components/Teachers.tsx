@@ -204,7 +204,7 @@ function Teachers({ labDetail, data }: { labDetail?: Lab; data?: ListTeacher }) 
 
   return (
     <div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} bordered />
+      <Table columns={columns} dataSource={data} bordered />
       <DetailPanel open={open} onClose={onClose} data={teacherDetail} type='teacher' />
     </div>
   )

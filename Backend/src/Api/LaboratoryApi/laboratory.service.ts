@@ -39,7 +39,7 @@ export class LabboratoryService {
         id: id
       }
     });
-    const checkLabHead = userId === detailLabModel.teacher.id;
+    const checkLabHead = detailLabModel.teacher !== null ? userId === detailLabModel.teacher.id : false;
     return {
       ...detailLabModel,
       isLabHead: checkLabHead
