@@ -11,6 +11,10 @@ function TableTeacherProject({ data }: TableTeacherProjectProps) {
     {
       title: 'Name',
       dataIndex: 'name'
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email'
     }
   ]
   return (

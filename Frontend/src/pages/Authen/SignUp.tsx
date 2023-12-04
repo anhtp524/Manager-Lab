@@ -62,7 +62,7 @@ function SignUp() {
           <DatePicker placeholder='Date of Birth' />
         </Form.Item>
         <Form.Item name={'department'}>
-          <Input placeholder='department' />
+          <Input placeholder='Department' />
         </Form.Item>
         <Form.Item name={'major'}>
           <Input placeholder='Major' />

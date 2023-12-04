@@ -282,12 +282,11 @@ function ProjectChildren() {
           <div style={{ fontSize: 14, marginTop: 12 }}>{detailProject?.feedback}</div>
         </div>
       )}
-
+      <div style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>Attachments</div>
       {projectDocs &&
         projectDocs.length > 0 &&
         projectDocs.map((item) => (
           <div className='detail-content' key={item.id}>
-            <div style={{ fontWeight: 600, color: '#498dff', marginTop: 12 }}>Attachments</div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 14, marginTop: 12 }}>{item?.documentName}</div>
               <Button icon={<DownloadOutlined />} onClick={() => handleDownloadFile(item.id)}></Button>

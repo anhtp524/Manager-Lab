@@ -64,7 +64,8 @@ export class UsersService {
       try {
         await this.studentRepository.save(studentModel);
       } catch (error) {
-        throw new BadRequestException(error.message);
+        await this.usersRepository.delete({id: userModel.id});
+        throw new BadRequestException("Error when create student");
       }
     } else if (newuser.role === Role.Teacher) {
       var teacherModel = this.teacherRepository.create(newuser.teacherAdd);
@@ -73,7 +74,8 @@ export class UsersService {
       try {
         await this.teacherRepository.save(teacherModel);
       } catch (ex) {
-        throw new BadRequestException(ex.message);
+        await this.usersRepository.delete({id: userModel.id});
+        throw new BadRequestException("Error when create teacher");
       }
     }
     return 1;

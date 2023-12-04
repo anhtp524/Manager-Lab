@@ -663,13 +663,16 @@ function Project() {
                       const response = await documentAPI.upload({ folderPath: 'create/project', file: file })
                       if (response && response.data) {
                         // setDocumentId([...documentId, response.data.id])
-                        setResponseFileDic((item) => [
+                        setResponseFileDic((item) => {
+                          if(item.length < 2) return [
                           ...item,
                           {
                             id: response.data.id,
                             documentName: response.data.documentName
                           }
-                        ])
+                        ]
+                        else return item  
+                      })
                       }
                     } catch (error: Dennis) {
                       console.error(error)

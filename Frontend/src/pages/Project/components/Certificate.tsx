@@ -55,7 +55,8 @@ const Certificate = () => {
               studentName: response.data.student.studentName,
               labName: response.data.labName,
               score: response.data.project.score,
-              finishDate: response.data.project.finishDate
+              finishDate: response.data.project.finishDate,
+              feedback: response.data.project.feedback
             }
           })
         }
