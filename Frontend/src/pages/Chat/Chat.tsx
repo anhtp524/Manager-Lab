@@ -217,8 +217,8 @@ function Chat() {
   return (
     <div className='chat-container'>
       <div className='chat-list'>
-        <div className='search'>
-          <Search
+        <div className='search' style={{ textAlign: 'center' }}>
+          {/* <Search
             placeholder='Search for messages'
             allowClear
             // enterButton='Search'
@@ -229,7 +229,10 @@ function Chat() {
                 <PlusOutlined />
               </div>
             }
-          />
+          /> */}
+          <Button type='default' onClick={() => setOpen(true)}>
+            Create chat
+          </Button>
         </div>
         <div className='message-list'>
           {chatBoxes && chatBoxes.length > 0 ? (
